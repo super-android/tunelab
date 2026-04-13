@@ -1,6 +1,6 @@
 # TuneLab Privacy Policy
 
-**Last Updated:** April 10, 2026
+**Last Updated:** April 13, 2026
 **App Version:** 1.0.0 and above
 
 ---
@@ -81,7 +81,7 @@ If this policy is materially updated, we will revise the "Last Updated" date at 
 
 For questions regarding this policy or the technical architecture of the App:
 
-- **GitHub Issues:** https://github.com/YOUR_GITHUB/tunelab/issues
+- **GitHub Issues:** https://github.com/super-android/tunelab/issues
 - **Support Email:** tunelab.dev@gmail.com
 
 *TuneLab is an independent app and is not affiliated with Xbox Game Studios, Turn 10 Studios, or Playground Games. Forza Horizon™ is a registered trademark of Microsoft Corporation.*
