@@ -1776,6 +1776,7 @@ export default function ForzaTuner(){
             {tuneGenerated&&!loading&&<div style={{marginTop:10,display:"flex",gap:8}}>
               <button onClick={()=>setShowQA(true)} style={{flex:1,padding:"10px",background:MD3.surfaceC1,border:`1px solid ${MD3.outline}`,borderRadius:12,color:MD3.onSurface,fontFamily:"Roboto,sans-serif",fontSize:12,fontWeight:600,cursor:"pointer"}}>🎛 Adjust Values</button>
             </div>}
+            {tuneGenerated&&!loading&&<TuneRating tuneId={tuneId} saveId={null}/>}
             {tuneGenerated&&!hasAI&&!loading&&<div style={{marginTop:12,background:MD3.surfaceC1,border:`1px solid ${MD3.outline}`,borderRadius:12,padding:"12px 14px",display:"flex",gap:10,alignItems:"center"}}>
               <span style={{fontSize:20}}>✦</span>
               <div style={{flex:1}}><div style={{fontFamily:"Roboto,sans-serif",fontSize:12,fontWeight:700,color:MD3.onSurface,marginBottom:2}}>Add free AI analysis</div><div style={{fontFamily:"Roboto,sans-serif",fontSize:11,color:MD3.onSurfaceVar}}>Connect Gemini (free) for car-specific notes and smarter wizard diagnoses.</div></div>

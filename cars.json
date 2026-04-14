@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "_note": "Update this file when FH6 launches. App fetches automatically. No Play Store update needed.",
+  "_updated": "2026-04-10",
+  "carDb": {
+    "Nissan": [
+      "GT-R Premium '17",
+      "GT-R Black Edition '12",
+      "Silvia S15 '02",
+      "Skyline GT-R R32 '89",
+      "Skyline GT-R R34 '99",
+      "370Z '09",
+      "Z '23"
+    ]
+  },
+  "carKnowledge": {
+    "GT-R Premium '17": {
+      "drive": "AWD",
+      "asp": "twin",
+      "char": "torquey",
+      "w": 3858,
+      "hp": 565,
+      "tq": 467,
+      "spd": 196,
+      "rpm": 6800,
+      "g": 6
+    },
+    "GT-R Black Edition '12": {
+      "drive": "AWD",
+      "asp": "twin",
+      "char": "torquey",
+      "w": 3836,
+      "hp": 545,
+      "tq": 463,
+      "spd": 193,
+      "rpm": 6800,
+      "g": 6
+    },
+    "Silvia S15 '02": {
+      "drive": "RWD",
+      "asp": "turbo",
+      "char": "torquey",
+      "w": 2734,
+      "hp": 247,
+      "tq": 224,
+      "spd": 149,
+      "rpm": 6800,
+      "g": 6
+    },
+    "Skyline GT-R R32 '89": {
+      "drive": "AWD",
+      "asp": "twin",
+      "char": "torquey",
+      "w": 3042,
+      "hp": 276,
+      "tq": 266,
+      "spd": 156,
+      "rpm": 7000,
+      "g": 5
+    },
+    "Skyline GT-R R34 '99": {
+      "drive": "AWD",
+      "asp": "twin",
+      "char": "torquey",
+      "w": 3107,
+      "hp": 276,
+      "tq": 289,
+      "spd": 156,
+      "rpm": 6800,
+      "g": 6
+    },
+    "370Z '09": {
+      "drive": "RWD",
+      "asp": "na",
+      "char": "balanced",
+      "w": 3232,
+      "hp": 332,
+      "tq": 270,
+      "spd": 155,
+      "rpm": 7500,
+      "g": 7
+    },
+    "Z '23": {
+      "drive": "RWD",
+      "asp": "twin",
+      "char": "balanced",
+      "w": 3306,
+      "hp": 400,
+      "tq": 350,
+      "spd": 155,
+      "rpm": 6400,
+      "g": 9
+    }
+  }
+}
