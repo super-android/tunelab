@@ -3,6 +3,10 @@
 **Free, open-source, AI-assisted tuning calculator for Forza Horizon 6.**  
 No ads. No subscriptions. No paywall. Your API key, your quota.
 
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://play.google.com/store)
+[![Version](https://img.shields.io/badge/version-1.3.6-orange.svg)](https://github.com/super-android/tunelab/releases)
+
 ---
 
 ## What it does
@@ -15,10 +19,19 @@ Connect your own free Gemini API key and every tune gets enhanced with per-value
 
 ---
 
+## D mode vs S mode
+
+| Feature | D Mode — Quick | S Mode — Advanced |
+|---|---|---|
+| Input effort | Low — car + tune type | Full specs — RPM, gearing, tires |
+| Gearing math | Baseline geometric | Precise RPM-based ratios |
+| Best for | Casual / first tune | Rivals, meta builds, time attack |
+| Time to tune | ~10 seconds | ~2 minutes |
+
+---
+
 ## Features
 
-- **D mode** — pick car + tune type → instant tune, no data entry needed
-- **S mode** — full RPM, gearing, tire size, and aero math for precise results
 - **8 tune modes** — Race, Touge, Wangan, Drift, Drag, Rally, Rain, General
 - **PI-scaled physics** — springs, damping, and caster scale correctly from D-class to X-class
 - **AI Enhance** — per-value notes and overall assessment via Gemini 2.5 Flash (BYOK)
@@ -26,7 +39,7 @@ Connect your own free Gemini API key and every tune gets enhanced with per-value
 - **Feel Adjuster** — real-time stable ↔ tail-happy and planted ↔ aggressive sliders
 - **Save / Load / Share** — up to 20 saved tunes, native Android share sheet
 - **Manual Copy fallback** — copy the AI prompt, paste Gemini's response back when quota is limited
-- **FH6-aware** — damping multiplier, compound defaults, and ride height tuned for FH6 physics
+- **FH6-aware** — damping multiplier, compound auto-defaults, and ride height tuned for FH6 physics
 
 ---
 
@@ -36,20 +49,27 @@ Spring rates use the natural frequency method: `K = M × (2πf)²` where base fr
 
 Damping uses critical damping ratio: `C = 2√(KM)` with a 1.15× FH6 planted physics multiplier applied to rebound and bump.
 
-All physics constants live in a single `PHYSICS` block at the top of the source file and will be updated post-FH6-launch based on in-game telemetry data.
+All physics constants live in a single `PHYSICS` block at the top of `src/App.jsx` and will be updated post-FH6-launch based on in-game telemetry data.
+
+### UDP Telemetry (coming soon)
+
+Planning to add a `/telemetry` folder with a Python listener for FH6's Data Out (UDP) feature to validate physics constants in real-time. If you're a dev interested in helping build this out, hit us up in [Discord](https://discord.gg/N4HfuWEXaN) or open an issue.
 
 ---
 
 ## AI setup (optional)
 
-TuneLab uses a **BYOK (bring your own key)** model. Your key is stored only on your device and never sent to TuneLab servers.
+TuneLab uses a **BYOK (bring your own key)** model. Your key is stored only on your device and is never transmitted to TuneLab servers.
 
 1. Go to [aistudio.google.com](https://aistudio.google.com/app/apikey)
 2. Create a free API key
-3. **Important:** make sure your project has no `$0.00` spending cap — this silently blocks all requests. Remove it or set it to $1–2. At ~$0.0001 per tune you will not be charged noticeably.
+3. **Remove any `$0.00` spending cap** — this silently blocks all requests. Set it to $1–2 or remove it entirely. At ~$0.0001 per tune you will not be charged noticeably.
 4. Open TuneLab → ✦ button → AI Provider → paste your key → Test & Save
 
-**🔐 Keep your API key private.** Never share it or screenshot it. Anyone with your key can use your quota.
+> **🔐 SECURITY: Keep your API key private.**  
+> Never share it, screenshot it, or include it in screen recordings.  
+> The AI Settings screen shows your key — anyone who sees it can use your quota.  
+> TuneLab stores it only on this device. We never see it.
 
 Free tier: 1,500 requests/day on Gemini 2.5 Flash.
 
@@ -70,45 +90,42 @@ npm run build && npx cap sync android
 
 Then open `android/` in Android Studio and run on device.
 
-**Stack:** React + Vite → Capacitor 7 → Android APK
-
+**Stack:** React + Vite → Capacitor 7 → Android APK  
 **Requirements:** Node 18+, Android Studio, Java 17+
 
 ---
 
 ## Android config notes
 
-Network security config is required for API calls. Make sure `android/app/src/main/res/xml/network_security_config.xml` exists and is referenced in `AndroidManifest.xml`:
+Network security config is required for API calls. `android/app/src/main/res/xml/network_security_config.xml` must exist and be referenced in `AndroidManifest.xml`:
 
 ```xml
 android:networkSecurityConfig="@xml/network_security_config"
+android:forceDarkAllowed="false"
 ```
 
 The config whitelists: `generativelanguage.googleapis.com`, `api.anthropic.com`, `api.openai.com`, `api.x.ai`
 
-Also add to `<application>` in `AndroidManifest.xml` to prevent Samsung WebView dark mode conflicts:
-
-```xml
-android:forceDarkAllowed="false"
-```
+> ⚠️ **Keystore:** Never commit `tunelab.keystore` to this repo. It should be in `.gitignore`. Back it up offline — losing it means you can never push an update to the Play Store.
 
 ---
 
 ## Contributing
 
 Community contributions welcome — especially:
-- Car database entries (make, model, drivetrain, weight, front weight %)
-- FH6 physics validation (do the spring rates feel right in-game?)
-- Tune mode calibration per car class
 
-Join the [Discord](https://discord.gg/N4HfuWEXaN) to share tunes and report issues, or open a GitHub issue.
+- **Car database** — make, model, drivetrain, weight, front weight % for FH6 cars
+- **Physics validation** — do the spring rates feel right in-game? Report in Discord
+- **Tune mode calibration** — per car class feedback after FH6 launches
+
+Join the [Discord](https://discord.gg/N4HfuWEXaN) or open a GitHub issue.
 
 ---
 
 ## Roadmap
 
 - [ ] FH6 launch day — car database from community data
-- [ ] Post-launch physics validation via UDP telemetry
+- [ ] Post-launch physics validation via UDP telemetry  
 - [ ] Car height data for ARB roll moment calculation
 - [ ] Grok and OpenAI provider support (framework ready, marked Coming Soon)
 - [ ] Kotlin v2 — proper haptics, system font scaling, reliable theming
@@ -117,7 +134,7 @@ Join the [Discord](https://discord.gg/N4HfuWEXaN) to share tunes and report issu
 
 ## Credits
 
-- **Kireth** ([youtube.com/@Kireth](https://youtube.com/@Kireth)) — FH6 early access physics feedback
+- **[Kireth](https://youtube.com/@Kireth)** — FH6 early access physics feedback
 - Physics constants partially derived from ForzaTune Pro decompiled source (math formulas are not copyrightable)
 
 ---
