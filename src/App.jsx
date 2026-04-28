@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Component } from "react";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
-const VERSION       = "1.4.3";
+const VERSION       = "1.4.7";
 const PLAY_STORE    = null; // Set to Play Store URL when published
 const KOFI_URL      = "https://ko-fi.com/tunelabs";
 const DISCORD_URL   = "https://discord.gg/N4HfuWEXaN";
@@ -628,7 +628,7 @@ function mergeEnhancement(tune, enhanced) {
   TUNE_PAGES.forEach(pg=>{
     if(!tune[pg]) return;
     merged[pg] = {
-      values: tune[pg].values.map(r=>({
+      values: (tune[pg].values||[]).map(r=>({
         ...r,
         // Match "Section/Key" format exactly
         note: enhanced.notes?.[`${pg}/${r.key}`]
@@ -1169,6 +1169,22 @@ function EnhancingBar({color, icon, label}) {
   );
 }
 
+class OutputErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = {error:null}; }
+  static getDerivedStateFromError(e) { return {error:e.message||"Unknown error"}; }
+  componentDidCatch(e, info) { console.error("TuneLab OutputScreen error:", e.message, info.componentStack?.slice(0,200)); }
+  render() {
+    if (this.state.error) return (
+      <div style={{minHeight:"100vh",background:"#0a0c0f",color:"#eaf2f7",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,gap:16}}>
+        <div style={{fontSize:32}}>⚠</div>
+        <div style={{fontFamily:"monospace",fontSize:13,color:"#ff4d4d",textAlign:"center",lineHeight:1.6}}>{this.state.error}</div>
+        <button onClick={this.props.onBack} style={{marginTop:8,padding:"10px 24px",background:"transparent",border:"1px solid #00ff85",borderRadius:6,color:"#00ff85",fontFamily:"monospace",fontSize:12,cursor:"pointer"}}>← Back</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
 function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
   const [tunePage,    setTunePage]    = useState("Tires");
   const [toast,       setToast]       = useState(null);
@@ -1208,12 +1224,12 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
         merged[pg] = {
           ...newTune[pg],
           // Preserve AI notes on each value row
-          values: (newTune[pg].values||[]).map((row, i) => ({
+          values: (newTune[pg]?.values||[]).map((row, i) => ({
             ...row,
             note: prev[pg]?.values?.[i]?.note || row.note,
           })),
           // Preserve AI tip if present
-          tip: prev[pg]?.tip || newTune[pg].tip,
+          tip: prev[pg]?.tip || newTune[pg]?.tip,
         };
       });
       return merged;
@@ -1241,8 +1257,8 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
         const ai = enhanced[pg];
         if(!ai) return;
         merged[pg] = {
-          values: tunePages[pg].values.map((r,i)=>({...r, note: ai?.values?.[i]?.note||r.note})),
-          tip: ai?.tip || tunePages[pg].tip,
+          values: (tunePages[pg]?.values||[]).map((r,i)=>({...r, note: ai?.values?.[i]?.note||r.note})),
+          tip: ai?.tip || tunePages[pg]?.tip,
         };
       });
       if(Object.keys(merged).length===0) throw new Error("Couldn't match any tune sections — try again");
@@ -1765,7 +1781,10 @@ export default function ForzaTuner() {
       setTunePages(tune);
       setGenerated(true);
       setScreen("output");
-    } catch(e) { setToast("Error generating tune"); }
+    } catch(e) {
+      console.log("Generate error:", e.message);
+      setToast("Error: " + e.message);
+    }
     setLoading(false);
   };
 
@@ -1814,14 +1833,24 @@ export default function ForzaTuner() {
     }}/>
   );
 
+  if (screen==="output" && Object.keys(tunePages).filter(k=>k!=='_summary'&&tunePages[k]).length === 0) return (
+    <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16}}>
+      <style>{FONTS+THEME_STYLE}</style>
+      <div style={{fontFamily:C.fMono,fontSize:11,color:C.muted,letterSpacing:"0.2em"}}>CALCULATING…</div>
+      <button onClick={()=>setScreen("main")} style={{fontFamily:C.fCond,fontSize:12,color:C.muted,background:"transparent",border:`1px solid ${C.border}`,borderRadius:4,padding:"8px 16px",cursor:"pointer"}}>← Back</button>
+    </div>
+  );
+
   if (screen==="output") return (
-    <OutputScreen
-      appState={getState()}
-      tunePages={tunePages}
-      setTunePages={setTunePages}
-      onBack={()=>setScreen("main")}
-      onNewTune={()=>setScreen("main")}
-    />
+    <OutputErrorBoundary onBack={()=>setScreen("main")}>
+      <OutputScreen
+        appState={getState()}
+        tunePages={tunePages}
+        setTunePages={setTunePages}
+        onBack={()=>setScreen("main")}
+        onNewTune={()=>setScreen("main")}
+      />
+    </OutputErrorBoundary>
   );
 
   // ── MAIN INPUT SCREEN ──────────────────────────────────────────────────────
