@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, Component } from "react";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
-const VERSION       = "1.4.7";
+const VERSION       = "1.4.9";
 const PLAY_STORE    = null; // Set to Play Store URL when published
 const KOFI_URL      = "https://ko-fi.com/tunelabs";
 const DISCORD_URL   = "https://discord.gg/N4HfuWEXaN";
@@ -410,7 +410,7 @@ function calcTune(s) {
     Tires: { values:[
       {key:"Front Pressure", value:pStr(fpsi)},
       {key:"Rear Pressure",  value:pStr(rpsi)},
-      {key:"Front Width",    value:`${tireWF}mm`},
+      {key:"Front Width",    value:tireWF.includes("/")?`${tireWF.replace(/mm$/,"")}`:`${tireWF}mm`},
       {key:"Rear Width",     value:tireWR.includes("/")?tireWR:tireWR+" mm"},
       {key:"Compound",       value:compound},
     ], tip: isDrift?"Lower rear pressure breaks traction predictably on throttle.":isRain?"Keep pressure low — cold wet tarmac needs more contact patch.":"Adjust ±0.5 psi front if you feel mid-corner push."},
@@ -675,7 +675,7 @@ const OFFLINE_FIXES = {
 // ─── UI PRIMITIVES ────────────────────────────────────────────────────────────
 const S = {
   card:   { background:C.card, border:`1px solid ${C.border}`, borderRadius:8 },
-  label:  { fontFamily:C.fMono, fontSize:9, color:C.muted, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:6, display:"block" },
+  label:  { fontFamily:C.fMono, fontSize:10, color:C.muted, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:8, display:"block" },
   mono:   { fontFamily:C.fMono },
   btn:    { cursor:"pointer", border:"none", display:"flex", alignItems:"center", justifyContent:"center" },
   cond:   { fontFamily:C.fCond },
@@ -754,7 +754,7 @@ function ModeGrid({value, onChange}) {
                 outline:"none"}}>
               {active&&<div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,${m.color},transparent)`,opacity:0.8}}/>}
               <div style={{fontFamily:C.fMono,fontSize:9,color:active?m.color:C.muted,letterSpacing:"0.15em",marginBottom:4}}>{m.code}</div>
-              <div style={{fontFamily:C.fCond,fontSize:15,fontWeight:700,letterSpacing:"0.04em",color:active?C.text:C.ice2,lineHeight:1.1}}>{m.label}</div>
+              <div style={{fontFamily:C.fCond,fontSize:16,fontWeight:700,letterSpacing:"0.04em",color:active?C.text:C.ice2,lineHeight:1.1}}>{m.label}</div>
               <div style={{fontFamily:C.fBody,fontSize:11,fontWeight:300,color:active?m.color+"aa":C.muted,marginTop:3}}>{m.sub}</div>
             </button>
           );
@@ -813,9 +813,9 @@ function UnitsScreen({onDone}) {
 
   return (
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,maxWidth:480,margin:"0 auto",fontFamily:C.fBody,padding:"0 0 40px"}}>
-      <style>{FONTS + `*{box-sizing:border-box}`}</style>
+      <style>{FONTS + THEME_STYLE + `*{box-sizing:border-box}`}</style>
       <div style={{padding:"calc(env(safe-area-inset-top, 0px) + 32px) 20px 20px"}}>
-        <div style={{fontSize:28,fontWeight:600,color:C.accent,marginBottom:4}}>TuneLab</div>
+        <div style={{fontFamily:C.fCond,fontSize:36,fontWeight:700,color:C.green,letterSpacing:"0.12em",marginBottom:8}}>TuneLab</div>
         <div style={{fontSize:13,color:C.muted,marginBottom:32}}>Let's set up your units and input device</div>
 
         <div style={{...S.card,padding:"16px 16px",marginBottom:12}}>
@@ -1354,6 +1354,7 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
       {overlay==="wizard"&&<Wizard ctx={{...appState}} onClose={()=>setOverlay(null)}/>}
       {overlay==="ai"&&<AIScreen onClose={()=>setOverlay(null)}/>}
       {overlay==="about"&&<AboutScreen onClose={()=>setOverlay(null)}/>}
+      {overlay==="settings"&&<SettingsScreen units={{}} device="controller" onSave={()=>setOverlay(null)} onClose={()=>setOverlay(null)}/>}
 
       {/* Paste-back modal */}
       {showPaste&&(
@@ -1458,7 +1459,7 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
                 <div key={i} style={{padding:"11px 14px",borderBottom:i<(data.values||[]).length-1?`1px solid ${C.border}`:"none",display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}}>
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{fontFamily:C.fBody,fontSize:13,color:C.text,fontWeight:400}}>{row.key}</div>
-                    {row.note&&<div style={{fontFamily:C.fBody,fontSize:11,fontWeight:300,color:C.muted,marginTop:3,lineHeight:1.5}}>{row.note}</div>}
+                    {row.note&&<div style={{fontFamily:C.fBody,fontSize:12,fontWeight:300,color:C.muted,marginTop:4,lineHeight:1.5}}>{row.note}</div>}
                   </div>
                   <div style={{fontFamily:C.fMono,fontSize:14,color:C.green,fontWeight:500,whiteSpace:"nowrap",flexShrink:0}}>{row.value}</div>
                 </div>
@@ -1519,149 +1520,118 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
 
 
 // ─── ABOUT / SETTINGS SCREEN ──────────────────────────────────────────────────
-function AboutScreen({onClose}) {
-  const [confirmNuke, setConfirmNuke] = useState(false);
-  const [nuked,       setNuked]       = useState(false);
-  const [fbStep,      setFbStep]      = useState("idle");
-  const [fbType,      setFbType]      = useState("bug");
-  const [fbText,      setFbText]      = useState("");
-
-  const doNuke = () => {
-    localStorage.clear();
-    setNuked(true);
-    setTimeout(()=>window.location.reload(), 1200);
-  };
-
-  const sendFeedback = () => {
-    const sub  = encodeURIComponent(`TuneLab ${VERSION} — ${fbType}`);
-    const body = encodeURIComponent(`Type: ${fbType}\n\n${fbText}\n\n---\nSent from TuneLab ${VERSION}`);
-    window.open(`mailto:tunelab.dev@gmail.com?subject=${sub}&body=${body}`,"_blank");
-    setFbStep("sent");
-  };
-
-  const links = [
-    ...(PLAY_STORE?[{icon:"📱", label:"Play Store",        desc:"Rate us — helps other tuners find TuneLab", color:C.green,   url:PLAY_STORE}]:[]),
-    {icon:"☕", label:"Buy me a coffee",   desc:"Ko-fi — free forever, tips appreciated",   color:"#ffcc44", url:KOFI_URL},
-    {icon:"💬", label:"Discord server",    desc:"Share tunes, get help, vote on features",  color:"#5865f2", url:DISCORD_URL},
-    {icon:"🐙", label:"GitHub",            desc:"Open source — bugs, features, source code",color:"#e2e4f0", url:GITHUB_URL},
-    {icon:"🔒", label:"Privacy policy",    desc:"What data we store and why",               color:"#888899", url:`${GITHUB_URL}/blob/main/privacy.md`},
-  ];
+function SettingsScreen({units, device, onSave, onClose}) {
+  const [w,   setW]   = useState(units?.weight  || "lbs");
+  const [sp,  setSp]  = useState(units?.springs || "lbs/in");
+  const [p,   setP]   = useState(units?.pressure|| "psi");
+  const [spd, setSpd] = useState(units?.speed   || "mph");
+  const [dev, setDev] = useState(device || "controller");
 
   return (
-    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:400,maxWidth:480,margin:"0 auto",display:"flex",flexDirection:"column",fontFamily:C.fBody,overflowY:"auto"}}>
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:400,maxWidth:480,margin:"0 auto",fontFamily:C.fBody,display:"flex",flexDirection:"column",overflowY:"auto"}}>
       <style>{FONTS+THEME_STYLE}</style>
-      <div style={{background:C.surface,borderBottom:`1px solid ${C.border}`,padding:"calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px",display:"flex",alignItems:"center",gap:12,flexShrink:0}}>
-        <button onClick={onClose} style={{background:"transparent",border:"none",color:C.text,fontSize:22,cursor:"pointer",padding:0,lineHeight:1}}>←</button>
-        <span style={{fontSize:13,fontWeight:600,color:C.text,letterSpacing:"0.06em"}}>ABOUT & SETTINGS</span>
-        <span style={{marginLeft:"auto",fontFamily:C.fMono,fontSize:10,color:C.dim}}>v{VERSION}</span>
+      <div style={{background:C.surface,borderBottom:`1px solid ${C.border}`,padding:"calc(env(safe-area-inset-top,0px) + 16px) 20px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+        <button onClick={onClose} style={{...S.btn,background:"transparent",color:C.green,fontFamily:C.fCond,fontSize:13,fontWeight:600,letterSpacing:"0.12em",textTransform:"uppercase",gap:4,padding:0}}>← Back</button>
+        <span style={{fontFamily:C.fMono,fontSize:10,color:C.muted,letterSpacing:"0.2em",textTransform:"uppercase"}}>Settings</span>
+        <button onClick={()=>onSave({weight:w,springs:sp,pressure:p,speed:spd},dev)}
+          style={{...S.btn,padding:"7px 16px",background:C.accentLo,border:`1px solid ${C.accent}44`,borderRadius:6,color:C.accent,fontFamily:C.fCond,fontSize:12,fontWeight:700,letterSpacing:"0.15em",textTransform:"uppercase"}}>Save</button>
       </div>
 
-      <div style={{padding:"16px 16px 60px",display:"flex",flexDirection:"column",gap:12}}>
-
-        {/* App info */}
-        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:"16px",textAlign:"center"}}>
-          <div style={{fontFamily:C.fMono,fontSize:22,fontWeight:500,color:C.accent,marginBottom:4}}>
-            Tune<span style={{color:C.text}}>Lab</span>
-          </div>
-          <div style={{fontSize:12,color:C.muted,marginBottom:2}}>AI-assisted Forza Horizon 6 tuning</div>
-          <div style={{fontSize:10,color:C.dim}}>v{VERSION} · Free forever · No ads · No paywall</div>
-          <div style={{fontSize:10,color:C.dim,marginTop:2}}>Physics: FH5-baseline · Updated post-FH6 launch</div>
-          {(()=>{const u=LS.get("tl_v1_ai_usage",{total:0});return u.total>0?<div style={{fontSize:11,color:C.green,marginTop:4}}>✦ {u.total} AI enhance{u.total===1?"":"s"} used on this device</div>:null;})()}
+      <div style={{padding:"20px",display:"flex",flexDirection:"column",gap:16}}>
+        <div style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.2em",textTransform:"uppercase",marginBottom:-8}}>Units</div>
+        <div style={{...S.card,padding:"16px"}}>
+          <Seg label="Weight" opts={["lbs","kg"]} val={w} set={setW} color={C.accent} onColor="#0a0c0f"/>
+          <Seg label="Springs" opts={["lbs/in","n/mm","kgf/mm"]} val={sp} set={setSp} color={C.accent} onColor="#0a0c0f"/>
+          <Seg label="Tire pressure" opts={["psi","bar"]} val={p} set={setP} color={C.accent} onColor="#0a0c0f"/>
+          <Seg label="Speed" opts={["mph","km/h"]} val={spd} set={setSpd} color={C.accent} onColor="#0a0c0f"/>
         </div>
 
-        {/* Links */}
-        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
-          {links.map((l,i)=>(
-            <a key={l.label} href={l.url} target="_blank" rel="noreferrer"
-              style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderBottom:i<links.length-1?`1px solid ${C.border}`:"none",textDecoration:"none"}}>
-              <span style={{fontSize:18,width:24,textAlign:"center"}}>{l.icon}</span>
-              <div style={{flex:1}}>
-                <div style={{fontSize:15,color:C.text,fontWeight:500}}>{l.label}</div>
-                <div style={{fontSize:13,color:C.muted,marginTop:1}}>{l.desc}</div>
-              </div>
-              <span style={{fontSize:12,color:C.dim}}>↗</span>
-            </a>
+        <div style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.2em",textTransform:"uppercase",marginBottom:-8}}>Input Device</div>
+        <div style={{...S.card,padding:"12px",display:"flex",flexDirection:"column",gap:6}}>
+          {INPUT_DEVICES.map(d=>(
+            <button key={d.id} onClick={()=>setDev(d.id)}
+              style={{...S.btn,justifyContent:"flex-start",padding:"11px 14px",borderRadius:6,
+                border:`1px solid ${dev===d.id?C.accent:C.border}`,
+                background:dev===d.id?C.accentLo:C.surface,
+                color:dev===d.id?C.accent:C.muted,
+                fontFamily:C.fBody,fontSize:14,fontWeight:dev===d.id?600:400}}>
+              {d.label}
+              {dev===d.id&&<span style={{marginLeft:"auto",fontSize:11,color:C.accent}}>✓</span>}
+            </button>
           ))}
         </div>
-
-        {/* Feedback */}
-        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:"14px"}}>
-          <div style={{fontSize:12,color:C.muted,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>Send feedback</div>
-          {fbStep==="idle"&&(
-            <button onClick={()=>setFbStep("form")} style={{width:"100%",padding:"11px",background:"transparent",border:`1px solid ${C.border}`,borderRadius:9,color:C.muted,fontFamily:C.fBody,fontSize:12,cursor:"pointer"}}>
-              ✉ Report bug / request feature
-            </button>
-          )}
-          {fbStep==="form"&&(
-            <>
-              <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}}>
-                {["bug","feature","tune feedback","other"].map(t=>(
-                  <button key={t} onClick={()=>setFbType(t)} style={{padding:"4px 10px",borderRadius:7,border:`1px solid ${fbType===t?C.accent:C.border}`,background:fbType===t?C.accentLo:"transparent",color:fbType===t?C.accent:C.muted,fontFamily:C.fBody,fontSize:11,cursor:"pointer",textTransform:"capitalize"}}>
-                    {t}
-                  </button>
-                ))}
-              </div>
-              <textarea value={fbText} onChange={e=>setFbText(e.target.value)} placeholder="Describe the issue or idea…" rows={3}
-                style={{width:"100%",background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,padding:"9px 11px",color:C.text,fontFamily:C.fBody,fontSize:12,resize:"vertical",outline:"none",marginBottom:8}}
-              />
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
-                <button onClick={()=>setFbStep("idle")} style={{padding:"10px",background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontFamily:C.fBody,fontSize:11,cursor:"pointer"}}>Cancel</button>
-                <button onClick={sendFeedback} style={{padding:"10px",background:C.accentLo,border:`1px solid ${C.accent}55`,borderRadius:8,color:C.accent,fontFamily:C.fBody,fontSize:11,fontWeight:600,cursor:"pointer"}}>Send ✉</button>
-              </div>
-            </>
-          )}
-          {fbStep==="sent"&&(
-            <div style={{textAlign:"center",padding:"8px 0"}}>
-              <div style={{fontSize:20,marginBottom:6}}>✅</div>
-              <div style={{fontSize:12,color:C.green,fontWeight:600}}>Feedback sent — thanks!</div>
-            </div>
-          )}
-        </div>
-
-        {/* Danger zone */}
-        <div style={{background:C.card,border:`1px solid ${C.red}44`,borderRadius:12,padding:"14px"}}>
-          <div style={{fontSize:10,color:C.red,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>Danger zone</div>
-          {!confirmNuke&&!nuked&&(
-            <>
-              <div style={{fontSize:12,color:C.muted,lineHeight:1.5,marginBottom:10}}>
-                Wipes all saved tunes, AI keys, unit preferences, and resets the app to first launch. Cannot be undone.
-              </div>
-              <button onClick={()=>setConfirmNuke(true)} style={{width:"100%",padding:"11px",background:"transparent",border:`1px solid ${C.red}55`,borderRadius:9,color:C.red,fontFamily:C.fBody,fontSize:12,cursor:"pointer",fontWeight:500}}>
-                🗑 Reset all data
-              </button>
-            </>
-          )}
-          {confirmNuke&&!nuked&&(
-            <>
-              <div style={{fontSize:13,color:C.text,marginBottom:12,lineHeight:1.5}}>Are you sure? This deletes everything including saved tunes and API keys.</div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
-                <button onClick={()=>setConfirmNuke(false)} style={{padding:"11px",background:"transparent",border:`1px solid ${C.border}`,borderRadius:9,color:C.muted,fontFamily:C.fBody,fontSize:12,cursor:"pointer"}}>Cancel</button>
-                <button onClick={doNuke} style={{padding:"11px",background:C.red+"22",border:`1px solid ${C.red}`,borderRadius:9,color:C.red,fontFamily:C.fBody,fontSize:12,fontWeight:600,cursor:"pointer"}}>Yes, nuke it</button>
-              </div>
-            </>
-          )}
-          {nuked&&(
-            <div style={{textAlign:"center",padding:"8px 0",fontSize:12,color:C.muted}}>Wiped. Reloading…</div>
-          )}
-        </div>
-
-        {/* Legal */}
-        <div style={{textAlign:"center",fontSize:10,color:C.dim,lineHeight:1.7,padding:"0 8px"}}>
-          <div style={{marginBottom:8,color:C.muted,fontSize:11}}>With thanks to</div>
-          <div style={{marginBottom:12,color:C.text,fontSize:12,fontWeight:500}}>Kireth</div>
-          <div style={{fontSize:10,color:C.dim,lineHeight:1.6}}>Early FH6 physics feedback · youtube.com/@Kireth</div>
-          <div style={{marginTop:12,fontSize:10,color:C.dim,lineHeight:1.7}}>
-            TuneLab is not affiliated with Xbox, Turn 10, or Playground Games.<br/>
-            Forza Horizon® is a registered trademark of Microsoft Corporation.
-          </div>
-        </div>
-
       </div>
     </div>
   );
 }
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+function AboutScreen({onClose}) {
+  return (
+    <div style={{position:"fixed",inset:0,background:C.bg,zIndex:400,maxWidth:480,margin:"0 auto",fontFamily:C.fBody,display:"flex",flexDirection:"column",overflowY:"auto"}}>
+      <style>{FONTS+THEME_STYLE}</style>
+      <div style={{background:C.surface,borderBottom:`1px solid ${C.border}`,padding:"calc(env(safe-area-inset-top,0px) + 16px) 20px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+        <button onClick={onClose} style={{...S.btn,background:"transparent",color:C.green,fontFamily:C.fCond,fontSize:14,fontWeight:600,letterSpacing:"0.1em",textTransform:"uppercase",gap:3,padding:0}}>← Back</button>
+        <span style={{fontFamily:C.fMono,fontSize:11,color:C.muted,letterSpacing:"0.15em"}}>ABOUT & SETTINGS</span>
+        <div style={{width:60}}/>
+      </div>
+      <div style={{padding:"20px",display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{...S.card,padding:"24px 20px",textAlign:"center"}}>
+          <div style={{fontFamily:C.fCond,fontSize:38,fontWeight:700,color:C.green,letterSpacing:"0.12em",marginBottom:8}}>TuneLab</div>
+          <div style={{fontFamily:C.fBody,fontSize:16,fontWeight:500,color:C.text,marginBottom:10}}>AI-assisted Forza Horizon 6 tuning</div>
+          <div style={{fontSize:13,color:C.muted,lineHeight:1.8}}>v{VERSION} · Free forever · No ads · No paywall</div>
+          <div style={{fontSize:13,color:C.muted,lineHeight:1.8,marginTop:2}}>Physics: FH5-baseline · Updated post-FH6 launch</div>
+        </div>
+
+        {[
+          {icon:"☕",title:"Buy me a coffee",sub:"Ko-fi — free forever, tips appreciated",url:KOFI_URL},
+          {icon:"💬",title:"Discord server",sub:"Share tunes, get help, vote on features",url:DISCORD_URL},
+          {icon:"🐙",title:"GitHub",sub:"Open source — bugs, features, source code",url:GITHUB_URL},
+          {icon:"🔒",title:"Privacy policy",sub:"What data we store and why",url:"https://github.com/super-android/tunelab/blob/main/privacy.md"},
+        ].map(item=>(
+          <a key={item.title} href={item.url} target="_blank" rel="noopener noreferrer"
+            style={{...S.card,padding:"14px 16px",display:"flex",alignItems:"center",gap:14,textDecoration:"none",cursor:"pointer"}}>
+            <span style={{fontSize:22,flexShrink:0}}>{item.icon}</span>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontFamily:C.fBody,fontSize:15,fontWeight:500,color:C.text,marginBottom:3}}>{item.title}</div>
+              <div style={{fontFamily:C.fBody,fontSize:13,color:C.muted}}>{item.sub}</div>
+            </div>
+            <span style={{color:C.dim,fontSize:14,flexShrink:0}}>↗</span>
+          </a>
+        ))}
+
+        <div style={{...S.card,padding:"14px 16px"}}>
+          <div style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.2em",marginBottom:10}}>SEND FEEDBACK</div>
+          <a href={`${GITHUB_URL}/issues`} target="_blank" rel="noopener noreferrer"
+            style={{...S.btn,width:"100%",padding:"11px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontFamily:C.fBody,fontSize:14,textDecoration:"none",gap:6}}>
+            🐛 Report bug / request feature
+          </a>
+        </div>
+
+        <div style={{...S.card,padding:"14px 16px",borderColor:"rgba(255,77,77,0.2)"}}>
+          <div style={{fontFamily:C.fMono,fontSize:9,color:"#ff4d4d",letterSpacing:"0.2em",marginBottom:8}}>DANGER ZONE</div>
+          <div style={{fontFamily:C.fBody,fontSize:13,color:C.muted,marginBottom:12,lineHeight:1.6}}>Wipes all saved tunes, AI keys, unit preferences, and resets the app to first launch. Cannot be undone.</div>
+          <button onClick={()=>{if(window.confirm("Reset all data? This cannot be undone.")){Object.keys(localStorage).filter(k=>k.startsWith("tl_")).forEach(k=>localStorage.removeItem(k));window.location.reload();}}}
+            style={{...S.btn,width:"100%",padding:"11px",background:"transparent",border:"1px solid rgba(255,77,77,0.3)",borderRadius:8,color:"#ff4d4d",fontFamily:C.fBody,fontSize:14,gap:6}}>
+            🗑 Reset all data
+          </button>
+        </div>
+
+        <div style={{textAlign:"center",padding:"8px 0 16px"}}>
+          <div style={{fontFamily:C.fBody,fontSize:13,color:C.muted,marginBottom:6}}>With thanks to</div>
+          <div style={{fontFamily:C.fCond,fontSize:20,fontWeight:700,color:C.text,letterSpacing:"0.08em"}}>Kireth</div>
+          <div style={{fontFamily:C.fBody,fontSize:12,color:C.dim,marginTop:4}}>Early FH6 physics feedback · youtube.com/@Kireth</div>
+        </div>
+
+        <div style={{textAlign:"center",padding:"0 0 20px"}}>
+          <div style={{fontFamily:C.fBody,fontSize:11,color:C.dim,lineHeight:1.7}}>TuneLab is not affiliated with Xbox, Turn 10, or Playground Games.</div>
+          <div style={{fontFamily:C.fBody,fontSize:11,color:C.dim,lineHeight:1.7}}>Forza Horizon® is a registered trademark of Microsoft Corporation.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 const CAR_DB = {
   "Acura":["Integra Type R '01","NSX '17","RSX-S '02","NSX Type S '22"],
   "Alfa Romeo":["4C '13","Giulia QV '16","GTA '65","Montreal '70"],
@@ -1704,7 +1674,11 @@ const CAR_DB = {
 const MAKES = Object.keys(CAR_DB).sort();
 
 export default function ForzaTuner() {
-  const [screen,      setScreen]      = useState(()=>LS.get("tl_v1_done_units",false)?"main":"units");
+  const [screen,      setScreen]      = useState(()=>{
+    // Only show units screen on first ever launch
+    const done = LS.get("tl_v1_done_units", false);
+    return (done === true || done === "true") ? "main" : "units";
+  });
   const [units,       setUnits]       = useState(()=>LS.get("tl_v1_units",{weight:"lbs",springs:"lbs/in",pressure:"psi",speed:"mph"}));
   const [inputDevice, setInputDevice] = useState(()=>LS.get("tl_v1_device","controller"));
   const [mode,        setMode]        = useState(()=>LS.get("tl_v1_mode","D")); // D or S
@@ -1863,15 +1837,16 @@ export default function ForzaTuner() {
       {overlay==="save"&&<SaveDrawer appState={getState()} tunePages={tunePages} onLoad={loadTune} onClose={()=>setOverlay(null)}/>}
       {overlay==="ai"&&<AIScreen onClose={()=>setOverlay(null)}/>}
       {overlay==="about"&&<AboutScreen onClose={()=>setOverlay(null)}/>}
+      {overlay==="settings"&&<SettingsScreen units={units} device={inputDevice} onSave={(u,dev)=>{LS.set("tl_v1_units",u);LS.set("tl_v1_device",dev);setUnits(u);setInputDevice(dev);setOverlay(null);}} onClose={()=>setOverlay(null)}/>}
 
       {/* Header */}
       <div style={{position:"sticky",top:0,zIndex:20,background:C.bg,borderBottom:`1px solid ${C.border}`,padding:"calc(env(safe-area-inset-top, 0px) + 10px) 14px 8px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{lineHeight:1,position:"relative"}}>
           <div style={{position:"absolute",bottom:-8,left:0,right:0,height:1,background:"linear-gradient(90deg,rgba(0,255,133,0.2),transparent)"}}/>
-          <div style={{fontFamily:C.fCond,fontSize:22,fontWeight:700,color:C.text,letterSpacing:"0.15em"}}><span style={{color:accentColor}}>Tune</span>Lab</div>
+          <div style={{fontFamily:C.fCond,fontSize:26,fontWeight:700,color:C.text,letterSpacing:"0.12em"}}><span style={{color:accentColor}}>Tune</span>Lab</div>
           <div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}>
-            <div style={{width:5,height:5,borderRadius:"50%",background:C.green,boxShadow:`0 0 6px ${C.green}`,animation:"pulse 2s infinite"}}/>
-            <div style={{fontFamily:C.fMono,fontSize:8,color:C.muted,letterSpacing:"0.1em"}}>FH6 · <span style={{color:C.green}}>v{VERSION}</span></div>
+            <div style={{width:7,height:7,borderRadius:"50%",background:C.green,boxShadow:`0 0 8px ${C.green}`,animation:"pulse 2s infinite"}}/>
+            <div style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.08em"}}>FH6 · <span style={{color:C.green}}>v{VERSION}</span></div>
           </div>
         </div>
         {/* D/S toggle */}
@@ -1883,15 +1858,15 @@ export default function ForzaTuner() {
               </button>
             ))}
           </div>
-          <span style={{fontSize:9,color:C.dim,fontFamily:C.fBody}}>
-            {mode==="D"?"car + mode → tune, instant":"full RPM + gearing math"}
+          <span style={{fontSize:12,color:C.muted,fontFamily:C.fBody,letterSpacing:"0.02em"}}>
+            {mode==="D"?"D — instant":"S — full math"}
           </span>
         </div>
         <div style={{display:"flex",gap:5}}>
           <button onClick={()=>setOverlay("ai")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:12}}>✦</button>
           <button onClick={()=>setOverlay("save")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:14}}>💾</button>
           <button onClick={()=>setOverlay("about")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:14}}>ℹ</button>
-          <button onClick={()=>{LS.set("tl_v1_done_units",false);setScreen("units");}} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:12}}>⚙</button>
+          <button onClick={()=>setOverlay("settings")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:12}}>⚙</button>
         </div>
       </div>
 
@@ -1923,7 +1898,7 @@ export default function ForzaTuner() {
                 onBlur={()=>setTimeout(()=>setShowSearch(false),200)}
               />
             ) : (
-              <span style={{flex:1,fontFamily:C.fCond,fontSize:15,fontWeight:700,letterSpacing:"0.04em",color:C.text,
+              <span style={{flex:1,fontFamily:C.fCond,fontSize:16,fontWeight:700,letterSpacing:"0.04em",color:C.text,
                 overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{make} {model}</span>
             )}
             <span style={{fontFamily:C.fMono,fontSize:10,color:accentColor,letterSpacing:"0.1em",flexShrink:0}}>{driveType}</span>
@@ -2104,7 +2079,7 @@ export default function ForzaTuner() {
       {/* Generate button — fixed at bottom */}
       <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,padding:"10px 14px 20px",background:`linear-gradient(0deg,${C.bg} 60%,transparent)`,pointerEvents:"none"}}>
         <button onClick={handleGenerate} disabled={loading}
-          style={{...S.btn,width:"100%",padding:"15px",pointerEvents:"auto",background:`${accentColor}14`,border:`1px solid ${accentColor}44`,borderRadius:6,color:accentColor,fontFamily:C.fCond,fontSize:15,fontWeight:700,letterSpacing:"0.22em",textTransform:"uppercase",boxShadow:"none"}}>
+          style={{...S.btn,width:"100%",padding:"15px",pointerEvents:"auto",background:`${accentColor}14`,border:`1px solid ${accentColor}44`,borderRadius:6,color:accentColor,fontFamily:C.fCond,fontSize:16,fontWeight:700,letterSpacing:"0.22em",textTransform:"uppercase",boxShadow:"none"}}>
           {loading?"Calculating…":"Deploy Setup"}
         </button>
         {!isAdvanced && <div style={{textAlign:"center",marginTop:5,fontSize:10,color:C.dim,pointerEvents:"auto"}}>Switch to S mode for gearing + RPM-based math</div>}
