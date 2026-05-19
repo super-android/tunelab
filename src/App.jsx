@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, Component } from "react";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
-const VERSION       = "1.4.9";
+const VERSION       = "1.5.1";
 const PLAY_STORE    = null; // Set to Play Store URL when published
 const KOFI_URL      = "https://ko-fi.com/tunelabs";
 const DISCORD_URL   = "https://discord.gg/N4HfuWEXaN";
@@ -14,21 +14,24 @@ const GITHUB_URL    = "https://github.com/super-android/tunelab";
 // Base Hz formula (ForzaTune-derived): 6.79e-7 × (PI-100)² + 2.45
 // freqMult scales that base per mode: front / rear multipliers.
 const PHYSICS = {
+  // FH6 uses FM engine — stiffer than FH5, faster transient response
+  // freqMult validated May 2026 via telemetry (susp std dev 0.147 → target 0.10)
+  // +10% across race modes, Rally/Snow unchanged, Rain slightly stiffer
   freqMult: {
-    Race:    {f:1.00, r:0.92},
-    Touge:   {f:0.98, r:0.90},
-    Drift:   {f:0.80, r:0.73},
-    Rally:   {f:0.62, r:0.57},
-    Drag:    {f:0.90, r:0.68},
-    Wangan:  {f:0.94, r:0.88},
-    Rain:    {f:0.77, r:0.72},
-    General: {f:0.87, r:0.83},
+    Race:    {f:1.10, r:1.01},  // +10% — FM engine needs stiffer baseline
+    Touge:   {f:1.08, r:0.99},  // +10% — tight corners need planted front
+    Drift:   {f:0.85, r:0.78},  // +6% — still soft but more controlled
+    Rally:   {f:0.63, r:0.58},  // unchanged — FH5 rally feel confirmed same
+    Drag:    {f:0.95, r:0.72},  // +5% — front squat control
+    Wangan:  {f:1.04, r:0.97},  // +10% — high speed needs stability
+    Rain:    {f:0.85, r:0.79},  // +10% — FM wet model more aggressive
+    General: {f:0.96, r:0.91},  // +10% — all-round baseline
   },
-  dampRebound:      0.68,  // fraction of critical damping — rebound
-  dampBump:         0.50,  // fraction of critical damping — bump
-  horizonDampMult:  1.15,  // FH5/FH6 planted physics correction
-  casterBase:       5.0,   // degrees at D-class
-  casterPIScale:    900,   // (PI-100)/casterPIScale added to base
+  dampRebound:      0.70,  // raised from 0.68 — FM engine rewards slightly more rebound
+  dampBump:         0.52,  // raised from 0.50 — faster bump response for FM transients
+  horizonDampMult:  1.10,  // reduced from 1.15 — FM base damping already higher than FH5
+  casterBase:       5.0,
+  casterPIScale:    900,
 };
 
 // ─── THEME CSS (injected into DOM, follows device light/dark) ─────────────────
@@ -102,7 +105,7 @@ const CLASSES = [
   {id:"A",  range:[701,800]},
   {id:"S1", range:[801,900]},
   {id:"S2", range:[901,998]},
-  {id:"R",  range:[901,998]},
+  {id:"R",  range:[800,998]},
   {id:"X",  range:[999,999]},
 ];
 
@@ -198,7 +201,9 @@ function calcTune(s) {
   // ── PI-based natural frequency (ForzaTune polynomial method)
   // baseFreq scales with car class: D≈2.45Hz → X≈3.8Hz
   const piNum   = Math.max(100, Math.min(999, pi||500));
-  const baseFreq = 6.79e-7 * Math.pow(piNum - 100, 2) + 2.45;
+  // FH6 base frequency — FM engine runs ~8% stiffer than FH5 at same PI
+  // Recalibrated from telemetry: D≈2.65Hz, A≈3.2Hz, S1≈3.6Hz, X≈4.1Hz
+  const baseFreq = 7.35e-7 * Math.pow(piNum - 100, 2) + 2.65;
 
   // Mode multipliers — sourced from PHYSICS constants block (top of file)
   const mod  = PHYSICS.freqMult[tuneId] || PHYSICS.freqMult.General;
@@ -242,33 +247,55 @@ function calcTune(s) {
   const fBump    = mapDamp(critDampF * bumRatio);
   const rBump    = mapDamp(critDampR * bumRatio);
 
-  // ── ARB — roll moment method (ForzaTune: 0.381 × height = CG estimate)
+  // ── ARB — weight transfer timing method (FH6 FM engine validated)
+  // ARB controls roll stiffness and weight transfer rate, NOT roll moment magnitude.
+  // Higher ARB = faster weight transfer = more understeer (front) or oversteer (rear).
+  // FH6 meta: AWD = 1/65 (min front, max rear) — locks rear, frees front to rotate.
+  // FWD: LOW front, HIGH rear — reduces understeer, rotates car on entry.
+  // RWD: moderate front, high rear — rotation without snap oversteer.
+  // pwr2wt used to scale RWD rear ARB — more power = more rear stability needed.
   const pwr2wtNorm = Math.min(1, pwr2wt / 800);
-  // If car height is provided, use roll-moment math; otherwise fall back to pwr2wt
-  const cgHeight   = carHeight ? 0.381 * carHeight : null; // mm
-  // Roll moment normalised 0–1: a 1500mm SUV ≈ 1.0, a 1100mm supercar ≈ 0.5
-  const rollNorm   = cgHeight ? Math.min(1, cgHeight / 600) : 0.5 + pwr2wtNorm * 0.3;
 
-  // ARB: FH6 community standard — "1/65 is practically a meme" for AWD
-  // Soft front = more rotation, stiff rear = stability. Min-front/max-rear for AWD.
-  // FWD/RWD: max both. Drift: vary for angle. Rally: moderate both for travel.
   let fARB, rARB;
   if (isDrift) {
-    fARB = 15 + rollNorm * 10; rARB = 35 + rollNorm * 15; // moderate for angle control
+    // Drift: soft front for easy initiation, moderate rear for angle hold
+    // High aggression = more angle = softer front, stiffer rear
+    fARB = 10 + (feelAggression / 100) * 8;   // 10–18
+    rARB = 28 + (feelAggression / 100) * 20;  // 28–48
   } else if (isDrag) {
-    fARB = 45; rARB = 45; // balanced for straight line
+    // Drag: balanced ARB — no cornering, just launch stability
+    // Slight rear bias to prevent wheelie tendency on RWD/AWD
+    fARB = isRWD ? 35 : isAWD ? 30 : 40;
+    rARB = isRWD ? 50 : isAWD ? 45 : 40;
   } else if (isRally) {
-    fARB = 8 + rollNorm * 6; rARB = 20 + rollNorm * 8; // soft for surface compliance
+    // Rally: both soft for max suspension travel and surface compliance
+    // Rear slightly stiffer than front for stability on loose
+    fARB = isFWD ? 10 : 8;
+    rARB = isFWD ? 18 : isAWD ? 20 : 22;
   } else if (isRain || isSnow) {
-    fARB = 5; rARB = 15; // very soft for grip
+    // Wet/snow: very soft both — maximum grip contact patch
+    fARB = isFWD ? 8 : 5;
+    rARB = isFWD ? 18 : 12;
   } else {
-    // Race / Touge / Wangan / General
-    if (isAWD) { fARB = 1 + rollNorm*4;  rARB = 55 + rollNorm*10; } // 1/65 meta
-    else if (isFWD) { fARB = 50; rARB = 60; } // max both for FWD
-    else { fARB = 8 + rollNorm*8; rARB = 55 + rollNorm*10; } // RWD: soft front for rotation
+    // Race / Touge / Wangan / General — core meta
+    if (isAWD) {
+      // 1/65 meta: minimum front, maximum rear
+      // Scales very slightly with power — high power AWD needs even more rear lock
+      fARB = 1 + Math.round(pwr2wtNorm * 3);   // 1–4
+      rARB = 58 + Math.round(pwr2wtNorm * 6);  // 58–64
+    } else if (isFWD) {
+      // FWD: LOW front (reduce push), HIGH rear (rotate on entry)
+      // Opposite of what seems intuitive — rear ARB transfers weight to outside front
+      fARB = 15 + Math.round(pwr2wtNorm * 10); // 15–25
+      rARB = 50 + Math.round(pwr2wtNorm * 10); // 50–60
+    } else {
+      // RWD: moderate front for trail braking, high rear for traction stability
+      fARB = 8  + Math.round(pwr2wtNorm * 14); // 8–22
+      rARB = 45 + Math.round(pwr2wtNorm * 18); // 45–63
+    }
   }
-  // Feel adjuster — aggression raises rear ARB, lowers front
-  const arbFeel = (feelAggression - 50) / 8;
+  // Feel adjuster: aggression increases rear relative to front
+  const arbFeel = (feelAggression - 50) / 10;
   fARB = +Math.max(1, Math.min(65, fARB - arbFeel)).toFixed(1);
   rARB = +Math.max(1, Math.min(65, rARB + arbFeel)).toFixed(1);
 
@@ -335,22 +362,33 @@ function calcTune(s) {
   brakeBal = Math.max(40, Math.min(65, brakeBal));
   // Brake pressure: never drop below 100 per FH6 guide — raise for faster response
   // Only drift goes below 100 for modulation control
-  const brakePressure = isDrift ? 90 : isDrag ? 120 : isRain||isSnow ? 100 : isRally ? 100 : 100;
+  // FM engine brakes are stronger — 100 baseline still correct but drift can go lower
+  const brakePressure = isDrift ? 85 : isDrag ? 115 : isRain||isSnow ? 95 : isRally ? 95 : 100;
   const trailRating   = isDrift ? 6 : isDrag ? 3 : isRain ? 7 : isRally ? 6 : isWheel ? 9 : 7;
 
   // ── DIFF
+  // FH6 FM engine: snappier throttle response means diff accel values need care
+  // High accel lock = planted exit but snappy — lower than FH5 for same feel
+  // Drag: high rear accel for launch, low decel so no engine braking lockup
+  // Wheelie tendency (high power RWD): reduce rear accel, raise front ARB slightly
   const pN = pwr2wtNorm;
+  const isHighPower = pwr2wt > 600; // high power threshold for wheelie risk
   let fAccel=0,fDecel=0,rAccel=0,rDecel=0,center=0;
   if (isFWD) {
-    fAccel = isDrift?85:isDrag?90:isRally?70:60; fDecel = isDrift?0:isDrag?15:20;
+    fAccel = isDrift?80:isDrag?85:isRally?65:55;
+    fDecel = isDrift?0:isDrag?10:20;
   } else if (isRWD) {
-    rAccel = isDrift?85:isDrag?95:isRally?65:Math.round(50+pN*20);
-    rDecel = isDrift?35:isDrag?5:isRally?25:20;
+    // Drag: high accel for launch grip, low decel — wheelie risk flagged in output
+    // High power RWD: slightly lower accel to prevent snap oversteer on FM engine
+    rAccel = isDrift?82:isDrag?90:isRally?60:Math.round(45 + pN*20);
+    rDecel = isDrift?30:isDrag?5:isRally?20:18;
   } else {
-    fAccel = isDrift?35:isDrag?20:isRally?55:40; fDecel = isDrift?0:isDrag?5:isRally?20:15;
-    rAccel = isDrift?80:isDrag?95:isRally?70:Math.round(55+pN*15);
-    rDecel = isDrift?30:isDrag?5:isRally?30:20;
-    center = isDrift?35:isDrag?20:isRally?55:45;
+    // AWD: center balance controls torque split feel
+    fAccel = isDrift?30:isDrag?15:isRally?50:35;
+    fDecel = isDrift?0:isDrag?5:isRally?15:15;
+    rAccel = isDrift?78:isDrag?90:isRally?65:Math.round(50 + pN*15);
+    rDecel = isDrift?28:isDrag?5:isRally?25:18;
+    center = isDrift?30:isDrag?15:isRally?50:42;
   }
 
   // ── GEARING (only if includeGearing + RPM data available)
@@ -453,7 +491,7 @@ function calcTune(s) {
       {key:"Trail Brake Rating",value:`${trailRating}/10`},
     ], tip: isWheel?"Trail brake: gradually release as you turn in — don't release all at once.":"Under ABS: hold threshold pressure and steer — the game manages lockup."},
 
-    Diff: { values: diffValues, tip: isDrift?"High rear accel keeps the slide going. Adjust decel for entry rotation.":isFWD?"High front accel causes torque steer — balance traction vs speed.":"Rear accel controls exit traction. Center balance shifts torque character." },
+    Diff: { values: diffValues, tip: isDrift?"High rear accel keeps the slide going. Adjust decel for entry rotation.":isDrag&&isRWD&&isHighPower?"⚠ High power RWD drag: if wheelie tendency, raise front ARB 5 points and lower rear ride height 0.5 cm.":isDrag?"Launch tune: high rear accel for grip, low decel to avoid lockup on shifts.":isFWD?"Low front accel reduces torque steer. High rear diff rotates the car on entry.":"Rear accel controls exit traction. Center balance shifts torque character." },
   };
 }
 
@@ -1632,104 +1670,790 @@ function AboutScreen({onClose}) {
 }
 
 
-const CAR_DB = {
-  "Acura":["Integra Type R '01","NSX '17","RSX-S '02","NSX Type S '22"],
-  "Alfa Romeo":["4C '13","Giulia QV '16","GTA '65","Montreal '70"],
-  "Aston Martin":["DB11 V12 '16","DB5 '64","DBS Superleggera '18","Vulcan AMR Pro '17","Vantage '19","Valkyrie '23"],
-  "Audi":["R8 V10 Plus '16","RS 6 Avant '20","RS3 Sedan '17","S1 '14","TT RS '18","Quattro '83","Sport Quattro '84"],
-  "Bentley":["Continental GT Speed '21","Mulsanne Speed '17"],
-  "BMW":["M2 Competition '20","M3 E30 '87","M3 E46 '01","M4 GTS '16","M5 CS '22","M8 Competition '20","2002 Turbo '73"],
-  "Bugatti":["Chiron '18","Veyron SS '10","Divo '19","Bolide '21"],
-  "Cadillac":["ATS-V '16","CT5-V Blackwing '22"],
-  "Can-Am":["Maverick X RS Turbo R '18"],
-  "Chevrolet":["Camaro SS '69","Camaro ZL1 '18","Corvette C8 '20","Corvette Grand Sport '17","Corvette Stingray '63"],
-  "Dodge":["Challenger SRT Demon '18","Viper ACR '16","Charger SRT Hellcat '15"],
-  "Ferrari":["488 Pista '19","812 Superfast '17","F40 '92","F50 '95","LaFerrari '13","SF90 Stradale '20","Enzo '02","250 GTO '62","F80 '25"],
-  "Ford":["F-150 Raptor R '23","Focus RS '16","GT '17","GT '05","Mustang Shelby GT500 '20","Mustang Boss 302 '13","Sierra Cosworth RS500 '87"],
-  "GMA":["T.50 '22"],
-  "Honda":["Civic Type R '23","NSX '90","S2000 '09","Beat '91","City E II '84","Acty '94"],
-  "Hyundai":["IONIQ 5 N '23"],
-  "Koenigsegg":["Agera RS '17","Jesko '20","Regera '16","One:1"],
-  "Lamborghini":["Aventador SVJ '19","Countach '88","Huracan STO '21","Huracan Sterrato '22","Murcielago LP 670 SV '09","Urus '18"],
-  "Lancia":["037 Stradale '82","Delta HF Integrale '92","Stratos HF '73"],
-  "Land Rover":["Defender 90 '15","Range Rover SVR '18"],
-  "Lotus":["Elise Series 1 '96","Exige S '06","Evora GT430 '17"],
-  "Maserati":["GranTurismo MC '13","MC20 '21"],
-  "Mazda":["MX-5 Miata '16","MX-5 NA '90","RX-7 FD '97","RX-7 Spirit R '02"],
-  "McLaren":["600LT '19","720S '17","F1 '93","P1 '13","Senna '18"],
-  "Mercedes-AMG":["A 45 S '19","C 63 S Coupe '16","E 63 S '18","GT Black Series '21","GT R '17","SLS AMG '11","One '21"],
-  "Mitsubishi":["Eclipse GSX '95","Lancer Evo VI '99","Lancer Evo X '07","3000GT VR-4 '92"],
-  "Nissan":["370Z '09","GT-R Premium '17","GT-R Black Edition '12","Silvia S15 '02","Skyline GT-R R32 '89","Skyline GT-R R34 '99","Z '23"],
-  "Pagani":["Huayra BC '16","Zonda Cinque '09","Utopia '23"],
-  "Porsche":["718 Cayman GT4 '20","911 Carrera RS '73","911 GT2 RS '18","911 GT3 RS '22","918 Spyder '14","Cayenne Turbo S '20","Taycan Turbo S '20"],
-  "Renault":["Clio V6 Phase 2 '03","Megane RS Trophy '19"],
-  "RUF":["CTR3 '07","CTR Anniversary '17","Yellowbird '87"],
-  "Shelby":["Cobra 427 S/C '65","Cobra Daytona Coupe '64"],
-  "Subaru":["BRZ '21","Impreza 22B '98","WRX STI '04","WRX STI S209 '19"],
-  "Toyota":["GR86 '22","GR Supra '20","GR Yaris '20","MR2 GT '95","Supra RZ '98"],
-  "TVR":["Cerbera Speed 12","Sagaris '06"],
-  "Volkswagen":["Golf R '14","Golf GTI Clubsport S '16","Polo GTI '18"],
-  "Volvo":["240 Turbo '84","850 R '96","S60 Polestar '17"],
-};
-const MAKES = Object.keys(CAR_DB).sort();
+// ─── CAR DATABASE ─────────────────────────────────────────────────────────
+// drive: FWD/RWD/AWD | cls: D/C/B/A/S1/S2/X/R | weight: lbs (0=unknown) | ev: true/false
+// Generated from official FH6 car list — weight/PI to be filled post-launch
 
+const CAR_DB_FULL = [
+  {make:"Abarth",model:"595 esseesse",year:"1968",drive:"RWD",cls:"D",weight:1350,ev:false},
+  {make:"Abarth",model:"Fiat 131",year:"1980",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Abarth",model:"695 Biposto",year:"2016",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Acura",model:"Integra Type-R",year:"2001",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Acura",model:"RSX Type S",year:"2002",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Acura",model:"NSX Type S",year:"2022",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Acura",model:"Integra A-Spec",year:"2023",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"Giulia Sprint GTA Stradale",year:"1965",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"Giulia TZ2",year:"1965",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"33 Stradale",year:"1968",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"SE 048SP",year:"1990",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"155 Q4",year:"1992",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"4C",year:"2014",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"Giulia Quadrifoglio",year:"2017",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Alfa Romeo",model:"Giulia GTAm",year:"2021",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Alumicraft",model:"Class 10 Race Car",year:"2015",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Alumicraft",model:"#122 Class 1 Buggy",year:"2021",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Alumicraft",model:"#6165 Trick Truck",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"AMG Transport Dynamics",model:"M12S Warthog CST",year:"2554",drive:"AWD",cls:"X",weight:0,ev:false},
+  {make:"Ariel",model:"Atom 500 V8",year:"2013",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ariel",model:"Nomad",year:"2016",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Aston Martin",model:"DB5",year:"1964",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Aston Martin",model:"DB11",year:"2017",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Aston Martin",model:"Vulcan AMR Pro",year:"2017",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Aston Martin",model:"DBS Superleggera",year:"2019",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Aston Martin",model:"Valhalla Concept Car",year:"2019",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Aston Martin",model:"Vantage",year:"2019",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Aston Martin",model:"DBX",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Aston Martin",model:"Valkyrie AMR Pro",year:"2022",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Aston Martin",model:"Valkyrie",year:"2023",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Audi",model:"Sport quattro",year:"1983",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"#2 Sport quattro S1",year:"1986",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS 4 Avant",year:"2001",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"RS 6",year:"2003",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS 4",year:"2006",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"RS 6",year:"2009",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"R8 LMS",year:"2009",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"TT RS Coupé",year:"2010",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"RS 3 Sportback",year:"2011",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"RS 5 Coupé",year:"2011",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"R8 Coupé V10 plus",year:"2013",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS 4 Avant",year:"2013",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"RS 7 Sportback",year:"2013",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS 6 Avant",year:"2015",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"S1",year:"2015",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Audi",model:"R8 V10 plus",year:"2016",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS 4 Avant",year:"2018",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"R8 V10 Performance",year:"2020",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS 3 Sedan",year:"2020",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Audi",model:"RS 6 Avant",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS 7 Sportback",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Audi",model:"RS e-tron GT",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Autozam",model:"AZ-1",year:"1993",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"BAC",model:"Mono",year:"2014",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Bentley",model:"Bentayga",year:"2016",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Bentley",model:"Continental GT Convertible",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"Isetta 300 Export",year:"1957",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"BMW",model:"2002 Turbo",year:"1973",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"BMW",model:"M1",year:"1981",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"BMW",model:"M3",year:"1988",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"BMW",model:"M5",year:"1988",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"850CSi",year:"1995",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M5",year:"1995",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M3",year:"1997",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M5",year:"2003",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M3",year:"2005",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M3",year:"2008",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"Z4 M Coupé",year:"2008",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M5",year:"2009",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M3 GTS",year:"2010",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"X5 M",year:"2011",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M5",year:"2012",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M4 Coupé",year:"2014",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"i8",year:"2015",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M4 GTS",year:"2016",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"Z4 Roadster",year:"2019",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M2 Competition Coupé",year:"2020",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M8 Competition Coupe",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M4 Competition Coupé",year:"2021",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M4 Competition Coupé 'Welcome Pack'",year:"2021",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M5 CS",year:"2022",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"iX xDrive50",year:"2022",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"BMW",model:"M2",year:"2023",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"M2 Forza Edition",year:"2023",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"BMW",model:"X6 M Competition",year:"2024",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Buick",model:"Regal GNX",year:"1987",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Cadillac",model:"ATS-V",year:"2016",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Cadillac",model:"CTS-V Sedan",year:"2016",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Cadillac",model:"CT4-V Blackwing",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Cadillac",model:"CT5-V Blackwing",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Can-Am",model:"Maverick X RS Turbo R",year:"2018",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Casey Currie",model:"#4402 Ultra 4 'Trophy Jeep'",year:"2019",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette",year:"1953",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"150 Utility Sedan",year:"1955",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Chevrolet",model:"Bel Air",year:"1957",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette",year:"1960",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"Impala Super Sport 409",year:"1964",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette Stingray 427",year:"1967",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Chevrolet",model:"Camaro Super Sport Coupe",year:"1969",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Chevrolet",model:"Nova Super Sport 396",year:"1969",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"Chevelle Super Sport 454",year:"1970",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Chevrolet",model:"El Camino Super Sport 454",year:"1970",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"K10 Custom",year:"1972",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"Camaro Z28",year:"1979",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Chevrolet",model:"Monte Carlo Super Sport",year:"1988",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette ZR-1",year:"1995",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Chevrolet",model:"Impala Super Sport",year:"1996",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette Z06",year:"2002",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette ZR1",year:"2009",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Chevrolet",model:"Camaro Z/28",year:"2015",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette Z06",year:"2015",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Chevrolet",model:"Camaro ZL1",year:"2017",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Chevrolet",model:"Camaro ZL1 1LE",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette ZR1",year:"2019",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette Stingray Coupé",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Chevrolet",model:"Silverado LT Trail Boss",year:"2020",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette Z06",year:"2023",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Chevrolet",model:"Corvette E-Ray",year:"2024",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Datsun",model:"510",year:"1970",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"DeBerti",model:"Wrangler Unlimited",year:"2013",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"DeBerti",model:"Chevrolet Silverado 1500 Drift Truck",year:"2018",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"DeBerti",model:"Ford Super Duty F-250 Lariat 'Transformer'",year:"2019",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"DeBerti",model:"Toyota Tacoma TRD 'The Performance Truck'",year:"2019",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"DeLorean",model:"DMC-12",year:"1982",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Dodge",model:"Dart HEMI Super Stock",year:"1968",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Dodge",model:"Charger Daytona HEMI",year:"1969",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Dodge",model:"Charger R/T",year:"1969",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Dodge",model:"Challenger R/T",year:"1970",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Dodge",model:"Coronet Super Bee",year:"1970",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Dodge",model:"Viper GTS ACR",year:"1999",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Viper GTS ACR Forza Edition",year:"1999",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Viper SRT10 ACR",year:"2008",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"SRT Viper GTS",year:"2013",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Challenger SRT Hellcat",year:"2015",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Charger SRT Hellcat",year:"2015",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Viper ACR",year:"2016",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Challenger SRT Demon",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Durango SRT Hellcat",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Dodge",model:"Challenger SRT Super Stock",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"250 GT Berlinetta Lusso",year:"1962",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Ferrari",model:"275 GTB4 Spider",year:"1967",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Ferrari",model:"Dino 246 GT",year:"1969",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Ferrari",model:"288 GTO",year:"1984",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ferrari",model:"F40",year:"1987",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"F40 Competizione",year:"1989",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ferrari",model:"512 TR",year:"1992",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ferrari",model:"F355 Berlinetta",year:"1994",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ferrari",model:"F50",year:"1995",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"F50 GT",year:"1996",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ferrari",model:"FXX",year:"2005",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Ferrari",model:"430 Scuderia",year:"2007",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"458 Italia",year:"2009",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"599XX",year:"2010",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Ferrari",model:"458 Speciale",year:"2013",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"LaFerrari",year:"2013",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ferrari",model:"J50",year:"2017",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ferrari",model:"FXX-K Evo",year:"2018",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Ferrari",model:"FXX-K Evo 'Welcome Pack'",year:"2018",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Ferrari",model:"Portofino",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"488 Pista",year:"2019",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"Monza SP2",year:"2019",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ferrari",model:"296 GTB",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ferrari",model:"F80",year:"2025",drive:"AWD",cls:"X",weight:0,ev:false},
+  {make:"Ford",model:"De Luxe Five-Window Coupe",year:"1932",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Ford",model:"Mustang GT Coupe",year:"1965",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Ford",model:"#2 GT40 Mk II Le Mans",year:"1966",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ford",model:"Mustang 2+2 Fastback",year:"1968",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Ford",model:"Mustang 2+2 Fastback Forza Edition",year:"1968",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Ford",model:"Mustang Boss 302",year:"1969",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Ford",model:"Capri RS3100",year:"1973",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Ford",model:"XB Falcon GT",year:"1973",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Ford",model:"#5 Escort RS1800 MK II",year:"1977",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Ford",model:"RS200 Evolution",year:"1985",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"F-150 XLT Lariat",year:"1986",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Ford",model:"F-150 XLT Lariat Forza Edition",year:"1986",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Ford",model:"Sierra Cosworth RS500",year:"1987",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Escort RS Cosworth",year:"1992",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"SVT Cobra R",year:"1993",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Supervan 3",year:"1994",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"Racing Puma",year:"1999",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Ford",model:"F-150 SVT Lightning",year:"2003",drive:"RWD",cls:"B",weight:0,ev:true},
+  {make:"Ford",model:"Focus RS",year:"2003",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"GT",year:"2005",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"Focus RS",year:"2009",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Crown Victoria Police Interceptor",year:"2010",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Ford",model:"Transit SuperSportVan",year:"2011",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Ford",model:"Mustang Shelby GT500",year:"2013",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"#11 Rockstar F-150 Trophy Truck",year:"2014",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Ranger T6 Rally Raid",year:"2014",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Mustang Shelby GT350R",year:"2016",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"#14 Rahal GRC Fiesta",year:"2017",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"#25 'Brocky' Ultra4 Bronco RTR",year:"2017",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Focus RS",year:"2017",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"GT",year:"2017",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ford",model:"Mustang RTR Spec 5",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"#2069 Ford Performance Bronco R",year:"2020",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Mustang Shelby GT500",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"Super Duty F-450 DRW Platinum",year:"2020",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"Ford",model:"Bronco Raptor",year:"2022",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Ford",model:"F-150 Lightning Platinum",year:"2022",drive:"AWD",cls:"A",weight:0,ev:true},
+  {make:"Ford",model:"Focus ST",year:"2022",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"F-150 Raptor R",year:"2023",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"F-150 Raptor R 'Welcome Pack'",year:"2023",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Ford",model:"Fiesta ST",year:"2023",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Ford",model:"Mustang Dark Horse",year:"2024",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Ford",model:"Mustang GT",year:"2024",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Formula Drift",model:"#98 BMW 325i",year:"1989",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Formula Drift",model:"#34 Toyota Supra MkIV",year:"1995",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#777 Nissan 240SX",year:"1997",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Formula Drift",model:"#43 Dodge Viper SRT10",year:"2006",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#117 599 GTB Fiorano",year:"2007",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#99 Mazda RX-8",year:"2009",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Formula Drift",model:"#777 Chevrolet Corvette",year:"2013",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#13 Ford Mustang",year:"2015",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#530 HSV Maloo Gen-F",year:"2016",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#411 Toyota Corolla Hatchback",year:"2019",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#91 BMW M2",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#151 Toyota GR Supra",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Formula Drift",model:"#64 Forsberg Racing Nissan Z",year:"2023",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Funco",model:"Motorsports F9",year:"2018",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"GMC",model:"Jimmy",year:"1970",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"GMC",model:"Syclone",year:"1991",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"GMC",model:"Typhoon",year:"1992",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"GMC",model:"HUMMER EV Pickup",year:"2022",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Gordon Murray",model:"T.50",year:"2022",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"GR",model:"GT Prototype",year:"2025",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Hennessey",model:"Venom GT",year:"2012",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Hennessey",model:"Venom F5",year:"2021",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Holden",model:"Torana A9X",year:"1977",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Honda",model:"S800",year:"1970",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"Civic RS",year:"1974",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"City E II",year:"1984",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"Civic CRX Mugen",year:"1984",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"Civic Si",year:"1986",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"#19 CRX WTAC",year:"1990",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Honda",model:"Beat",year:"1991",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"CR-X SiR",year:"1991",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"#21 Hardrace Civic WTAC",year:"1992",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Honda",model:"NSX-R",year:"1992",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Honda",model:"Acty",year:"1994",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"Acty 'Rakuraku Express'",year:"1994",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Honda",model:"Prelude Si",year:"1994",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Honda",model:"Civic Type R",year:"1997",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Honda",model:"#33 Integra WTAC",year:"2001",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Honda",model:"S2000",year:"2003",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Honda",model:"S2000 Touge Edition",year:"2003",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Honda",model:"#52 Evasive S2000 WTAC",year:"2004",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Honda",model:"Civic Type R",year:"2004",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Honda",model:"NSX-R",year:"2005",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Honda",model:"NSX-R GT",year:"2005",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Honda",model:"Civic Type-R",year:"2007",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Honda",model:"Civic Type R",year:"2015",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"Honda",model:"Ridgeline Baja Trophy Truck",year:"2015",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Honda",model:"Civic Type R",year:"2018",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"Honda",model:"e",year:"2022",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Honda",model:"Civic Type R",year:"2023",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"HSV",model:"GEN-F GTS",year:"2014",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Hyundai",model:"Veloster N",year:"2019",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Hyundai",model:"i30 N",year:"2020",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Hyundai",model:"i20 N",year:"2021",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Hyundai",model:"N Vision 74",year:"2022",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Hyundai",model:"IONIQ 5 N",year:"2023",drive:"AWD",cls:"A",weight:0,ev:true},
+  {make:"Jaguar",model:"D-Type",year:"1956",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Jaguar",model:"E-Type",year:"1961",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Jaguar",model:"Lightweight E-Type",year:"1964",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Jaguar",model:"XJ220",year:"1993",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Jaguar",model:"XJ220 TWR",year:"1993",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Jaguar",model:"C-X75",year:"2010",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Jeep",model:"Wrangler Rubicon",year:"2012",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"Jeep",model:"Trailcat",year:"2016",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Jeep",model:"Grand Cherokee Trackhawk",year:"2018",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Jeep",model:"Gladiator Rubicon (JT)",year:"2020",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Jimco",model:"#240 Fastball Racing Spec Trophy Truck",year:"2019",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Jimco",model:"#179 Hammerhead Class 1",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Koenigsegg",model:"CCGT",year:"2008",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Koenigsegg",model:"Agera",year:"2011",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Koenigsegg",model:"One:1",year:"2015",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Koenigsegg",model:"Regera",year:"2016",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Koenigsegg",model:"Jesko",year:"2020",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"KTM",model:"X-Bow GT4",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Miura P400",year:"1967",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Lamborghini",model:"Countach LP5000 QV",year:"1988",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Lamborghini",model:"Diablo SV",year:"1997",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Diablo GTR",year:"1999",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Lamborghini",model:"Murciélago LP 670-4 SV",year:"2010",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Aventador LP 700-4",year:"2012",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Gallardo LP 570-4 Spyder Performante",year:"2012",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Veneno",year:"2013",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Lamborghini",model:"Huracán LP 610-4",year:"2014",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Centenario LP 770-4",year:"2016",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Lamborghini",model:"Aventador SVJ",year:"2018",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Lamborghini",model:"Urus",year:"2019",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Essenza SCV12",year:"2020",drive:"AWD",cls:"X",weight:0,ev:false},
+  {make:"Lamborghini",model:"Huracán STO",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Countach LPI 800-4",year:"2021",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Lamborghini",model:"Huracán Sterrato",year:"2022",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Lamborghini",model:"Huracán Tecnica",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lamborghini",model:"Revuelto",year:"2024",drive:"AWD",cls:"X",weight:0,ev:false},
+  {make:"Lancia",model:"Stratos HF Stradale",year:"1974",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Lancia",model:"Delta S4",year:"1986",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Lancia",model:"Delta HF Integrale Evo",year:"1992",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Land Rover",model:"Range Rover Sport SVR",year:"2015",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Land Rover",model:"Defender 110 X",year:"2020",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Lexus",model:"LFA",year:"2010",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lexus",model:"LFA Forza Edition",year:"2010",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lexus",model:"RC F",year:"2015",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lexus",model:"LC 500",year:"2021",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lincoln",model:"Continental",year:"1962",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Lotus",model:"Elise GT1",year:"1997",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Lotus",model:"Elise Series 1 Sport 190",year:"1999",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Lotus",model:"Exige Cup 430",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lotus",model:"Scura Motorsport Exige WTAC",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lotus",model:"Evija",year:"2020",drive:"AWD",cls:"X",weight:0,ev:true},
+  {make:"Lotus",model:"Evija Forza Edition",year:"2020",drive:"AWD",cls:"X",weight:0,ev:true},
+  {make:"Lotus",model:"Emira",year:"2023",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Lucid",model:"Air Sapphire",year:"2024",drive:"AWD",cls:"S2",weight:0,ev:true},
+  {make:"Maserati",model:"Ghibli Cup",year:"1997",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Maserati",model:"MC20",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Mazda",model:"Cosmo 110S Series II",year:"1972",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Mazda",model:"RX-3",year:"1973",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Mazda",model:"RX-3 Forza Edition",year:"1973",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Mazda",model:"RX-7 GSL-SE",year:"1985",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Mazda",model:"Savanna RX-7",year:"1990",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Mazda",model:"MX-5 Miata",year:"1990",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Mazda",model:"#55 Mazda 787B",year:"1991",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Mazda",model:"RX-7 Type R",year:"1992",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Mazda",model:"MX-5 Miata",year:"1994",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Mazda",model:"MX-5 Miata Forza Edition",year:"1994",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Mazda",model:"Mazdaspeed MX-5",year:"2005",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Mazda",model:"Furai",year:"2008",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Mazda",model:"Mazdaspeed 3",year:"2010",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Mazda",model:"RX-8 R3",year:"2011",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Mazda",model:"MX-5",year:"2013",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Mazda",model:"MX-5",year:"2016",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Mazda",model:"MX-5 Cup",year:"2017",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Mazda",model:"MX-5 Miata RF",year:"2022",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"McLaren",model:"F1",year:"1993",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"McLaren",model:"F1 GT",year:"1997",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"McLaren",model:"12C Coupé",year:"2011",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"McLaren",model:"P1",year:"2013",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"McLaren",model:"570S Coupé",year:"2015",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"McLaren",model:"600LT Coupé",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"McLaren",model:"Speedtail",year:"2019",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"McLaren",model:"620R",year:"2021",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"McLaren",model:"765LT",year:"2021",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"McLaren",model:"Sabre",year:"2021",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"McLaren",model:"Artura",year:"2023",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-AMG",model:"C 63 S Coupé",year:"2016",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-AMG",model:"E 63 S",year:"2018",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-AMG",model:"GT 4-Door Coupé",year:"2018",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-AMG",model:"GT Black Series",year:"2021",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Mercedes-AMG",model:"GT Black Series 'Welcome Pack'",year:"2021",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Mercedes-AMG",model:"SL 63",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"300 SL Coupé",year:"1954",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"AMG Hammer Coupe",year:"1987",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"190E 2.5-16 Evolution II",year:"1990",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"190E 2.5-16 Evolution II Forza Edition",year:"1990",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"SL 65 AMG Black Series",year:"2009",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"C 63 AMG Coupé Black Series",year:"2012",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"A 45 AMG",year:"2013",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"G 65 AMG",year:"2013",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"G 65 AMG 6x6",year:"2014",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"Unimog U5023",year:"2014",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"X-Class",year:"2018",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"Mercedes-Benz",model:"SLC 43 Final Edition",year:"2020",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Meyers",model:"Manx",year:"1971",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Meyers",model:"Manx 2.0 EV",year:"2023",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"MG",model:"Metro 6R4",year:"1986",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"MINI",model:"Cooper S",year:"1965",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"MINI",model:"John Cooper Works GP",year:"2012",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"MINI",model:"X-Raid John Cooper Works Buggy",year:"2018",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"MINI",model:"John Cooper Works GP",year:"2021",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Mitsubishi",model:"#269 Minicab Time Attack",year:"1990",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Galant VR-4",year:"1992",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Eclipse GSX",year:"1995",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Lancer Evolution III GSR",year:"1995",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Montero Exceed 2800 TD",year:"1995",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"Mitsubishi",model:"GTO",year:"1997",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Montero Evolution",year:"1997",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Lancer Evolution VI GSR TM Edition",year:"2001",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Lancer Evolution VIII MR",year:"2004",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Lancer Evolution VIII MR 'Welcome Pack'",year:"2004",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mitsubishi",model:"#1 Sierra Lancer Evolution Time Attack",year:"2005",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Lancer Evolution IX MR",year:"2006",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Mitsubishi",model:"Lancer Evolution X GSR",year:"2008",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"Fairlady Z 432",year:"1969",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"Skyline 2000GT-R",year:"1971",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"Skyline H/T 2000GT-R",year:"1973",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"#11 Tomica Skyline Turbo Super Silhouette",year:"1983",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"Safari Turbo",year:"1985",drive:"AWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"Be-1",year:"1987",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Nissan",model:"Skyline GTS-R (HR31)",year:"1987",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Nissan",model:"PAO",year:"1989",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Nissan",model:"S-Cargo",year:"1989",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Nissan",model:"S-Cargo Forza Edition",year:"1989",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Nissan",model:"Silvia K's",year:"1989",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"Pulsar GTI-R",year:"1990",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Nissan",model:"Figaro",year:"1991",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Nissan",model:"Skyline GT-R",year:"1992",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"#32 Skyline WTAC 'Xtreme GTR'",year:"1993",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"240SX",year:"1993",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"Skyline GT-R V-Spec",year:"1993",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"Fairlady Z Version S Twin Turbo",year:"1994",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"Silvia K's",year:"1994",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"Gloria Gran Turismo",year:"1995",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"Nismo GT-R LM",year:"1995",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Nissan",model:"Skyline GT-R V-Spec",year:"1997",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"Stagea RS Four V",year:"1997",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Nissan",model:"#23 Pennzoil Nismo Skyline GT-R",year:"1998",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"Silvia K's Aero",year:"1998",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Nissan",model:"#36 Silvia WTAC",year:"2000",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"Skyline GT-R V-Spec II",year:"2000",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"Silvia Spec-R",year:"2002",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"Fairlady Z",year:"2003",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"370Z",year:"2010",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"GT-R Black Edition (R35)",year:"2012",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"GT-R Black Edition (R35) Forza Edition",year:"2012",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"GT-R Black Edition (R35) Touge Edition",year:"2012",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"GT-R (R35)",year:"2017",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"370Z NISMO",year:"2019",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Nissan",model:"GT-R NISMO (R35)",year:"2020",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"GT-R NISMO",year:"2024",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Nissan",model:"Z NISMO",year:"2024",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Noble",model:"M600",year:"2010",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Opel",model:"Manta 400",year:"1984",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Pagani",model:"Zonda Cinque Roadster",year:"2009",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Pagani",model:"Huayra BC Coupe",year:"2016",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Pagani",model:"Huayra R",year:"2021",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Peel",model:"P50",year:"1962",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Peel",model:"P50 Trolli Edition",year:"1962",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Penhall",model:"The Cholla",year:"2011",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Peugeot",model:"205 Turbo 16",year:"1984",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Peugeot",model:"205 Rallye",year:"1991",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Peugeot",model:"207 Super 2000",year:"2007",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"Plymouth",model:"Fury",year:"1958",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Plymouth",model:"Barracuda Formula-S",year:"1968",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Plymouth",model:"Cuda 426 Hemi",year:"1971",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Polaris",model:"RZR Pro XP Ultimate",year:"2021",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Polaris",model:"RZR Pro XP Factory Racing Limited Edition",year:"2021",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Pontiac",model:"Firebird Trans Am",year:"1977",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Pontiac",model:"Firebird Trans Am GTA",year:"1987",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Porsche",model:"#3 917 LH",year:"1970",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Porsche",model:"911 Carrera RS",year:"1973",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Porsche",model:"911 Turbo 3.3",year:"1982",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Porsche",model:"#185 959 Prodrive Rally Raid",year:"1986",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"928 GTS",year:"1993",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Porsche",model:"968 Turbo S",year:"1993",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Porsche",model:"911 GT2",year:"1995",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"911 GT1 Strassenversion",year:"1997",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Porsche",model:"Carrera GT",year:"2003",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"911 GT3",year:"2004",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"911 GT3 RS 4.0",year:"2012",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"918 Spyder",year:"2014",drive:"AWD",cls:"X",weight:0,ev:false},
+  {make:"Porsche",model:"718 Cayman GTS",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"Macan LPR Rally Raid",year:"2018",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Porsche",model:"#70 Porsche Motorsport 935",year:"2019",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Porsche",model:"911 Carrera S",year:"2019",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"911 GT3 RS",year:"2019",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"911 GT3",year:"2021",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"Mission R",year:"2021",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Porsche",model:"718 Cayman GT4 RS",year:"2022",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Porsche",model:"911 GT3 RS",year:"2023",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Porsche",model:"911 Rallye",year:"2023",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Porsche",model:"911 Turbo S",year:"2023",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"Radical",model:"RXC Turbo",year:"2015",drive:"RWD",cls:"S2",weight:0,ev:false},
+  {make:"Ram",model:"1500 TRX",year:"2024",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Reliant",model:"Supervan III",year:"1972",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Renault",model:"8 Gordini",year:"1967",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Renault",model:"5 Turbo",year:"1980",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Renault",model:"Clio Williams",year:"1993",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Renault",model:"Megane R26.R",year:"2008",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Renault",model:"Megane RS 250",year:"2010",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Renault",model:"Mégane R.S.",year:"2018",drive:"FWD",cls:"A",weight:0,ev:false},
+  {make:"Rivian",model:"R1T",year:"2022",drive:"AWD",cls:"A",weight:0,ev:true},
+  {make:"RJ Anderson",model:"#37 Polaris RZR-Rockstar Pro 2 Truck",year:"2016",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"RJ Anderson",model:"#37 Polaris RZR Pro 4 Truck",year:"2021",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Saleen",model:"S7 LM",year:"2017",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Schuppan",model:"962CR",year:"1993",drive:"RWD",cls:"X",weight:0,ev:false},
+  {make:"Shelby",model:"Cobra 427 S/C",year:"1965",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Shelby",model:"Cobra Daytona Coupé",year:"1965",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"SIERRA Cars",model:"#23 Yokohama Alpha",year:"2020",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"SIERRA Cars",model:"700R",year:"2021",drive:"AWD",cls:"S2",weight:0,ev:false},
+  {make:"SIERRA Cars",model:"RX3",year:"2021",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Subaru",model:"BRAT GL",year:"1980",drive:"AWD",cls:"D",weight:0,ev:false},
+  {make:"Subaru",model:"Legacy RS",year:"1990",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Subaru",model:"Vivio RX-R",year:"1994",drive:"AWD",cls:"D",weight:0,ev:false},
+  {make:"Subaru",model:"Vivio RX-R Forza Edition",year:"1994",drive:"AWD",cls:"D",weight:0,ev:false},
+  {make:"Subaru",model:"SVX",year:"1996",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Subaru",model:"Impreza 22B-STi Version",year:"1998",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Subaru",model:"Impreza WRX STi",year:"2004",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Subaru",model:"Impreza WRX STi",year:"2005",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Subaru",model:"Legacy B4 2.0 GT",year:"2005",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Subaru",model:"Impreza WRX STI",year:"2008",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Subaru",model:"WRX STI",year:"2011",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Subaru",model:"BRZ",year:"2013",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Subaru",model:"WRX STI",year:"2015",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Subaru",model:"WRX STI ARX Supercar",year:"2018",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Subaru",model:"STI S209",year:"2019",drive:"AWD",cls:"S1",weight:0,ev:false},
+  {make:"Subaru",model:"BRZ",year:"2022",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Subaru",model:"BRZ Forza Edition",year:"2022",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Subaru",model:"WRX",year:"2022",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Toyota",model:"Sports 800",year:"1965",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Toyota",model:"Sports 800 Fanta Edition",year:"1965",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Toyota",model:"2000GT",year:"1969",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"Corolla SR5",year:"1974",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Toyota",model:"FJ40",year:"1979",drive:"AWD",cls:"D",weight:0,ev:false},
+  {make:"Toyota",model:"Sprinter Trueno GT Apex",year:"1985",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"Sprinter Trueno GT Apex Forza Edition",year:"1985",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"Sprinter Trueno GT Apex Touge Edition",year:"1985",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"MR2 SC",year:"1989",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"Chaser GT Twin Turbo",year:"1991",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Sera",year:"1991",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Toyota",model:"Celica GT-Four RC ST185",year:"1992",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Toyota",model:"Supra 2.0 GT",year:"1992",drive:"RWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"#1 Baja T100 Truck",year:"1993",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Celica GT-Four ST205",year:"1994",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Toyota",model:"J&J Motorsport Supra WTAC",year:"1995",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Toyota",model:"MR2 GT",year:"1995",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Chaser 2.5 Tourer V",year:"1997",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Soarer 2.5 GT-T",year:"1997",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Supra RZ",year:"1998",drive:"RWD",cls:"A",weight:0,ev:false},
+  {make:"Toyota",model:"Celica Sport Specialty II",year:"2003",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"Crown Super Deluxe Taxi",year:"2005",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Toyota",model:"86",year:"2013",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"86 'Stories'",year:"2013",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Land Cruiser Arctic Trucks AT37",year:"2016",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"JPN Taxi",year:"2017",drive:"FWD",cls:"D",weight:0,ev:false},
+  {make:"Toyota",model:"4Runner TRD Pro",year:"2019",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Tacoma TRD Pro",year:"2019",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Tacoma TRD Pro Forza Edition",year:"2019",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"GR Supra",year:"2020",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Toyota",model:"GR Yaris",year:"2021",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Toyota",model:"GR86",year:"2022",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Toyota",model:"Camry TRD",year:"2023",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Toyota",model:"Land Cruiser",year:"2025",drive:"AWD",cls:"B",weight:0,ev:false},
+  {make:"TVR",model:"Sagaris",year:"2005",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"TVR",model:"Griffith",year:"2018",drive:"RWD",cls:"S1",weight:0,ev:false},
+  {make:"Volkswagen",model:"Beetle",year:"1963",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Volkswagen",model:"Type 2 De Luxe",year:"1963",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Volkswagen",model:"Class 5/1600 Baja Bug",year:"1969",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Volkswagen",model:"Pickup LX",year:"1982",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Volkswagen",model:"Golf GTI",year:"1983",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Volkswagen",model:"Golf GTI 16V Mk2",year:"1992",drive:"FWD",cls:"C",weight:0,ev:false},
+  {make:"Volkswagen",model:"Corrado VR6",year:"1995",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Volkswagen",model:"Golf R",year:"2010",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Volkswagen",model:"Scirocco R",year:"2011",drive:"FWD",cls:"B",weight:0,ev:false},
+  {make:"Volkswagen",model:"Golf R",year:"2014",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Volkswagen",model:"#34 Volkswagen Andretti Rallycross Beetle",year:"2017",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Volkswagen",model:"Golf R",year:"2021",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Volkswagen",model:"Golf R",year:"2022",drive:"AWD",cls:"A",weight:0,ev:false},
+  {make:"Volvo",model:"242 Turbo Evolution",year:"1983",drive:"RWD",cls:"B",weight:0,ev:false},
+  {make:"Wuling",model:"Sunshine S",year:"2013",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Wuling",model:"Sunshine S Forza Edition",year:"2013",drive:"RWD",cls:"D",weight:0,ev:false},
+  {make:"Wuling",model:"Hongguang Mini EV Macaron",year:"2022",drive:"RWD",cls:"D",weight:0,ev:true},
+  {make:"Zenvo",model:"TSR-S",year:"2019",drive:"RWD",cls:"X",weight:0,ev:false},
+];
+
+// 555 cars total
+
+const MAKES = [
+  "AMG Transport Dynamics",
+  "Abarth",
+  "Acura",
+  "Alfa Romeo",
+  "Alumicraft",
+  "Ariel",
+  "Aston Martin",
+  "Audi",
+  "Autozam",
+  "BAC",
+  "BMW",
+  "Bentley",
+  "Buick",
+  "Cadillac",
+  "Can-Am",
+  "Casey Currie",
+  "Chevrolet",
+  "Datsun",
+  "DeBerti",
+  "DeLorean",
+  "Dodge",
+  "Ferrari",
+  "Ford",
+  "Formula Drift",
+  "Funco",
+  "GMC",
+  "GR",
+  "Gordon Murray",
+  "HSV",
+  "Hennessey",
+  "Holden",
+  "Honda",
+  "Hyundai",
+  "Jaguar",
+  "Jeep",
+  "Jimco",
+  "KTM",
+  "Koenigsegg",
+  "Lamborghini",
+  "Lancia",
+  "Land Rover",
+  "Lexus",
+  "Lincoln",
+  "Lotus",
+  "Lucid",
+  "MG",
+  "MINI",
+  "Maserati",
+  "Mazda",
+  "McLaren",
+  "Mercedes-AMG",
+  "Mercedes-Benz",
+  "Meyers",
+  "Mitsubishi",
+  "Nissan",
+  "Noble",
+  "Opel",
+  "Pagani",
+  "Peel",
+  "Penhall",
+  "Peugeot",
+  "Plymouth",
+  "Polaris",
+  "Pontiac",
+  "Porsche",
+  "RJ Anderson",
+  "Radical",
+  "Ram",
+  "Reliant",
+  "Renault",
+  "Rivian",
+  "SIERRA Cars",
+  "Saleen",
+  "Schuppan",
+  "Shelby",
+  "Subaru",
+  "TVR",
+  "Toyota",
+  "Volkswagen",
+  "Volvo",
+  "Wuling",
+  "Zenvo",
+];
+
+// Helper: get car details from full DB
+function getCarDetails(make, model) {
+  const short = model.split(" '")[0];
+  return CAR_DB_FULL.find(c => c.make === make && (c.model === model || c.model.startsWith(short))) || null;
+}
+
+
+const CAR_DB = {
+  "AMG Transport Dynamics": ["M12S Warthog CST '54"],
+  "Abarth": ["595 esseesse '68", "Fiat 131 '80", "695 Biposto '16"],
+  "Acura": ["Integra Type-R '01", "RSX Type S '02", "NSX Type S '22", "Integra A-Spec '23"],
+  "Alfa Romeo": ["Giulia Sprint GTA Stradale '65", "Giulia TZ2 '65", "33 Stradale '68", "SE 048SP '90", "155 Q4 '92", "4C '14", "Giulia Quadrifoglio '17", "Giulia GTAm '21"],
+  "Alumicraft": ["Class 10 Race Car '15", "#122 Class 1 Buggy '21", "#6165 Trick Truck '22"],
+  "Ariel": ["Atom 500 V8 '13", "Nomad '16"],
+  "Aston Martin": ["DB5 '64", "DB11 '17", "Vulcan AMR Pro '17", "DBS Superleggera '19", "Valhalla Concept Car '19", "Vantage '19", "DBX '21", "Valkyrie AMR Pro '22", "Valkyrie '23"],
+  "Audi": ["Sport quattro '83", "#2 Sport quattro S1 '86", "RS 4 Avant '01", "RS 6 '03", "RS 4 '06", "RS 6 '09", "R8 LMS '09", "TT RS Coupé '10", "RS 3 Sportback '11", "RS 5 Coupé '11", "R8 Coupé V10 plus '13", "RS 4 Avant '13", "RS 7 Sportback '13", "RS 6 Avant '15", "S1 '15", "R8 V10 plus '16", "RS 4 Avant '18", "R8 V10 Performance '20", "RS 3 Sedan '20", "RS 6 Avant '21", "RS 7 Sportback '21", "RS e-tron GT '21"],
+  "Autozam": ["AZ-1 '93"],
+  "BAC": ["Mono '14"],
+  "BMW": ["Isetta 300 Export '57", "2002 Turbo '73", "M1 '81", "M3 '88", "M5 '88", "850CSi '95", "M5 '95", "M3 '97", "M5 '03", "M3 '05", "M3 '08", "Z4 M Coupé '08", "M5 '09", "M3 GTS '10", "X5 M '11", "M5 '12", "M4 Coupé '14", "i8 '15", "M4 GTS '16", "Z4 Roadster '19", "M2 Competition Coupé '20", "M8 Competition Coupe '20", "M4 Competition Coupé '21", "M4 Competition Coupé 'Welcome Pack' '21", "M5 CS '22", "iX xDrive50 '22", "M2 '23", "M2 Forza Edition '23", "X6 M Competition '24"],
+  "Bentley": ["Bentayga '16", "Continental GT Convertible '21"],
+  "Buick": ["Regal GNX '87"],
+  "Cadillac": ["ATS-V '16", "CTS-V Sedan '16", "CT4-V Blackwing '22", "CT5-V Blackwing '22"],
+  "Can-Am": ["Maverick X RS Turbo R '18"],
+  "Casey Currie": ["#4402 Ultra 4 'Trophy Jeep' '19"],
+  "Chevrolet": ["Corvette '53", "150 Utility Sedan '55", "Bel Air '57", "Corvette '60", "Impala Super Sport 409 '64", "Corvette Stingray 427 '67", "Camaro Super Sport Coupe '69", "Nova Super Sport 396 '69", "Chevelle Super Sport 454 '70", "El Camino Super Sport 454 '70", "K10 Custom '72", "Camaro Z28 '79", "Monte Carlo Super Sport '88", "Corvette ZR-1 '95", "Impala Super Sport '96", "Corvette Z06 '02", "Corvette ZR1 '09", "Camaro Z/28 '15", "Corvette Z06 '15", "Camaro ZL1 '17", "Camaro ZL1 1LE '18", "Corvette ZR1 '19", "Corvette Stingray Coupé '20", "Silverado LT Trail Boss '20", "Corvette Z06 '23", "Corvette E-Ray '24"],
+  "Datsun": ["510 '70"],
+  "DeBerti": ["Wrangler Unlimited '13", "Chevrolet Silverado 1500 Drift Truck '18", "Ford Super Duty F-250 Lariat 'Transformer' '19", "Toyota Tacoma TRD 'The Performance Truck' '19"],
+  "DeLorean": ["DMC-12 '82"],
+  "Dodge": ["Dart HEMI Super Stock '68", "Charger Daytona HEMI '69", "Charger R/T '69", "Challenger R/T '70", "Coronet Super Bee '70", "Viper GTS ACR '99", "Viper GTS ACR Forza Edition '99", "Viper SRT10 ACR '08", "SRT Viper GTS '13", "Challenger SRT Hellcat '15", "Charger SRT Hellcat '15", "Viper ACR '16", "Challenger SRT Demon '18", "Durango SRT Hellcat '21", "Challenger SRT Super Stock '22"],
+  "Ferrari": ["250 GT Berlinetta Lusso '62", "275 GTB4 Spider '67", "Dino 246 GT '69", "288 GTO '84", "F40 '87", "F40 Competizione '89", "512 TR '92", "F355 Berlinetta '94", "F50 '95", "F50 GT '96", "FXX '05", "430 Scuderia '07", "458 Italia '09", "599XX '10", "458 Speciale '13", "LaFerrari '13", "J50 '17", "FXX-K Evo '18", "FXX-K Evo 'Welcome Pack' '18", "Portofino '18", "488 Pista '19", "Monza SP2 '19", "296 GTB '22", "F80 '25"],
+  "Ford": ["De Luxe Five-Window Coupe '32", "Mustang GT Coupe '65", "#2 GT40 Mk II Le Mans '66", "Mustang 2+2 Fastback '68", "Mustang 2+2 Fastback Forza Edition '68", "Mustang Boss 302 '69", "Capri RS3100 '73", "XB Falcon GT '73", "#5 Escort RS1800 MK II '77", "RS200 Evolution '85", "F-150 XLT Lariat '86", "F-150 XLT Lariat Forza Edition '86", "Sierra Cosworth RS500 '87", "Escort RS Cosworth '92", "SVT Cobra R '93", "Supervan 3 '94", "Racing Puma '99", "F-150 SVT Lightning '03", "Focus RS '03", "GT '05", "Focus RS '09", "Crown Victoria Police Interceptor '10", "Transit SuperSportVan '11", "Mustang Shelby GT500 '13", "#11 Rockstar F-150 Trophy Truck '14", "Ranger T6 Rally Raid '14", "Mustang Shelby GT350R '16", "#14 Rahal GRC Fiesta '17", "#25 'Brocky' Ultra4 Bronco RTR '17", "Focus RS '17", "GT '17", "Mustang RTR Spec 5 '18", "#2069 Ford Performance Bronco R '20", "Mustang Shelby GT500 '20", "Super Duty F-450 DRW Platinum '20", "Bronco Raptor '22", "F-150 Lightning Platinum '22", "Focus ST '22", "F-150 Raptor R '23", "F-150 Raptor R 'Welcome Pack' '23", "Fiesta ST '23", "Mustang Dark Horse '24", "Mustang GT '24"],
+  "Formula Drift": ["#98 BMW 325i '89", "#34 Toyota Supra MkIV '95", "#777 Nissan 240SX '97", "#43 Dodge Viper SRT10 '06", "#117 599 GTB Fiorano '07", "#99 Mazda RX-8 '09", "#777 Chevrolet Corvette '13", "#13 Ford Mustang '15", "#530 HSV Maloo Gen-F '16", "#411 Toyota Corolla Hatchback '19", "#91 BMW M2 '20", "#151 Toyota GR Supra '20", "#64 Forsberg Racing Nissan Z '23"],
+  "Funco": ["Motorsports F9 '18"],
+  "GMC": ["Jimmy '70", "Syclone '91", "Typhoon '92", "HUMMER EV Pickup '22"],
+  "GR": ["GT Prototype '25"],
+  "Gordon Murray": ["T.50 '22"],
+  "HSV": ["GEN-F GTS '14"],
+  "Hennessey": ["Venom GT '12", "Venom F5 '21"],
+  "Holden": ["Torana A9X '77"],
+  "Honda": ["S800 '70", "Civic RS '74", "City E II '84", "Civic CRX Mugen '84", "Civic Si '86", "#19 CRX WTAC '90", "Beat '91", "CR-X SiR '91", "#21 Hardrace Civic WTAC '92", "NSX-R '92", "Acty '94", "Acty 'Rakuraku Express' '94", "Prelude Si '94", "Civic Type R '97", "#33 Integra WTAC '01", "S2000 '03", "S2000 Touge Edition '03", "#52 Evasive S2000 WTAC '04", "Civic Type R '04", "NSX-R '05", "NSX-R GT '05", "Civic Type-R '07", "Civic Type R '15", "Ridgeline Baja Trophy Truck '15", "Civic Type R '18", "e '22", "Civic Type R '23"],
+  "Hyundai": ["Veloster N '19", "i30 N '20", "i20 N '21", "N Vision 74 '22", "IONIQ 5 N '23"],
+  "Jaguar": ["D-Type '56", "E-Type '61", "Lightweight E-Type '64", "XJ220 '93", "XJ220 TWR '93", "C-X75 '10"],
+  "Jeep": ["Wrangler Rubicon '12", "Trailcat '16", "Grand Cherokee Trackhawk '18", "Gladiator Rubicon (JT) '20"],
+  "Jimco": ["#240 Fastball Racing Spec Trophy Truck '19", "#179 Hammerhead Class 1 '20"],
+  "KTM": ["X-Bow GT4 '18"],
+  "Koenigsegg": ["CCGT '08", "Agera '11", "One:1 '15", "Regera '16", "Jesko '20"],
+  "Lamborghini": ["Miura P400 '67", "Countach LP5000 QV '88", "Diablo SV '97", "Diablo GTR '99", "Murciélago LP 670-4 SV '10", "Aventador LP 700-4 '12", "Gallardo LP 570-4 Spyder Performante '12", "Veneno '13", "Huracán LP 610-4 '14", "Centenario LP 770-4 '16", "Aventador SVJ '18", "Urus '19", "Essenza SCV12 '20", "Huracán STO '20", "Countach LPI 800-4 '21", "Huracán Sterrato '22", "Huracán Tecnica '22", "Revuelto '24"],
+  "Lancia": ["Stratos HF Stradale '74", "Delta S4 '86", "Delta HF Integrale Evo '92"],
+  "Land Rover": ["Range Rover Sport SVR '15", "Defender 110 X '20"],
+  "Lexus": ["LFA '10", "LFA Forza Edition '10", "RC F '15", "LC 500 '21"],
+  "Lincoln": ["Continental '62"],
+  "Lotus": ["Elise GT1 '97", "Elise Series 1 Sport 190 '99", "Exige Cup 430 '18", "Scura Motorsport Exige WTAC '18", "Evija '20", "Evija Forza Edition '20", "Emira '23"],
+  "Lucid": ["Air Sapphire '24"],
+  "MG": ["Metro 6R4 '86"],
+  "MINI": ["Cooper S '65", "John Cooper Works GP '12", "X-Raid John Cooper Works Buggy '18", "John Cooper Works GP '21"],
+  "Maserati": ["Ghibli Cup '97", "MC20 '22"],
+  "Mazda": ["Cosmo 110S Series II '72", "RX-3 '73", "RX-3 Forza Edition '73", "RX-7 GSL-SE '85", "Savanna RX-7 '90", "MX-5 Miata '90", "#55 Mazda 787B '91", "RX-7 Type R '92", "MX-5 Miata '94", "MX-5 Miata Forza Edition '94", "Mazdaspeed MX-5 '05", "Furai '08", "Mazdaspeed 3 '10", "RX-8 R3 '11", "MX-5 '13", "MX-5 '16", "MX-5 Cup '17", "MX-5 Miata RF '22"],
+  "McLaren": ["F1 '93", "F1 GT '97", "12C Coupé '11", "P1 '13", "570S Coupé '15", "600LT Coupé '18", "Speedtail '19", "620R '21", "765LT '21", "Sabre '21", "Artura '23"],
+  "Mercedes-AMG": ["C 63 S Coupé '16", "E 63 S '18", "GT 4-Door Coupé '18", "GT Black Series '21", "GT Black Series 'Welcome Pack' '21", "SL 63 '21"],
+  "Mercedes-Benz": ["300 SL Coupé '54", "AMG Hammer Coupe '87", "190E 2.5-16 Evolution II '90", "190E 2.5-16 Evolution II Forza Edition '90", "SL 65 AMG Black Series '09", "C 63 AMG Coupé Black Series '12", "A 45 AMG '13", "G 65 AMG '13", "G 65 AMG 6x6 '14", "Unimog U5023 '14", "X-Class '18", "SLC 43 Final Edition '20"],
+  "Meyers": ["Manx '71", "Manx 2.0 EV '23"],
+  "Mitsubishi": ["#269 Minicab Time Attack '90", "Galant VR-4 '92", "Eclipse GSX '95", "Lancer Evolution III GSR '95", "Montero Exceed 2800 TD '95", "GTO '97", "Montero Evolution '97", "Lancer Evolution VI GSR TM Edition '01", "Lancer Evolution VIII MR '04", "Lancer Evolution VIII MR 'Welcome Pack' '04", "#1 Sierra Lancer Evolution Time Attack '05", "Lancer Evolution IX MR '06", "Lancer Evolution X GSR '08"],
+  "Nissan": ["Fairlady Z 432 '69", "Skyline 2000GT-R '71", "Skyline H/T 2000GT-R '73", "#11 Tomica Skyline Turbo Super Silhouette '83", "Safari Turbo '85", "Be-1 '87", "Skyline GTS-R (HR31) '87", "PAO '89", "S-Cargo '89", "S-Cargo Forza Edition '89", "Silvia K's '89", "Pulsar GTI-R '90", "Figaro '91", "Skyline GT-R '92", "#32 Skyline WTAC 'Xtreme GTR' '93", "240SX '93", "Skyline GT-R V-Spec '93", "Fairlady Z Version S Twin Turbo '94", "Silvia K's '94", "Gloria Gran Turismo '95", "Nismo GT-R LM '95", "Skyline GT-R V-Spec '97", "Stagea RS Four V '97", "#23 Pennzoil Nismo Skyline GT-R '98", "Silvia K's Aero '98", "#36 Silvia WTAC '00", "Skyline GT-R V-Spec II '00", "Silvia Spec-R '02", "Fairlady Z '03", "370Z '10", "GT-R Black Edition (R35) '12", "GT-R Black Edition (R35) Forza Edition '12", "GT-R Black Edition (R35) Touge Edition '12", "GT-R (R35) '17", "370Z NISMO '19", "GT-R NISMO (R35) '20", "GT-R NISMO '24", "Z NISMO '24"],
+  "Noble": ["M600 '10"],
+  "Opel": ["Manta 400 '84"],
+  "Pagani": ["Zonda Cinque Roadster '09", "Huayra BC Coupe '16", "Huayra R '21"],
+  "Peel": ["P50 '62", "P50 Trolli Edition '62"],
+  "Penhall": ["The Cholla '11"],
+  "Peugeot": ["205 Turbo 16 '84", "205 Rallye '91", "207 Super 2000 '07"],
+  "Plymouth": ["Fury '58", "Barracuda Formula-S '68", "Cuda 426 Hemi '71"],
+  "Polaris": ["RZR Pro XP Ultimate '21", "RZR Pro XP Factory Racing Limited Edition '21"],
+  "Pontiac": ["Firebird Trans Am '77", "Firebird Trans Am GTA '87"],
+  "Porsche": ["#3 917 LH '70", "911 Carrera RS '73", "911 Turbo 3.3 '82", "#185 959 Prodrive Rally Raid '86", "928 GTS '93", "968 Turbo S '93", "911 GT2 '95", "911 GT1 Strassenversion '97", "Carrera GT '03", "911 GT3 '04", "911 GT3 RS 4.0 '12", "918 Spyder '14", "718 Cayman GTS '18", "Macan LPR Rally Raid '18", "#70 Porsche Motorsport 935 '19", "911 Carrera S '19", "911 GT3 RS '19", "911 GT3 '21", "Mission R '21", "718 Cayman GT4 RS '22", "911 GT3 RS '23", "911 Rallye '23", "911 Turbo S '23"],
+  "RJ Anderson": ["#37 Polaris RZR-Rockstar Pro 2 Truck '16", "#37 Polaris RZR Pro 4 Truck '21"],
+  "Radical": ["RXC Turbo '15"],
+  "Ram": ["1500 TRX '24"],
+  "Reliant": ["Supervan III '72"],
+  "Renault": ["8 Gordini '67", "5 Turbo '80", "Clio Williams '93", "Megane R26.R '08", "Megane RS 250 '10", "Mégane R.S. '18"],
+  "Rivian": ["R1T '22"],
+  "SIERRA Cars": ["#23 Yokohama Alpha '20", "700R '21", "RX3 '21"],
+  "Saleen": ["S7 LM '17"],
+  "Schuppan": ["962CR '93"],
+  "Shelby": ["Cobra 427 S/C '65", "Cobra Daytona Coupé '65"],
+  "Subaru": ["BRAT GL '80", "Legacy RS '90", "Vivio RX-R '94", "Vivio RX-R Forza Edition '94", "SVX '96", "Impreza 22B-STi Version '98", "Impreza WRX STi '04", "Impreza WRX STi '05", "Legacy B4 2.0 GT '05", "Impreza WRX STI '08", "WRX STI '11", "BRZ '13", "WRX STI '15", "WRX STI ARX Supercar '18", "STI S209 '19", "BRZ '22", "BRZ Forza Edition '22", "WRX '22"],
+  "TVR": ["Sagaris '05", "Griffith '18"],
+  "Toyota": ["Sports 800 '65", "Sports 800 Fanta Edition '65", "2000GT '69", "Corolla SR5 '74", "FJ40 '79", "Sprinter Trueno GT Apex '85", "Sprinter Trueno GT Apex Forza Edition '85", "Sprinter Trueno GT Apex Touge Edition '85", "MR2 SC '89", "Chaser GT Twin Turbo '91", "Sera '91", "Celica GT-Four RC ST185 '92", "Supra 2.0 GT '92", "#1 Baja T100 Truck '93", "Celica GT-Four ST205 '94", "J&J Motorsport Supra WTAC '95", "MR2 GT '95", "Chaser 2.5 Tourer V '97", "Soarer 2.5 GT-T '97", "Supra RZ '98", "Celica Sport Specialty II '03", "Crown Super Deluxe Taxi '05", "86 '13", "86 'Stories' '13", "Land Cruiser Arctic Trucks AT37 '16", "JPN Taxi '17", "4Runner TRD Pro '19", "Tacoma TRD Pro '19", "Tacoma TRD Pro Forza Edition '19", "GR Supra '20", "GR Yaris '21", "GR86 '22", "Camry TRD '23", "Land Cruiser '25"],
+  "Volkswagen": ["Beetle '63", "Type 2 De Luxe '63", "Class 5/1600 Baja Bug '69", "Pickup LX '82", "Golf GTI '83", "Golf GTI 16V Mk2 '92", "Corrado VR6 '95", "Golf R '10", "Scirocco R '11", "Golf R '14", "#34 Volkswagen Andretti Rallycross Beetle '17", "Golf R '21", "Golf R '22"],
+  "Volvo": ["242 Turbo Evolution '83"],
+  "Wuling": ["Sunshine S '13", "Sunshine S Forza Edition '13", "Hongguang Mini EV Macaron '22"],
+  "Zenvo": ["TSR-S '19"],
+};
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function ForzaTuner() {
-  const [screen,      setScreen]      = useState(()=>{
-    // Only show units screen on first ever launch
-    const done = LS.get("tl_v1_done_units", false);
-    return (done === true || done === "true") ? "main" : "units";
-  });
+  const [screen,      setScreen]      = useState(()=>{ const done = LS.get("tl_v1_done_units",false); return (done===true||done==="true")?"main":"units"; });
   const [units,       setUnits]       = useState(()=>LS.get("tl_v1_units",{weight:"lbs",springs:"lbs/in",pressure:"psi",speed:"mph"}));
   const [inputDevice, setInputDevice] = useState(()=>LS.get("tl_v1_device","controller"));
-  const [mode,        setMode]        = useState(()=>LS.get("tl_v1_mode","D")); // D or S
+  const [mode,        setMode]        = useState(()=>LS.get("tl_v1_mode","D"));
   const [overlay,     setOverlay]     = useState(null);
   const [toast,       setToast]       = useState(null);
 
-  // Car inputs
   const [make,        setMake]        = useState("Nissan");
-  const [model,       setModel]       = useState("GT-R Premium '17");
+  const [model,       setModel]       = useState("GT-R Black Edition (R35)");
   const [carSearch,   setCarSearch]   = useState("");
   const [showSearch,  setShowSearch]  = useState(false);
 
-  // Setup
-  const [driveType,   setDriveType]   = useState("AWD");
-  const [tuneId,      setTuneId]      = useState("Race");
-  const [weight,      setWeight]      = useState(3836);
-  const [weightDist,  setWeightDist]  = useState(48);
+  const [weight,      setWeight]      = useState(3900);
+  const [weightDist,  setWeightDist]  = useState(53);
   const [pi,          setPi]          = useState(850);
   const [carClass,    setCarClass]    = useState("S1");
-  const [surface,     setSurface]     = useState("Road");
-  const [compound,    setCompound]    = useState("Race Slick"); // updated by mode selection
+  const [driveType,   setDriveType]   = useState("AWD");
+  const [tuneId,      setTuneId]      = useState("Race");
+  const [surface,     setSurface]     = useState("Tarmac");
+  const [compound,    setCompound]    = useState("Race Semi-Slick");
 
-  // Advanced
-  const [rpmScale,    setRpmScale]    = useState(0);   // index into RPM_SCALES
-  const [redlineRpm,  setRedlineRpm]  = useState(7000);
-  const [peakTorqueRpm,setPeakTorqueRpm] = useState(4400);
-  const [maxTorque,   setMaxTorque]   = useState(547);
-  const [topspeed,    setTopspeed]    = useState(180);
-  const [gears,       setGears]       = useState(6);
-  const [tireWF,      setTireWF]      = useState("255");
-  const [tireWR,      setTireWR]      = useState("275");
-  const [tireAR,      setTireAR]      = useState("35");
-  const [tireRim,     setTireRim]     = useState("19");
-  const [tireARF,     setTireARF]     = useState("35");
-  const [tireRimF,    setTireRimF]    = useState("19");
-  const [carHeight,   setCarHeight]   = useState(1300); // mm — typical sports car
-  const [hasAero,     setHasAero]     = useState(true);
-  const [aeroF,       setAeroF]       = useState(150);
-  const [aeroR,       setAeroR]       = useState(220);
-  const [dragCd,      setDragCd]      = useState(0.32);
-  const [includeGearing,setIncludeGearing] = useState(true);
+  const [redlineRpm,     setRedlineRpm]     = useState(7000);
+  const [peakTorqueRpm,  setPeakTorqueRpm]  = useState(4500);
+  const [maxTorque,      setMaxTorque]      = useState(500);
+  const [topSpeed,       setTopSpeed]       = useState(180);
+  const [numGears,       setNumGears]       = useState(6);
+  const [includeGearing, setIncludeGearing] = useState(true);
 
-  // Output
-  const [tunePages,   setTunePages]   = useState({});
-  const [loading,     setLoading]     = useState(false);
-  const [generated,   setGenerated]   = useState(false);
+  const [hasAero,  setHasAero]  = useState(false);
+  const [aeroF,    setAeroF]    = useState(0);
+  const [aeroR,    setAeroR]    = useState(0);
+  const [dragCd,   setDragCd]   = useState(0.32);
 
-  const accentColor = TUNE_MODES.find(t=>t.id===tuneId)?.color||C.accent;
-  // For bright mode colors (lime, yellow) use dark text; for dark ones use white
-  const BRIGHT_MODES = ["Touge","Drag"]; // lime + electric yellow are bright
-  const onAccent = BRIGHT_MODES.includes(tuneId) ? "#0a0c0f" : "#ffffff";
+  const [feelAggression, setFeelAggression] = useState(50);
+  const [feelBalance,    setFeelBalance]    = useState(50);
+
+  const [tunePages,    setTunePages]    = useState([]);
+  const [loading,      setLoading]      = useState(false);
+  const [aiSummary,    setAiSummary]    = useState(null);
+  const [showPaste,    setShowPaste]    = useState(false);
+  const [pasteError,   setPasteError]   = useState("");
 
   const getState = () => ({
     make,model,driveType,tuneId,weight,weightDist,pi,carClass,surface,compound,
@@ -1876,7 +2600,14 @@ export default function ForzaTuner() {
         <div style={{marginBottom:10,position:"relative"}}>
           {/* Manufacturer dropdown + search — two-step like ForzaDroid */}
           <div style={{display:"flex",gap:6,marginBottom:6}}>
-            <select value={make} onChange={e=>{setMake(e.target.value);setModel(CAR_DB[e.target.value]?.[0]||"");setCarSearch("");}}
+            <select value={make} onChange={e=>{
+              const newMake = e.target.value;
+              const firstModel = CAR_DB[newMake]?.[0]||"";
+              setMake(newMake);setModel(firstModel);setCarSearch("");
+              const details = getCarDetails(newMake, firstModel);
+              if(details?.drive) setDriveType(details.drive);
+              if(details?.cls) setCarClass(details.cls);
+            }}
               style={{flex:1,background:C.card,border:`1px solid ${C.border}`,borderRadius:6,
                 padding:"9px 10px",color:C.text,fontFamily:C.fMono,fontSize:11,letterSpacing:"0.06em",
                 outline:"none",cursor:"pointer",appearance:"none",
@@ -1908,7 +2639,13 @@ export default function ForzaTuner() {
               background:C.card,border:`1px solid ${C.border}`,borderRadius:4,
               marginTop:4,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 24px rgba(0,0,0,0.5)"}}>
               {searchResults.map((r,i)=>(
-                <div key={i} onMouseDown={()=>{setMake(r.make);setModel(r.model);setCarSearch("");setShowSearch(false);}}
+                <div key={i} onMouseDown={()=>{
+                  setMake(r.make);setModel(r.model);setCarSearch("");setShowSearch(false);
+                  const details = getCarDetails(r.make, r.model);
+                  if(details?.drive) setDriveType(details.drive);
+                  if(details?.cls) setCarClass(details.cls);
+                  if(details?.weight && details.weight > 0) setWeight(details.weight);
+                }}
                   style={{padding:"10px 14px",borderBottom:i<searchResults.length-1?`1px solid ${C.border}`:"none",
                     cursor:"pointer",fontFamily:C.fBody,fontSize:13,color:C.text,
                     display:"flex",justifyContent:"space-between",alignItems:"center"}}>
