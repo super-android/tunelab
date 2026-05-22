@@ -5352,6 +5352,16 @@
       "pi": 456
     },
     {
+      "make": "Toyota",
+      "model": "Altezza RS200 Z Edition",
+      "year": "1999",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 2998,
+      "pi": 461,
+      "ev": false
+    },
+    {
       "make": "TVR",
       "model": "Sagaris",
       "year": "2005",
