@@ -1,8 +1,17 @@
 {
-  "version": 5,
+  "version": 6,
   "updated": "2026-05-25",
-  "count": 641,
   "cars": [
+    {
+      "make": "AMG Transport Dynamics",
+      "model": "M12S Warthog CST",
+      "year": "2554",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 663
+    },
     {
       "make": "Abarth",
       "model": "595 esseesse",
@@ -15,6 +24,16 @@
     },
     {
       "make": "Abarth",
+      "model": "695 Biposto",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 540
+    },
+    {
+      "make": "Abarth",
       "model": "Fiat 131",
       "year": "1980",
       "drive": "RWD",
@@ -24,14 +43,14 @@
       "pi": 399
     },
     {
-      "make": "Abarth",
-      "model": "695 Biposto",
-      "year": "2016",
-      "drive": "RWD",
-      "cls": "B",
+      "make": "Acura",
+      "model": "Integra A-Spec",
+      "year": "2023",
+      "drive": "FWD",
+      "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 540
+      "pi": 484
     },
     {
       "make": "Acura",
@@ -45,16 +64,6 @@
     },
     {
       "make": "Acura",
-      "model": "RSX Type S",
-      "year": "2002",
-      "drive": "FWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 462
-    },
-    {
-      "make": "Acura",
       "model": "NSX Type S",
       "year": "2022",
       "drive": "AWD",
@@ -65,13 +74,73 @@
     },
     {
       "make": "Acura",
-      "model": "Integra A-Spec",
-      "year": "2023",
+      "model": "RSX Type S",
+      "year": "2002",
       "drive": "FWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 484
+      "pi": 462
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "155 Q4",
+      "year": "1992",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 439
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "33 Stradale",
+      "year": "1968",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 593
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "4C",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 644
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "8C Competizione",
+      "year": "2007",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 635
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "Giulia GTAm",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 717
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "Giulia Quadrifoglio",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 667
     },
     {
       "make": "Alfa Romeo",
@@ -95,16 +164,6 @@
     },
     {
       "make": "Alfa Romeo",
-      "model": "33 Stradale",
-      "year": "1968",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 593
-    },
-    {
-      "make": "Alfa Romeo",
       "model": "SE 048SP",
       "year": "1990",
       "drive": "RWD",
@@ -112,56 +171,6 @@
       "weight": 0,
       "ev": false,
       "pi": 978
-    },
-    {
-      "make": "Alfa Romeo",
-      "model": "155 Q4",
-      "year": "1992",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 439
-    },
-    {
-      "make": "Alfa Romeo",
-      "model": "4C",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 644
-    },
-    {
-      "make": "Alfa Romeo",
-      "model": "Giulia Quadrifoglio",
-      "year": "2017",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 667
-    },
-    {
-      "make": "Alfa Romeo",
-      "model": "Giulia GTAm",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 717
-    },
-    {
-      "make": "Alumicraft",
-      "model": "Class 10 Race Car",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 532
     },
     {
       "make": "Alumicraft",
@@ -184,14 +193,24 @@
       "pi": 485
     },
     {
-      "make": "AMG Transport Dynamics",
-      "model": "M12S Warthog CST",
-      "year": "2554",
-      "drive": "AWD",
-      "cls": "A",
+      "make": "Alumicraft",
+      "model": "Class 10 Race Car",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 663
+      "pi": 532
+    },
+    {
+      "make": "Apollo",
+      "model": "Intensa Emozione",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 916
     },
     {
       "make": "Ariel",
@@ -215,16 +234,6 @@
     },
     {
       "make": "Aston Martin",
-      "model": "DB5",
-      "year": "1964",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 416
-    },
-    {
-      "make": "Aston Martin",
       "model": "DB11",
       "year": "2017",
       "drive": "RWD",
@@ -235,13 +244,13 @@
     },
     {
       "make": "Aston Martin",
-      "model": "Vulcan AMR Pro",
-      "year": "2017",
+      "model": "DB5",
+      "year": "1964",
       "drive": "RWD",
-      "cls": "S2",
+      "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 898
+      "pi": 416
     },
     {
       "make": "Aston Martin",
@@ -255,6 +264,16 @@
     },
     {
       "make": "Aston Martin",
+      "model": "DBX",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 618
+    },
+    {
+      "make": "Aston Martin",
       "model": "Valhalla Concept Car",
       "year": "2019",
       "drive": "AWD",
@@ -265,23 +284,13 @@
     },
     {
       "make": "Aston Martin",
-      "model": "Vantage",
-      "year": "2019",
+      "model": "Valkyrie",
+      "year": "2023",
       "drive": "RWD",
-      "cls": "A",
+      "cls": "R",
       "weight": 0,
       "ev": false,
-      "pi": 696
-    },
-    {
-      "make": "Aston Martin",
-      "model": "DBX",
-      "year": "2021",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 618
+      "pi": 924
     },
     {
       "make": "Aston Martin",
@@ -295,23 +304,43 @@
     },
     {
       "make": "Aston Martin",
-      "model": "Valkyrie",
-      "year": "2023",
+      "model": "Vantage",
+      "year": "2019",
       "drive": "RWD",
-      "cls": "R",
+      "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 924
+      "pi": 696
+    },
+    {
+      "make": "Aston Martin",
+      "model": "Vulcan",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 884
+    },
+    {
+      "make": "Aston Martin",
+      "model": "Vulcan AMR Pro",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 898
     },
     {
       "make": "Audi",
-      "model": "Sport quattro",
-      "year": "1983",
+      "model": "#2 Audi Sport quattro S1",
+      "year": "1986",
       "drive": "AWD",
-      "cls": "B",
+      "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 526
+      "pi": 726
     },
     {
       "make": "Audi",
@@ -325,83 +354,23 @@
     },
     {
       "make": "Audi",
-      "model": "RS 4 Avant",
-      "year": "2001",
-      "drive": "AWD",
-      "cls": "B",
+      "model": "R8 Coupe V10 GT RWD",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 544
+      "pi": 769
     },
     {
       "make": "Audi",
-      "model": "RS 6",
-      "year": "2003",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 556
-    },
-    {
-      "make": "Audi",
-      "model": "RS 4",
-      "year": "2006",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 593
-    },
-    {
-      "make": "Audi",
-      "model": "RS 6",
-      "year": "2009",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 598
-    },
-    {
-      "make": "Audi",
-      "model": "R8 LMS",
-      "year": "2009",
-      "drive": "AWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 810
-    },
-    {
-      "make": "Audi",
-      "model": "TT RS Coup\u00e9",
-      "year": "2010",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 593
-    },
-    {
-      "make": "Audi",
-      "model": "RS 3 Sportback",
-      "year": "2011",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 565
-    },
-    {
-      "make": "Audi",
-      "model": "RS 5 Coup\u00e9",
-      "year": "2011",
-      "drive": "AWD",
+      "model": "R8 Coupe V10 plus",
+      "year": "2013",
+      "drive": "RWD",
       "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 613
+      "pi": 694
     },
     {
       "make": "Audi",
@@ -415,63 +384,13 @@
     },
     {
       "make": "Audi",
-      "model": "RS 4 Avant",
-      "year": "2013",
+      "model": "R8 LMS",
+      "year": "2009",
       "drive": "AWD",
-      "cls": "A",
+      "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 607
-    },
-    {
-      "make": "Audi",
-      "model": "RS 7 Sportback",
-      "year": "2013",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 619
-    },
-    {
-      "make": "Audi",
-      "model": "RS 6 Avant",
-      "year": "2015",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 640
-    },
-    {
-      "make": "Audi",
-      "model": "S1",
-      "year": "2015",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 527
-    },
-    {
-      "make": "Audi",
-      "model": "R8 V10 plus",
-      "year": "2016",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 731
-    },
-    {
-      "make": "Audi",
-      "model": "RS 4 Avant",
-      "year": "2018",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 637
+      "pi": 810
     },
     {
       "make": "Audi",
@@ -485,6 +404,26 @@
     },
     {
       "make": "Audi",
+      "model": "R8 V10 performance",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 738
+    },
+    {
+      "make": "Audi",
+      "model": "R8 V10 plus",
+      "year": "2016",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 731
+    },
+    {
+      "make": "Audi",
       "model": "RS 3 Sedan",
       "year": "2020",
       "drive": "AWD",
@@ -495,6 +434,106 @@
     },
     {
       "make": "Audi",
+      "model": "RS 3 Sportback",
+      "year": "2011",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 565
+    },
+    {
+      "make": "Audi",
+      "model": "RS 4",
+      "year": "2006",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 593
+    },
+    {
+      "make": "Audi",
+      "model": "RS 4 Avant",
+      "year": "2001",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 544
+    },
+    {
+      "make": "Audi",
+      "model": "RS 4 Avant",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 607
+    },
+    {
+      "make": "Audi",
+      "model": "RS 4 Avant",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 637
+    },
+    {
+      "make": "Audi",
+      "model": "RS 5 Coupe",
+      "year": "2011",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 613
+    },
+    {
+      "make": "Audi",
+      "model": "RS 5 Coup\u00e9",
+      "year": "2011",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 613
+    },
+    {
+      "make": "Audi",
+      "model": "RS 6",
+      "year": "2003",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 556
+    },
+    {
+      "make": "Audi",
+      "model": "RS 6",
+      "year": "2009",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 598
+    },
+    {
+      "make": "Audi",
+      "model": "RS 6 Avant",
+      "year": "2015",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 640
+    },
+    {
+      "make": "Audi",
       "model": "RS 6 Avant",
       "year": "2021",
       "drive": "AWD",
@@ -502,6 +541,16 @@
       "weight": 0,
       "ev": false,
       "pi": 650
+    },
+    {
+      "make": "Audi",
+      "model": "RS 7 Sportback",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 619
     },
     {
       "make": "Audi",
@@ -524,6 +573,76 @@
       "pi": 677
     },
     {
+      "make": "Audi",
+      "model": "S1",
+      "year": "2015",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 527
+    },
+    {
+      "make": "Audi",
+      "model": "Sport quattro",
+      "year": "1983",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 526
+    },
+    {
+      "make": "Audi",
+      "model": "Sport quattro",
+      "year": "1984",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 526
+    },
+    {
+      "make": "Audi",
+      "model": "Sport quattro S1",
+      "year": "1986",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 726,
+      "ev": false
+    },
+    {
+      "make": "Audi",
+      "model": "TT RS Coupe",
+      "year": "2010",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 593,
+      "ev": false
+    },
+    {
+      "make": "Audi",
+      "model": "TT RS Coup\u00e9",
+      "year": "2010",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 593
+    },
+    {
+      "make": "Austin-Healey",
+      "model": "3000 MkIII",
+      "year": "1965",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 352
+    },
+    {
       "make": "Autozam",
       "model": "AZ-1",
       "year": "1993",
@@ -544,36 +663,6 @@
       "pi": 766
     },
     {
-      "make": "Bentley",
-      "model": "Bentayga",
-      "year": "2016",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 612
-    },
-    {
-      "make": "Bentley",
-      "model": "Continental GT Convertible",
-      "year": "2021",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 649
-    },
-    {
-      "make": "BMW",
-      "model": "Isetta 300 Export",
-      "year": "1957",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 100
-    },
-    {
       "make": "BMW",
       "model": "2002 Turbo",
       "year": "1973",
@@ -582,36 +671,6 @@
       "weight": 0,
       "ev": false,
       "pi": 424
-    },
-    {
-      "make": "BMW",
-      "model": "M1",
-      "year": "1981",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 510
-    },
-    {
-      "make": "BMW",
-      "model": "M3",
-      "year": "1988",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 474
-    },
-    {
-      "make": "BMW",
-      "model": "M5",
-      "year": "1988",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 470
     },
     {
       "make": "BMW",
@@ -625,13 +684,73 @@
     },
     {
       "make": "BMW",
-      "model": "M5",
-      "year": "1995",
+      "model": "Isetta 300 Export",
+      "year": "1957",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 100
+    },
+    {
+      "make": "BMW",
+      "model": "M1",
+      "year": "1981",
       "drive": "RWD",
       "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 516
+      "pi": 510
+    },
+    {
+      "make": "BMW",
+      "model": "M2",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 647
+    },
+    {
+      "make": "BMW",
+      "model": "M2 Competition Coupe",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 656,
+      "ev": false
+    },
+    {
+      "make": "BMW",
+      "model": "M2 Competition Coup\u00e9",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 684
+    },
+    {
+      "make": "BMW",
+      "model": "M2 Forza Edition",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 700
+    },
+    {
+      "make": "BMW",
+      "model": "M3",
+      "year": "1988",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 474
     },
     {
       "make": "BMW",
@@ -642,16 +761,6 @@
       "weight": 0,
       "ev": false,
       "pi": 549
-    },
-    {
-      "make": "BMW",
-      "model": "M5",
-      "year": "2003",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 580
     },
     {
       "make": "BMW",
@@ -675,26 +784,6 @@
     },
     {
       "make": "BMW",
-      "model": "Z4 M Coup\u00e9",
-      "year": "2008",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 608
-    },
-    {
-      "make": "BMW",
-      "model": "M5",
-      "year": "2009",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 595
-    },
-    {
-      "make": "BMW",
       "model": "M3 GTS",
       "year": "2010",
       "drive": "RWD",
@@ -705,83 +794,23 @@
     },
     {
       "make": "BMW",
-      "model": "X5 M",
-      "year": "2011",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 546
-    },
-    {
-      "make": "BMW",
-      "model": "M5",
-      "year": "2012",
+      "model": "M4 Competition Coupe",
+      "year": "2021",
       "drive": "RWD",
       "cls": "A",
       "weight": 0,
-      "ev": false,
-      "pi": 652
+      "pi": 666,
+      "ev": false
     },
     {
       "make": "BMW",
-      "model": "M4 Coup\u00e9",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 679
-    },
-    {
-      "make": "BMW",
-      "model": "i8",
-      "year": "2015",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 665
-    },
-    {
-      "make": "BMW",
-      "model": "M4 GTS",
-      "year": "2016",
+      "model": "M4 Competition Coupe Welcome Pack",
+      "year": "2021",
       "drive": "RWD",
       "cls": "S1",
       "weight": 0,
-      "ev": false,
-      "pi": 711
-    },
-    {
-      "make": "BMW",
-      "model": "Z4 Roadster",
-      "year": "2019",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 634
-    },
-    {
-      "make": "BMW",
-      "model": "M2 Competition Coup\u00e9",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 684
-    },
-    {
-      "make": "BMW",
-      "model": "M8 Competition Coupe",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 684
+      "pi": 800,
+      "ev": false
     },
     {
       "make": "BMW",
@@ -805,6 +834,86 @@
     },
     {
       "make": "BMW",
+      "model": "M4 Coupe",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 679
+    },
+    {
+      "make": "BMW",
+      "model": "M4 Coup\u00e9",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 679
+    },
+    {
+      "make": "BMW",
+      "model": "M4 GTS",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 711
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "year": "1988",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 470
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 516
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "year": "2003",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 580
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "year": "2009",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 595
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "year": "2012",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 652
+    },
+    {
+      "make": "BMW",
       "model": "M5 CS",
       "year": "2022",
       "drive": "AWD",
@@ -812,6 +921,76 @@
       "weight": 0,
       "ev": false,
       "pi": 731
+    },
+    {
+      "make": "BMW",
+      "model": "M8 Competition Coupe",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 684
+    },
+    {
+      "make": "BMW",
+      "model": "X5 M",
+      "year": "2011",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 546
+    },
+    {
+      "make": "BMW",
+      "model": "X6 M Competition",
+      "year": "2024",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 672
+    },
+    {
+      "make": "BMW",
+      "model": "Z4 M Coupe",
+      "year": "2008",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 579
+    },
+    {
+      "make": "BMW",
+      "model": "Z4 M Coup\u00e9",
+      "year": "2008",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 608
+    },
+    {
+      "make": "BMW",
+      "model": "Z4 Roadster",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 634
+    },
+    {
+      "make": "BMW",
+      "model": "i8",
+      "year": "2015",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 665
     },
     {
       "make": "BMW",
@@ -824,34 +1003,24 @@
       "pi": 595
     },
     {
-      "make": "BMW",
-      "model": "M2",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 647
-    },
-    {
-      "make": "BMW",
-      "model": "M2 Forza Edition",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 700
-    },
-    {
-      "make": "BMW",
-      "model": "X6 M Competition",
-      "year": "2024",
+      "make": "Bentley",
+      "model": "Bentayga",
+      "year": "2016",
       "drive": "AWD",
       "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 672
+      "pi": 612
+    },
+    {
+      "make": "Bentley",
+      "model": "Continental GT Convertible",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 649
     },
     {
       "make": "Buick",
@@ -875,16 +1044,6 @@
     },
     {
       "make": "Cadillac",
-      "model": "CTS-V Sedan",
-      "year": "2016",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 648
-    },
-    {
-      "make": "Cadillac",
       "model": "CT4-V Blackwing",
       "year": "2022",
       "drive": "RWD",
@@ -902,6 +1061,26 @@
       "weight": 0,
       "ev": false,
       "pi": 701
+    },
+    {
+      "make": "Cadillac",
+      "model": "CTS-V Sedan",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 648
+    },
+    {
+      "make": "Cadillac",
+      "model": "XTS Limousine",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 381
     },
     {
       "make": "Can-Am",
@@ -924,14 +1103,24 @@
       "pi": 641
     },
     {
-      "make": "Chevrolet",
-      "model": "Corvette",
-      "year": "1953",
-      "drive": "RWD",
-      "cls": "D",
+      "make": "Casey Currie Motorsports",
+      "model": "#4402 Ultra 4 Trophy Jeep",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 270
+      "pi": 641
+    },
+    {
+      "make": "Casey Currie Motorsports",
+      "model": "Ultra 4 Trophy Jeep",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 641,
+      "ev": false
     },
     {
       "make": "Chevrolet",
@@ -955,36 +1144,6 @@
     },
     {
       "make": "Chevrolet",
-      "model": "Corvette",
-      "year": "1960",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 428
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Impala Super Sport 409",
-      "year": "1964",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 427
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Corvette Stingray 427",
-      "year": "1967",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 510
-    },
-    {
-      "make": "Chevrolet",
       "model": "Camaro Super Sport Coupe",
       "year": "1969",
       "drive": "RWD",
@@ -992,106 +1151,6 @@
       "weight": 0,
       "ev": false,
       "pi": 471
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Nova Super Sport 396",
-      "year": "1969",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 431
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Chevelle Super Sport 454",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 424
-    },
-    {
-      "make": "Chevrolet",
-      "model": "El Camino Super Sport 454",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 430
-    },
-    {
-      "make": "Chevrolet",
-      "model": "K10 Custom",
-      "year": "1972",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 268
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Camaro Z28",
-      "year": "1979",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 364
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Monte Carlo Super Sport",
-      "year": "1988",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 282
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Corvette ZR-1",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 576
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Impala Super Sport",
-      "year": "1996",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 407
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Corvette Z06",
-      "year": "2002",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 602
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Corvette ZR1",
-      "year": "2009",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 712
     },
     {
       "make": "Chevrolet",
@@ -1105,13 +1164,33 @@
     },
     {
       "make": "Chevrolet",
-      "model": "Corvette Z06",
-      "year": "2015",
+      "model": "Camaro Z28",
+      "year": "1970",
       "drive": "RWD",
-      "cls": "S1",
+      "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 755
+      "pi": 430
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Camaro Z28",
+      "year": "1979",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 364
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Camaro Z28",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 695
     },
     {
       "make": "Chevrolet",
@@ -1135,13 +1214,63 @@
     },
     {
       "make": "Chevrolet",
-      "model": "Corvette ZR1",
-      "year": "2019",
+      "model": "Chevelle Super Sport 454",
+      "year": "1970",
       "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 424
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette",
+      "year": "1953",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 270
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette",
+      "year": "1960",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 428
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette E-Ray",
+      "year": "2024",
+      "drive": "AWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 778
+      "pi": 737
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette Stingray 427",
+      "year": "1967",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 510
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette Stingray Coupe",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 699,
+      "ev": false
     },
     {
       "make": "Chevrolet",
@@ -1155,13 +1284,23 @@
     },
     {
       "make": "Chevrolet",
-      "model": "Silverado LT Trail Boss",
-      "year": "2020",
+      "model": "Corvette Z06",
+      "year": "2002",
       "drive": "RWD",
-      "cls": "C",
+      "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 449
+      "pi": 602
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette Z06",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 755
     },
     {
       "make": "Chevrolet",
@@ -1175,13 +1314,153 @@
     },
     {
       "make": "Chevrolet",
-      "model": "Corvette E-Ray",
-      "year": "2024",
-      "drive": "AWD",
+      "model": "Corvette ZR-1",
+      "year": "1970",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 497
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette ZR-1",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 576
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette ZR1",
+      "year": "2009",
+      "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 737
+      "pi": 712
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Corvette ZR1",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 778
+    },
+    {
+      "make": "Chevrolet",
+      "model": "El Camino Super Sport 454",
+      "year": "1970",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 430
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Impala Super Sport",
+      "year": "1996",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 407
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Impala Super Sport 409",
+      "year": "1964",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 427
+    },
+    {
+      "make": "Chevrolet",
+      "model": "K-10 Custom",
+      "year": "1972",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 268
+    },
+    {
+      "make": "Chevrolet",
+      "model": "K10 Custom",
+      "year": "1972",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 268
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Monte Carlo Super Sport",
+      "year": "1988",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 282
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Nova Super Sport 396",
+      "year": "1969",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 431
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Silverado LT Trail Boss",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 449
+    },
+    {
+      "make": "Datsun",
+      "model": "2000 Roadster",
+      "year": "1969",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 323
+    },
+    {
+      "make": "Datsun",
+      "model": "240Z All Carbon Hillclimb Beast",
+      "year": "1972",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "pi": 951,
+      "ev": false
+    },
+    {
+      "make": "Datsun",
+      "model": "240Z Hill Climb Beast",
+      "year": "1972",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 951
     },
     {
       "make": "Datsun",
@@ -1195,16 +1474,6 @@
     },
     {
       "make": "DeBerti",
-      "model": "Wrangler Unlimited",
-      "year": "2013",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 645
-    },
-    {
-      "make": "DeBerti",
       "model": "Chevrolet Silverado 1500 Drift Truck",
       "year": "2018",
       "drive": "RWD",
@@ -1212,6 +1481,16 @@
       "weight": 0,
       "ev": false,
       "pi": 707
+    },
+    {
+      "make": "DeBerti",
+      "model": "Ford Super Duty F-250 Lariat",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 548,
+      "ev": false
     },
     {
       "make": "DeBerti",
@@ -1225,6 +1504,26 @@
     },
     {
       "make": "DeBerti",
+      "model": "Jeep Wrangler Unlimited",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 645
+    },
+    {
+      "make": "DeBerti",
+      "model": "Toyota Tacoma TRD",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 717,
+      "ev": false
+    },
+    {
+      "make": "DeBerti",
       "model": "Toyota Tacoma TRD 'The Performance Truck'",
       "year": "2019",
       "drive": "AWD",
@@ -1232,6 +1531,16 @@
       "weight": 0,
       "ev": false,
       "pi": 717
+    },
+    {
+      "make": "DeBerti",
+      "model": "Wrangler Unlimited",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 645
     },
     {
       "make": "DeLorean",
@@ -1245,13 +1554,43 @@
     },
     {
       "make": "Dodge",
-      "model": "Dart HEMI Super Stock",
-      "year": "1968",
+      "model": "Challenger R/T",
+      "year": "1970",
       "drive": "RWD",
-      "cls": "B",
+      "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 540
+      "pi": 443
+    },
+    {
+      "make": "Dodge",
+      "model": "Challenger SRT Demon",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 678
+    },
+    {
+      "make": "Dodge",
+      "model": "Challenger SRT Hellcat",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 631
+    },
+    {
+      "make": "Dodge",
+      "model": "Challenger SRT Super Stock",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 695
     },
     {
       "make": "Dodge",
@@ -1275,13 +1614,13 @@
     },
     {
       "make": "Dodge",
-      "model": "Challenger R/T",
-      "year": "1970",
+      "model": "Charger SRT Hellcat",
+      "year": "2015",
       "drive": "RWD",
-      "cls": "C",
+      "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 443
+      "pi": 637
     },
     {
       "make": "Dodge",
@@ -1292,6 +1631,55 @@
       "weight": 0,
       "ev": false,
       "pi": 455
+    },
+    {
+      "make": "Dodge",
+      "model": "Dart HEMI Super Stock",
+      "year": "1968",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 540
+    },
+    {
+      "make": "Dodge",
+      "model": "Durango SRT Hellcat",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 628
+    },
+    {
+      "make": "Dodge",
+      "model": "Ram SRT-10",
+      "year": "2006",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 547
+    },
+    {
+      "make": "Dodge",
+      "model": "SRT Viper GTS",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false
+    },
+    {
+      "make": "Dodge",
+      "model": "Viper ACR",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 786
     },
     {
       "make": "Dodge",
@@ -1315,7 +1703,7 @@
     },
     {
       "make": "Dodge",
-      "model": "Viper SRT10 ACR",
+      "model": "Viper SRT-10 ACR",
       "year": "2008",
       "drive": "RWD",
       "cls": "S1",
@@ -1325,72 +1713,13 @@
     },
     {
       "make": "Dodge",
-      "model": "SRT Viper GTS",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false
-    },
-    {
-      "make": "Dodge",
-      "model": "Challenger SRT Hellcat",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 631
-    },
-    {
-      "make": "Dodge",
-      "model": "Charger SRT Hellcat",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 637
-    },
-    {
-      "make": "Dodge",
-      "model": "Viper ACR",
-      "year": "2016",
+      "model": "Viper SRT10 ACR",
+      "year": "2008",
       "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 786
-    },
-    {
-      "make": "Dodge",
-      "model": "Challenger SRT Demon",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 678
-    },
-    {
-      "make": "Dodge",
-      "model": "Durango SRT Hellcat",
-      "year": "2021",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 628
-    },
-    {
-      "make": "Dodge",
-      "model": "Challenger SRT Super Stock",
-      "year": "2022",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 695
+      "pi": 735
     },
     {
       "make": "Ferrari",
@@ -1404,6 +1733,16 @@
     },
     {
       "make": "Ferrari",
+      "model": "250 GTO",
+      "year": "1962",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 494
+    },
+    {
+      "make": "Ferrari",
       "model": "275 GTB4 Spider",
       "year": "1967",
       "drive": "RWD",
@@ -1411,16 +1750,6 @@
       "weight": 0,
       "ev": false,
       "pi": 490
-    },
-    {
-      "make": "Ferrari",
-      "model": "Dino 246 GT",
-      "year": "1969",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 428
     },
     {
       "make": "Ferrari",
@@ -1434,73 +1763,23 @@
     },
     {
       "make": "Ferrari",
-      "model": "F40",
-      "year": "1987",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 678
-    },
-    {
-      "make": "Ferrari",
-      "model": "F40 Competizione",
-      "year": "1989",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 948
-    },
-    {
-      "make": "Ferrari",
-      "model": "512 TR",
-      "year": "1992",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 615
-    },
-    {
-      "make": "Ferrari",
-      "model": "F355 Berlinetta",
-      "year": "1994",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 588
-    },
-    {
-      "make": "Ferrari",
-      "model": "F50",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 678
-    },
-    {
-      "make": "Ferrari",
-      "model": "F50 GT",
-      "year": "1996",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 948
-    },
-    {
-      "make": "Ferrari",
-      "model": "FXX",
-      "year": "2005",
+      "model": "296 GTB",
+      "year": "2022",
       "drive": "RWD",
       "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 900
+      "pi": 811
+    },
+    {
+      "make": "Ferrari",
+      "model": "330 P4",
+      "year": "1967",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 684,
+      "ev": false
     },
     {
       "make": "Ferrari",
@@ -1524,16 +1803,6 @@
     },
     {
       "make": "Ferrari",
-      "model": "599XX",
-      "year": "2010",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 840
-    },
-    {
-      "make": "Ferrari",
       "model": "458 Speciale",
       "year": "2013",
       "drive": "RWD",
@@ -1544,23 +1813,193 @@
     },
     {
       "make": "Ferrari",
-      "model": "LaFerrari",
-      "year": "2013",
+      "model": "488 GTB",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 770,
+      "ev": false
+    },
+    {
+      "make": "Ferrari",
+      "model": "488 Pista",
+      "year": "2019",
       "drive": "RWD",
       "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 857
+      "pi": 803
     },
     {
       "make": "Ferrari",
-      "model": "J50",
-      "year": "2017",
+      "model": "512 S",
+      "year": "1970",
       "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 772
+      "pi": 774
+    },
+    {
+      "make": "Ferrari",
+      "model": "512 TR",
+      "year": "1992",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 615
+    },
+    {
+      "make": "Ferrari",
+      "model": "599XX",
+      "year": "2010",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 840
+    },
+    {
+      "make": "Ferrari",
+      "model": "599XX Evolution",
+      "year": "2012",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 894,
+      "ev": false
+    },
+    {
+      "make": "Ferrari",
+      "model": "812 Superfast",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 780,
+      "ev": false
+    },
+    {
+      "make": "Ferrari",
+      "model": "Dino 246 GT",
+      "year": "1969",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 428
+    },
+    {
+      "make": "Ferrari",
+      "model": "Enzo Ferrari",
+      "year": "2002",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 755
+    },
+    {
+      "make": "Ferrari",
+      "model": "F12tdf",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 788,
+      "ev": false
+    },
+    {
+      "make": "Ferrari",
+      "model": "F355 Berlinetta",
+      "year": "1994",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 588
+    },
+    {
+      "make": "Ferrari",
+      "model": "F40",
+      "year": "1987",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 678
+    },
+    {
+      "make": "Ferrari",
+      "model": "F40 Competizione",
+      "year": "1989",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 948
+    },
+    {
+      "make": "Ferrari",
+      "model": "F50",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 678
+    },
+    {
+      "make": "Ferrari",
+      "model": "F50 GT",
+      "year": "1996",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 948
+    },
+    {
+      "make": "Ferrari",
+      "model": "F8 Tributo",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 802,
+      "ev": false
+    },
+    {
+      "make": "Ferrari",
+      "model": "F80",
+      "year": "2025",
+      "drive": "AWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 920
+    },
+    {
+      "make": "Ferrari",
+      "model": "FXX",
+      "year": "2005",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 900
+    },
+    {
+      "make": "Ferrari",
+      "model": "FXX K",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 936
     },
     {
       "make": "Ferrari",
@@ -1584,23 +2023,33 @@
     },
     {
       "make": "Ferrari",
-      "model": "Portofino",
-      "year": "2018",
+      "model": "J50",
+      "year": "2017",
       "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 714
+      "pi": 772
     },
     {
       "make": "Ferrari",
-      "model": "488 Pista",
-      "year": "2019",
+      "model": "J50 Preorder Car",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 800,
+      "ev": false
+    },
+    {
+      "make": "Ferrari",
+      "model": "LaFerrari",
+      "year": "2013",
       "drive": "RWD",
       "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 803
+      "pi": 857
     },
     {
       "make": "Ferrari",
@@ -1614,23 +2063,133 @@
     },
     {
       "make": "Ferrari",
-      "model": "296 GTB",
-      "year": "2022",
+      "model": "Portofino",
+      "year": "2018",
       "drive": "RWD",
-      "cls": "S2",
+      "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 811
+      "pi": 714
     },
     {
       "make": "Ferrari",
-      "model": "F80",
-      "year": "2025",
+      "model": "Roma",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 735,
+      "ev": false
+    },
+    {
+      "make": "Ferrari",
+      "model": "SF90 Stradale",
+      "year": "2020",
       "drive": "AWD",
-      "cls": "R",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 851,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "#11 Rockstar F-150 Trophy Truck",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 920
+      "pi": 563
+    },
+    {
+      "make": "Ford",
+      "model": "#14 Rahal GRC Fiesta",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 772
+    },
+    {
+      "make": "Ford",
+      "model": "#2 GT40 Mk II Le Mans",
+      "year": "1966",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 666
+    },
+    {
+      "make": "Ford",
+      "model": "#2069 Ford Performance Bronco R",
+      "year": "2020",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 441
+    },
+    {
+      "make": "Ford",
+      "model": "#25 'Brocky' Ultra4 Bronco RTR",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 772
+    },
+    {
+      "make": "Ford",
+      "model": "#5 Escort RS1800 MK II",
+      "year": "1977",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 544
+    },
+    {
+      "make": "Ford",
+      "model": "Bronco R",
+      "year": "2020",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 441
+    },
+    {
+      "make": "Ford",
+      "model": "Bronco Raptor",
+      "year": "2022",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 473
+    },
+    {
+      "make": "Ford",
+      "model": "Capri RS3100",
+      "year": "1973",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 394
+    },
+    {
+      "make": "Ford",
+      "model": "Crown Victoria Police Interceptor",
+      "year": "2010",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 354
     },
     {
       "make": "Ford",
@@ -1644,23 +2203,223 @@
     },
     {
       "make": "Ford",
-      "model": "Mustang GT Coupe",
-      "year": "1965",
+      "model": "Escort RS Cosworth",
+      "year": "1992",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 456
+    },
+    {
+      "make": "Ford",
+      "model": "Escort RS1800 MkII",
+      "year": "1977",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 544,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "F-150 Lightning",
+      "year": "2022",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "pi": 500,
+      "ev": true
+    },
+    {
+      "make": "Ford",
+      "model": "F-150 Lightning Platinum",
+      "year": "2022",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": true,
+      "pi": 500
+    },
+    {
+      "make": "Ford",
+      "model": "F-150 Raptor R",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 536
+    },
+    {
+      "make": "Ford",
+      "model": "F-150 Raptor R 'Welcome Pack'",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 536
+    },
+    {
+      "make": "Ford",
+      "model": "F-150 SVT Lightning",
+      "year": "2003",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": true,
+      "pi": 474
+    },
+    {
+      "make": "Ford",
+      "model": "F-150 Trophy Truck",
+      "year": "2014",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 613
+    },
+    {
+      "make": "Ford",
+      "model": "F-150 XLT Lariat",
+      "year": "1986",
       "drive": "RWD",
       "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 388
+      "pi": 263
     },
     {
       "make": "Ford",
-      "model": "#2 GT40 Mk II Le Mans",
-      "year": "1966",
+      "model": "F-150 XLT Lariat Forza Edition",
+      "year": "1986",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 850
+    },
+    {
+      "make": "Ford",
+      "model": "FPV Limited Edition Pursuit Ute",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 563,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "Fiesta ST",
+      "year": "2023",
+      "drive": "FWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 500
+    },
+    {
+      "make": "Ford",
+      "model": "Focus RS",
+      "year": "2001",
+      "drive": "FWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 639,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "Focus RS",
+      "year": "2003",
+      "drive": "FWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 484
+    },
+    {
+      "make": "Ford",
+      "model": "Focus RS",
+      "year": "2009",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 551
+    },
+    {
+      "make": "Ford",
+      "model": "Focus RS",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 588
+    },
+    {
+      "make": "Ford",
+      "model": "Focus ST",
+      "year": "2022",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 594
+    },
+    {
+      "make": "Ford",
+      "model": "GRC Fiesta",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 772,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "GT",
+      "year": "2005",
       "drive": "RWD",
       "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 666
+      "pi": 676
+    },
+    {
+      "make": "Ford",
+      "model": "GT",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 757
+    },
+    {
+      "make": "Ford",
+      "model": "GT40 Mk II",
+      "year": "1966",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 666,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "M-Sport Fiesta RS",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 707,
+      "ev": false
     },
     {
       "make": "Ford",
@@ -1694,356 +2453,6 @@
     },
     {
       "make": "Ford",
-      "model": "Capri RS3100",
-      "year": "1973",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 394
-    },
-    {
-      "make": "Ford",
-      "model": "XB Falcon GT",
-      "year": "1973",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 422
-    },
-    {
-      "make": "Ford",
-      "model": "#5 Escort RS1800 MK II",
-      "year": "1977",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 544
-    },
-    {
-      "make": "Ford",
-      "model": "RS200 Evolution",
-      "year": "1985",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 710
-    },
-    {
-      "make": "Ford",
-      "model": "F-150 XLT Lariat",
-      "year": "1986",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 263
-    },
-    {
-      "make": "Ford",
-      "model": "F-150 XLT Lariat Forza Edition",
-      "year": "1986",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 850
-    },
-    {
-      "make": "Ford",
-      "model": "Sierra Cosworth RS500",
-      "year": "1987",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 484
-    },
-    {
-      "make": "Ford",
-      "model": "Escort RS Cosworth",
-      "year": "1992",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 456
-    },
-    {
-      "make": "Ford",
-      "model": "SVT Cobra R",
-      "year": "1993",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 432
-    },
-    {
-      "make": "Ford",
-      "model": "Supervan 3",
-      "year": "1994",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 740
-    },
-    {
-      "make": "Ford",
-      "model": "Racing Puma",
-      "year": "1999",
-      "drive": "FWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 401
-    },
-    {
-      "make": "Ford",
-      "model": "F-150 SVT Lightning",
-      "year": "2003",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": true,
-      "pi": 474
-    },
-    {
-      "make": "Ford",
-      "model": "Focus RS",
-      "year": "2003",
-      "drive": "FWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 484
-    },
-    {
-      "make": "Ford",
-      "model": "GT",
-      "year": "2005",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 676
-    },
-    {
-      "make": "Ford",
-      "model": "Focus RS",
-      "year": "2009",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 551
-    },
-    {
-      "make": "Ford",
-      "model": "Crown Victoria Police Interceptor",
-      "year": "2010",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 354
-    },
-    {
-      "make": "Ford",
-      "model": "Transit SuperSportVan",
-      "year": "2011",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 235
-    },
-    {
-      "make": "Ford",
-      "model": "Mustang Shelby GT500",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 647
-    },
-    {
-      "make": "Ford",
-      "model": "#11 Rockstar F-150 Trophy Truck",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 563
-    },
-    {
-      "make": "Ford",
-      "model": "Ranger T6 Rally Raid",
-      "year": "2014",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 530
-    },
-    {
-      "make": "Ford",
-      "model": "Mustang Shelby GT350R",
-      "year": "2016",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 721
-    },
-    {
-      "make": "Ford",
-      "model": "#14 Rahal GRC Fiesta",
-      "year": "2017",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 772
-    },
-    {
-      "make": "Ford",
-      "model": "#25 'Brocky' Ultra4 Bronco RTR",
-      "year": "2017",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 772
-    },
-    {
-      "make": "Ford",
-      "model": "Focus RS",
-      "year": "2017",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 588
-    },
-    {
-      "make": "Ford",
-      "model": "GT",
-      "year": "2017",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 757
-    },
-    {
-      "make": "Ford",
-      "model": "Mustang RTR Spec 5",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 648
-    },
-    {
-      "make": "Ford",
-      "model": "#2069 Ford Performance Bronco R",
-      "year": "2020",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 441
-    },
-    {
-      "make": "Ford",
-      "model": "Mustang Shelby GT500",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 734
-    },
-    {
-      "make": "Ford",
-      "model": "Super Duty F-450 DRW Platinum",
-      "year": "2020",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 700
-    },
-    {
-      "make": "Ford",
-      "model": "Bronco Raptor",
-      "year": "2022",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 473
-    },
-    {
-      "make": "Ford",
-      "model": "F-150 Lightning Platinum",
-      "year": "2022",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": true,
-      "pi": 500
-    },
-    {
-      "make": "Ford",
-      "model": "Focus ST",
-      "year": "2022",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 594
-    },
-    {
-      "make": "Ford",
-      "model": "F-150 Raptor R",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 536
-    },
-    {
-      "make": "Ford",
-      "model": "F-150 Raptor R 'Welcome Pack'",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 536
-    },
-    {
-      "make": "Ford",
-      "model": "Fiesta ST",
-      "year": "2023",
-      "drive": "FWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 500
-    },
-    {
-      "make": "Ford",
       "model": "Mustang Dark Horse",
       "year": "2024",
       "drive": "RWD",
@@ -2063,44 +2472,224 @@
       "pi": 628
     },
     {
-      "make": "Formula Drift",
-      "model": "#98 BMW 325i",
-      "year": "1989",
+      "make": "Ford",
+      "model": "Mustang GT 2+2 Fastback",
+      "year": "1968",
       "drive": "RWD",
-      "cls": "S1",
+      "cls": "D",
       "weight": 0,
-      "ev": false,
-      "pi": 726
+      "pi": 394,
+      "ev": false
     },
     {
-      "make": "Formula Drift",
-      "model": "#34 Toyota Supra MkIV",
-      "year": "1995",
+      "make": "Ford",
+      "model": "Mustang GT 2+2 Fastback Forza Edition",
+      "year": "1968",
       "drive": "RWD",
-      "cls": "S1",
+      "cls": "A",
       "weight": 0,
-      "ev": false,
-      "pi": 759
+      "pi": 700,
+      "ev": false
     },
     {
-      "make": "Formula Drift",
-      "model": "#777 Nissan 240SX",
-      "year": "1997",
+      "make": "Ford",
+      "model": "Mustang GT Coupe",
+      "year": "1965",
       "drive": "RWD",
-      "cls": "S1",
+      "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 748
+      "pi": 388
     },
     {
-      "make": "Formula Drift",
-      "model": "#43 Dodge Viper SRT10",
-      "year": "2006",
+      "make": "Ford",
+      "model": "Mustang GT Fastback",
+      "year": "1968",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 394
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang RTR Spec 5",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 648
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang SVT Cobra R",
+      "year": "1993",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 432
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang SVT Cobra R",
+      "year": "2000",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 528,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang Shelby GT350R",
+      "year": "2016",
       "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 748
+      "pi": 721
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang Shelby GT500",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 647
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang Shelby GT500",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 734
+    },
+    {
+      "make": "Ford",
+      "model": "RS200 Evolution",
+      "year": "1985",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 710
+    },
+    {
+      "make": "Ford",
+      "model": "Racing Puma",
+      "year": "1999",
+      "drive": "FWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 401
+    },
+    {
+      "make": "Ford",
+      "model": "Ranger T6 Rally Raid",
+      "year": "2014",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 530
+    },
+    {
+      "make": "Ford",
+      "model": "SVT Cobra R",
+      "year": "1993",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 432
+    },
+    {
+      "make": "Ford",
+      "model": "Sierra Cosworth RS500",
+      "year": "1987",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 484
+    },
+    {
+      "make": "Ford",
+      "model": "Super Duty F-450 DRW PLATINUM Forza Edition",
+      "year": "2020",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 700,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "Super Duty F-450 DRW Platinum",
+      "year": "2020",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 700
+    },
+    {
+      "make": "Ford",
+      "model": "Supervan 3",
+      "year": "1994",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 740
+    },
+    {
+      "make": "Ford",
+      "model": "Supervan 4",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 919
+    },
+    {
+      "make": "Ford",
+      "model": "Transit SuperSportVan",
+      "year": "2011",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 235
+    },
+    {
+      "make": "Ford",
+      "model": "Ultra4 Bronco RTR",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 644,
+      "ev": false
+    },
+    {
+      "make": "Ford",
+      "model": "XB Falcon GT",
+      "year": "1973",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 422
     },
     {
       "make": "Formula Drift",
@@ -2114,26 +2703,6 @@
     },
     {
       "make": "Formula Drift",
-      "model": "#99 Mazda RX-8",
-      "year": "2009",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 737
-    },
-    {
-      "make": "Formula Drift",
-      "model": "#777 Chevrolet Corvette",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 760
-    },
-    {
-      "make": "Formula Drift",
       "model": "#13 Ford Mustang",
       "year": "2015",
       "drive": "RWD",
@@ -2141,36 +2710,6 @@
       "weight": 0,
       "ev": false,
       "pi": 739
-    },
-    {
-      "make": "Formula Drift",
-      "model": "#530 HSV Maloo Gen-F",
-      "year": "2016",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 710
-    },
-    {
-      "make": "Formula Drift",
-      "model": "#411 Toyota Corolla Hatchback",
-      "year": "2019",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 754
-    },
-    {
-      "make": "Formula Drift",
-      "model": "#91 BMW M2",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 748
     },
     {
       "make": "Formula Drift",
@@ -2184,6 +2723,46 @@
     },
     {
       "make": "Formula Drift",
+      "model": "#34 Toyota Supra MkIV",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 759
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#411 Toyota Corolla Hatchback",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 754
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#43 Dodge Viper SRT10",
+      "year": "2006",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 748
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#530 HSV Maloo Gen-F",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 710
+    },
+    {
+      "make": "Formula Drift",
       "model": "#64 Forsberg Racing Nissan Z",
       "year": "2023",
       "drive": "RWD",
@@ -2191,6 +2770,186 @@
       "weight": 0,
       "ev": false,
       "pi": 783
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#777 Chevrolet Corvette",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 760
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#777 Nissan 240SX",
+      "year": "1997",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 748
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#91 BMW M2",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 748
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#98 BMW 325i",
+      "year": "1989",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 726
+    },
+    {
+      "make": "Formula Drift",
+      "model": "#99 Mazda RX-8",
+      "year": "2009",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 737
+    },
+    {
+      "make": "Formula Drift",
+      "model": "BMW 325i",
+      "year": "1989",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 726,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "BMW M2",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 748,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Chevrolet Corvette",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 760,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Dodge Viper SRT10",
+      "year": "2006",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 748,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Ferrari 599 GTB Fiorano",
+      "year": "2007",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 767,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Ford Mustang",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 739,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "HSV Maloo Gen-F",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 710,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Mazda RX-8",
+      "year": "2009",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 737,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Nissan 240SX",
+      "year": "1997",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 748,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Nissan Z",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 783,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Toyota Corolla Hatchback",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 754,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Toyota GR Supra",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 779,
+      "ev": false
+    },
+    {
+      "make": "Formula Drift",
+      "model": "Toyota Supra MkIV",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 759,
+      "ev": false
     },
     {
       "make": "Funco",
@@ -2201,6 +2960,26 @@
       "weight": 0,
       "ev": false,
       "pi": 752
+    },
+    {
+      "make": "Funco Motorsports",
+      "model": "F9",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 752
+    },
+    {
+      "make": "GMC",
+      "model": "HUMMER EV Pickup",
+      "year": "2022",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 610
     },
     {
       "make": "GMC",
@@ -2233,14 +3012,14 @@
       "pi": 435
     },
     {
-      "make": "GMC",
-      "model": "HUMMER EV Pickup",
-      "year": "2022",
-      "drive": "AWD",
-      "cls": "A",
+      "make": "GR",
+      "model": "GT Prototype",
+      "year": "2025",
+      "drive": "RWD",
+      "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 610
+      "pi": 771
     },
     {
       "make": "Gordon Murray",
@@ -2253,24 +3032,54 @@
       "pi": 871
     },
     {
-      "make": "GR",
-      "model": "GT Prototype",
-      "year": "2025",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 771
-    },
-    {
-      "make": "Hennessey",
-      "model": "Venom GT",
-      "year": "2012",
+      "make": "Gordon Murray Automotive",
+      "model": "T.50",
+      "year": "2020",
       "drive": "RWD",
       "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 845
+      "pi": 871
+    },
+    {
+      "make": "Gordon Murray Automotive",
+      "model": "T.50",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 871,
+      "ev": false
+    },
+    {
+      "make": "HSV",
+      "model": "GEN-F GTS",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 601
+    },
+    {
+      "make": "HSV",
+      "model": "Limited Edition GEN-F GTS Maloo",
+      "year": "2014",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 629
+    },
+    {
+      "make": "Hennessey",
+      "model": "Ford F-150 VelociRaptor 6X6",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 520
     },
     {
       "make": "Hennessey",
@@ -2281,6 +3090,16 @@
       "weight": 0,
       "ev": false,
       "pi": 870
+    },
+    {
+      "make": "Hennessey",
+      "model": "Venom GT",
+      "year": "2012",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 845
     },
     {
       "make": "Holden",
@@ -2294,56 +3113,6 @@
     },
     {
       "make": "Honda",
-      "model": "S800",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 134
-    },
-    {
-      "make": "Honda",
-      "model": "Civic RS",
-      "year": "1974",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 254
-    },
-    {
-      "make": "Honda",
-      "model": "City E II",
-      "year": "1984",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 203
-    },
-    {
-      "make": "Honda",
-      "model": "Civic CRX Mugen",
-      "year": "1984",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 390
-    },
-    {
-      "make": "Honda",
-      "model": "Civic Si",
-      "year": "1986",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 253
-    },
-    {
-      "make": "Honda",
       "model": "#19 CRX WTAC",
       "year": "1990",
       "drive": "FWD",
@@ -2351,26 +3120,6 @@
       "weight": 0,
       "ev": false,
       "pi": 877
-    },
-    {
-      "make": "Honda",
-      "model": "Beat",
-      "year": "1991",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 283
-    },
-    {
-      "make": "Honda",
-      "model": "CR-X SiR",
-      "year": "1991",
-      "drive": "FWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 465
     },
     {
       "make": "Honda",
@@ -2384,13 +3133,33 @@
     },
     {
       "make": "Honda",
-      "model": "NSX-R",
-      "year": "1992",
-      "drive": "RWD",
-      "cls": "B",
+      "model": "#33 Integra WTAC",
+      "year": "2001",
+      "drive": "FWD",
+      "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 572
+      "pi": 860
+    },
+    {
+      "make": "Honda",
+      "model": "#52 Evasive S2000 WTAC",
+      "year": "2004",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 480
+    },
+    {
+      "make": "Honda",
+      "model": "101 Motorsport CRX WTAC",
+      "year": "1990",
+      "drive": "FWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 877,
+      "ev": false
     },
     {
       "make": "Honda",
@@ -2414,13 +3183,63 @@
     },
     {
       "make": "Honda",
-      "model": "Prelude Si",
-      "year": "1994",
+      "model": "Beat",
+      "year": "1991",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 283
+    },
+    {
+      "make": "Honda",
+      "model": "CR-X SiR",
+      "year": "1991",
       "drive": "FWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 410
+      "pi": 465
+    },
+    {
+      "make": "Honda",
+      "model": "City E II",
+      "year": "1984",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 203
+    },
+    {
+      "make": "Honda",
+      "model": "Civic CRX Mugen",
+      "year": "1984",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 390
+    },
+    {
+      "make": "Honda",
+      "model": "Civic RS",
+      "year": "1974",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 254
+    },
+    {
+      "make": "Honda",
+      "model": "Civic Si",
+      "year": "1986",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 253
     },
     {
       "make": "Honda",
@@ -2434,39 +3253,9 @@
     },
     {
       "make": "Honda",
-      "model": "#33 Integra WTAC",
-      "year": "2001",
-      "drive": "FWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 860
-    },
-    {
-      "make": "Honda",
-      "model": "S2000",
-      "year": "2003",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 503
-    },
-    {
-      "make": "Honda",
-      "model": "S2000 Touge Edition",
-      "year": "2003",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 503
-    },
-    {
-      "make": "Honda",
-      "model": "#52 Evasive S2000 WTAC",
+      "model": "Civic Type R",
       "year": "2004",
-      "drive": "RWD",
+      "drive": "FWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
@@ -2475,12 +3264,92 @@
     {
       "make": "Honda",
       "model": "Civic Type R",
-      "year": "2004",
+      "year": "2008",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 514,
+      "ev": false
+    },
+    {
+      "make": "Honda",
+      "model": "Civic Type R",
+      "year": "2015",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 585
+    },
+    {
+      "make": "Honda",
+      "model": "Civic Type R",
+      "year": "2018",
+      "drive": "FWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 608
+    },
+    {
+      "make": "Honda",
+      "model": "Civic Type R",
+      "year": "2023",
+      "drive": "FWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 620
+    },
+    {
+      "make": "Honda",
+      "model": "Civic Type-R",
+      "year": "2007",
       "drive": "FWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 480
+      "pi": 454
+    },
+    {
+      "make": "Honda",
+      "model": "Evasive Motorsports S2000 WTAC",
+      "year": "2004",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 888,
+      "ev": false
+    },
+    {
+      "make": "Honda",
+      "model": "Hardrace Civic WTAC",
+      "year": "1992",
+      "drive": "FWD",
+      "cls": "R",
+      "weight": 0,
+      "pi": 913,
+      "ev": false
+    },
+    {
+      "make": "Honda",
+      "model": "Integra WTAC",
+      "year": "2001",
+      "drive": "FWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 860,
+      "ev": false
+    },
+    {
+      "make": "Honda",
+      "model": "NSX-R",
+      "year": "1992",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 572
     },
     {
       "make": "Honda",
@@ -2504,23 +3373,13 @@
     },
     {
       "make": "Honda",
-      "model": "Civic Type-R",
-      "year": "2007",
+      "model": "Prelude Si",
+      "year": "1994",
       "drive": "FWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 454
-    },
-    {
-      "make": "Honda",
-      "model": "Civic Type R",
-      "year": "2015",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 585
+      "pi": 410
     },
     {
       "make": "Honda",
@@ -2534,13 +3393,33 @@
     },
     {
       "make": "Honda",
-      "model": "Civic Type R",
-      "year": "2018",
-      "drive": "FWD",
-      "cls": "A",
+      "model": "S2000",
+      "year": "2003",
+      "drive": "RWD",
+      "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 608
+      "pi": 503
+    },
+    {
+      "make": "Honda",
+      "model": "S2000 Touge Edition",
+      "year": "2003",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 503
+    },
+    {
+      "make": "Honda",
+      "model": "S800",
+      "year": "1970",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 134
     },
     {
       "make": "Honda",
@@ -2553,54 +3432,14 @@
       "pi": 398
     },
     {
-      "make": "Honda",
-      "model": "Civic Type R",
+      "make": "Hyundai",
+      "model": "IONIQ 5 N",
       "year": "2023",
-      "drive": "FWD",
+      "drive": "AWD",
       "cls": "A",
       "weight": 0,
-      "ev": false,
-      "pi": 620
-    },
-    {
-      "make": "HSV",
-      "model": "GEN-F GTS",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 601
-    },
-    {
-      "make": "Hyundai",
-      "model": "Veloster N",
-      "year": "2019",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 532
-    },
-    {
-      "make": "Hyundai",
-      "model": "i30 N",
-      "year": "2020",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 553
-    },
-    {
-      "make": "Hyundai",
-      "model": "i20 N",
-      "year": "2021",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 564
+      "ev": true,
+      "pi": 657
     },
     {
       "make": "Hyundai",
@@ -2614,13 +3453,43 @@
     },
     {
       "make": "Hyundai",
-      "model": "IONIQ 5 N",
-      "year": "2023",
-      "drive": "AWD",
-      "cls": "A",
+      "model": "Veloster N",
+      "year": "2019",
+      "drive": "FWD",
+      "cls": "B",
       "weight": 0,
-      "ev": true,
-      "pi": 657
+      "ev": false,
+      "pi": 532
+    },
+    {
+      "make": "Hyundai",
+      "model": "i20 N",
+      "year": "2021",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 564
+    },
+    {
+      "make": "Hyundai",
+      "model": "i30 N",
+      "year": "2020",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 553
+    },
+    {
+      "make": "Jaguar",
+      "model": "C-X75",
+      "year": "2010",
+      "drive": "AWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 810
     },
     {
       "make": "Jaguar",
@@ -2644,6 +3513,16 @@
     },
     {
       "make": "Jaguar",
+      "model": "E-type",
+      "year": "1961",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 414
+    },
+    {
+      "make": "Jaguar",
       "model": "Lightweight E-Type",
       "year": "1964",
       "drive": "RWD",
@@ -2651,6 +3530,16 @@
       "weight": 0,
       "ev": false,
       "pi": 568
+    },
+    {
+      "make": "Jaguar",
+      "model": "Sport XJR-15",
+      "year": "1991",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 716
     },
     {
       "make": "Jaguar",
@@ -2674,33 +3563,22 @@
     },
     {
       "make": "Jaguar",
-      "model": "C-X75",
-      "year": "2010",
-      "drive": "AWD",
-      "cls": "S2",
+      "model": "XJ220S TWR",
+      "year": "1993",
+      "drive": "RWD",
+      "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 810
+      "pi": 750
     },
     {
       "make": "Jeep",
-      "model": "Wrangler Rubicon",
-      "year": "2012",
+      "model": "Gladiator Rubicon (JT)",
+      "year": "2020",
       "drive": "AWD",
-      "cls": "D",
+      "cls": "B",
       "weight": 0,
-      "ev": false,
-      "pi": 350
-    },
-    {
-      "make": "Jeep",
-      "model": "Trailcat",
-      "year": "2016",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 635
+      "ev": false
     },
     {
       "make": "Jeep",
@@ -2714,12 +3592,43 @@
     },
     {
       "make": "Jeep",
-      "model": "Gladiator Rubicon (JT)",
+      "model": "JT",
       "year": "2020",
-      "drive": "AWD",
-      "cls": "B",
+      "drive": "RWD",
+      "cls": "D",
       "weight": 0,
-      "ev": false
+      "ev": false,
+      "pi": 336
+    },
+    {
+      "make": "Jeep",
+      "model": "Trailcat",
+      "year": "2016",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 635
+    },
+    {
+      "make": "Jeep",
+      "model": "Wrangler Rubicon",
+      "year": "2012",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 350
+    },
+    {
+      "make": "Jimco",
+      "model": "#179 Hammerhead Class 1",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 652
     },
     {
       "make": "Jimco",
@@ -2733,13 +3642,53 @@
     },
     {
       "make": "Jimco",
-      "model": "#179 Hammerhead Class 1",
+      "model": "Fastball Racing Spec Trophy Truck",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 511,
+      "ev": false
+    },
+    {
+      "make": "Jimco",
+      "model": "Hammerhead Class 1",
       "year": "2020",
       "drive": "RWD",
       "cls": "A",
       "weight": 0,
+      "pi": 652,
+      "ev": false
+    },
+    {
+      "make": "KTM",
+      "model": "X-Bow GT4",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
       "ev": false,
-      "pi": 652
+      "pi": 749
+    },
+    {
+      "make": "Koenigsegg",
+      "model": "Agera",
+      "year": "2011",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 810
+    },
+    {
+      "make": "Koenigsegg",
+      "model": "Agera RS",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 890
     },
     {
       "make": "Koenigsegg",
@@ -2753,13 +3702,23 @@
     },
     {
       "make": "Koenigsegg",
-      "model": "Agera",
-      "year": "2011",
+      "model": "Gemera",
+      "year": "2024",
       "drive": "RWD",
       "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 810
+      "pi": 900
+    },
+    {
+      "make": "Koenigsegg",
+      "model": "Jesko",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 899
     },
     {
       "make": "Koenigsegg",
@@ -2782,76 +3741,6 @@
       "pi": 886
     },
     {
-      "make": "Koenigsegg",
-      "model": "Jesko",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 899
-    },
-    {
-      "make": "KTM",
-      "model": "X-Bow GT4",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 749
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Miura P400",
-      "year": "1967",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 505
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Countach LP5000 QV",
-      "year": "1988",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 622
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Diablo SV",
-      "year": "1997",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 649
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Diablo GTR",
-      "year": "1999",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 823
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Murci\u00e9lago LP 670-4 SV",
-      "year": "2010",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 707
-    },
-    {
       "make": "Lamborghini",
       "model": "Aventador LP 700-4",
       "year": "2012",
@@ -2863,43 +3752,23 @@
     },
     {
       "make": "Lamborghini",
-      "model": "Gallardo LP 570-4 Spyder Performante",
-      "year": "2012",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 685
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Veneno",
-      "year": "2013",
-      "drive": "AWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 834
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Hurac\u00e1n LP 610-4",
-      "year": "2014",
+      "model": "Aventador LP 780-4 Ultimae",
+      "year": "2021",
       "drive": "AWD",
       "cls": "S1",
       "weight": 0,
-      "ev": false,
-      "pi": 738
+      "pi": 794,
+      "ev": false
     },
     {
       "make": "Lamborghini",
-      "model": "Centenario LP 770-4",
-      "year": "2016",
-      "drive": "AWD",
+      "model": "Aventador LP 780-4 Ultimae",
+      "year": "2022",
+      "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 792
+      "pi": 794
     },
     {
       "make": "Lamborghini",
@@ -2913,13 +3782,53 @@
     },
     {
       "make": "Lamborghini",
-      "model": "Urus",
-      "year": "2019",
+      "model": "Centenario LP 770-4",
+      "year": "2016",
       "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 792
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Countach LP5000 QV",
+      "year": "1988",
+      "drive": "RWD",
       "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 659
+      "pi": 622
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Countach LPI 800-4",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 773
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Diablo GTR",
+      "year": "1999",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 823
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Diablo SV",
+      "year": "1997",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 649
     },
     {
       "make": "Lamborghini",
@@ -2933,7 +3842,37 @@
     },
     {
       "make": "Lamborghini",
-      "model": "Hurac\u00e1n STO",
+      "model": "Gallardo LP 570-4 Spyder Performante",
+      "year": "2012",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 685
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Huracan EVO",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 761
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Huracan LP 610-4",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 738
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Huracan STO",
       "year": "2020",
       "drive": "RWD",
       "cls": "S1",
@@ -2943,13 +3882,53 @@
     },
     {
       "make": "Lamborghini",
-      "model": "Countach LPI 800-4",
-      "year": "2021",
+      "model": "Huracan Sterrato",
+      "year": "2022",
       "drive": "AWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 773
+      "pi": 738
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Huracan Sterrato",
+      "year": "2023",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 738,
+      "ev": false
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Huracan Tecnica",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 747
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Hurac\u00e1n LP 610-4",
+      "year": "2014",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 738
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Hurac\u00e1n STO",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 783
     },
     {
       "make": "Lamborghini",
@@ -2973,6 +3952,36 @@
     },
     {
       "make": "Lamborghini",
+      "model": "Miura P400",
+      "year": "1967",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 505
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Murcielago LP 670-4 SV",
+      "year": "2010",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 707
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Murci\u00e9lago LP 670-4 SV",
+      "year": "2010",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 707
+    },
+    {
+      "make": "Lamborghini",
       "model": "Revuelto",
       "year": "2024",
       "drive": "AWD",
@@ -2982,14 +3991,54 @@
       "pi": 829
     },
     {
-      "make": "Lancia",
-      "model": "Stratos HF Stradale",
-      "year": "1974",
+      "make": "Lamborghini",
+      "model": "Sesto Elemento",
+      "year": "2011",
       "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 871
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Sian Roadster",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 797
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Urus",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 659
+    },
+    {
+      "make": "Lamborghini",
+      "model": "Veneno",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 834
+    },
+    {
+      "make": "Lancia",
+      "model": "Delta HF Integrale Evo",
+      "year": "1992",
+      "drive": "AWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 483
+      "pi": 489
     },
     {
       "make": "Lancia",
@@ -3003,13 +4052,23 @@
     },
     {
       "make": "Lancia",
-      "model": "Delta HF Integrale Evo",
-      "year": "1992",
+      "model": "Stratos HF Stradale",
+      "year": "1974",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 483
+    },
+    {
+      "make": "Land Rover",
+      "model": "Defender 110 X",
+      "year": "2020",
       "drive": "AWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 489
+      "pi": 427
     },
     {
       "make": "Land Rover",
@@ -3022,14 +4081,14 @@
       "pi": 604
     },
     {
-      "make": "Land Rover",
-      "model": "Defender 110 X",
-      "year": "2020",
-      "drive": "AWD",
-      "cls": "C",
+      "make": "Lexus",
+      "model": "LC 500",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 427
+      "pi": 592
     },
     {
       "make": "Lexus",
@@ -3060,16 +4119,6 @@
       "weight": 0,
       "ev": false,
       "pi": 623
-    },
-    {
-      "make": "Lexus",
-      "model": "LC 500",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 592
     },
     {
       "make": "Lincoln",
@@ -3103,23 +4152,13 @@
     },
     {
       "make": "Lotus",
-      "model": "Exige Cup 430",
-      "year": "2018",
+      "model": "Emira",
+      "year": "2023",
       "drive": "RWD",
-      "cls": "S1",
+      "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 732
-    },
-    {
-      "make": "Lotus",
-      "model": "Scura Motorsport Exige WTAC",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 998
+      "pi": 656
     },
     {
       "make": "Lotus",
@@ -3143,13 +4182,33 @@
     },
     {
       "make": "Lotus",
-      "model": "Emira",
-      "year": "2023",
+      "model": "Exige Cup 430",
+      "year": "2018",
       "drive": "RWD",
-      "cls": "A",
+      "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 656
+      "pi": 732
+    },
+    {
+      "make": "Lotus",
+      "model": "Scura Motorsport Exige WTAC",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 998
+    },
+    {
+      "make": "Lotus",
+      "model": "Scura Motorsports Exige WTAC",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "pi": 998,
+      "ev": false
     },
     {
       "make": "Lucid",
@@ -3160,516 +4219,6 @@
       "weight": 0,
       "ev": true,
       "pi": 820
-    },
-    {
-      "make": "Maserati",
-      "model": "Ghibli Cup",
-      "year": "1997",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 591
-    },
-    {
-      "make": "Maserati",
-      "model": "MC20",
-      "year": "2022",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 753
-    },
-    {
-      "make": "Mazda",
-      "model": "Cosmo 110S Series II",
-      "year": "1972",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 394
-    },
-    {
-      "make": "Mazda",
-      "model": "RX-3",
-      "year": "1973",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 328
-    },
-    {
-      "make": "Mazda",
-      "model": "RX-3 Forza Edition",
-      "year": "1973",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 600
-    },
-    {
-      "make": "Mazda",
-      "model": "RX-7 GSL-SE",
-      "year": "1985",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 357
-    },
-    {
-      "make": "Mazda",
-      "model": "Savanna RX-7",
-      "year": "1990",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 451
-    },
-    {
-      "make": "Mazda",
-      "model": "MX-5 Miata",
-      "year": "1990",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 451
-    },
-    {
-      "make": "Mazda",
-      "model": "#55 Mazda 787B",
-      "year": "1991",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 988
-    },
-    {
-      "make": "Mazda",
-      "model": "RX-7 Type R",
-      "year": "1992",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 548
-    },
-    {
-      "make": "Mazda",
-      "model": "MX-5 Miata",
-      "year": "1994",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 329
-    },
-    {
-      "make": "Mazda",
-      "model": "MX-5 Miata Forza Edition",
-      "year": "1994",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 850
-    },
-    {
-      "make": "Mazda",
-      "model": "Mazdaspeed MX-5",
-      "year": "2005",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 469
-    },
-    {
-      "make": "Mazda",
-      "model": "Furai",
-      "year": "2008",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 926
-    },
-    {
-      "make": "Mazda",
-      "model": "Mazdaspeed 3",
-      "year": "2010",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 536
-    },
-    {
-      "make": "Mazda",
-      "model": "RX-8 R3",
-      "year": "2011",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 508
-    },
-    {
-      "make": "Mazda",
-      "model": "MX-5",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 432
-    },
-    {
-      "make": "Mazda",
-      "model": "MX-5",
-      "year": "2016",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 499
-    },
-    {
-      "make": "Mazda",
-      "model": "MX-5 Cup",
-      "year": "2017",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 586
-    },
-    {
-      "make": "Mazda",
-      "model": "MX-5 Miata RF",
-      "year": "2022",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 509
-    },
-    {
-      "make": "McLaren",
-      "model": "F1",
-      "year": "1993",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 713
-    },
-    {
-      "make": "McLaren",
-      "model": "F1 GT",
-      "year": "1997",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 769
-    },
-    {
-      "make": "McLaren",
-      "model": "12C Coup\u00e9",
-      "year": "2011",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 727
-    },
-    {
-      "make": "McLaren",
-      "model": "P1",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 848
-    },
-    {
-      "make": "McLaren",
-      "model": "570S Coup\u00e9",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 721
-    },
-    {
-      "make": "McLaren",
-      "model": "600LT Coup\u00e9",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 780
-    },
-    {
-      "make": "McLaren",
-      "model": "Speedtail",
-      "year": "2019",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 835
-    },
-    {
-      "make": "McLaren",
-      "model": "620R",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 773
-    },
-    {
-      "make": "McLaren",
-      "model": "765LT",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 829
-    },
-    {
-      "make": "McLaren",
-      "model": "Sabre",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 787
-    },
-    {
-      "make": "McLaren",
-      "model": "Artura",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 766
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "C 63 S Coup\u00e9",
-      "year": "2016",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 645
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "E 63 S",
-      "year": "2018",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 674
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "GT 4-Door Coup\u00e9",
-      "year": "2018",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 664
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "GT Black Series",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 782
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "GT Black Series 'Welcome Pack'",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 782
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "SL 63",
-      "year": "2021",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 690
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "300 SL Coup\u00e9",
-      "year": "1954",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 388
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "AMG Hammer Coupe",
-      "year": "1987",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 565
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "190E 2.5-16 Evolution II",
-      "year": "1990",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 460
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "190E 2.5-16 Evolution II Forza Edition",
-      "year": "1990",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 700
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "SL 65 AMG Black Series",
-      "year": "2009",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 699
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "C 63 AMG Coup\u00e9 Black Series",
-      "year": "2012",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 654
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "A 45 AMG",
-      "year": "2013",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 582
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "G 65 AMG",
-      "year": "2013",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 530
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "G 65 AMG 6x6",
-      "year": "2014",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 489
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "Unimog U5023",
-      "year": "2014",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 100
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "X-Class",
-      "year": "2018",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 258
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "SLC 43 Final Edition",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 900
-    },
-    {
-      "make": "Meyers",
-      "model": "Manx",
-      "year": "1971",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 201
-    },
-    {
-      "make": "Meyers",
-      "model": "Manx 2.0 EV",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 540
     },
     {
       "make": "MG",
@@ -3703,6 +4252,26 @@
     },
     {
       "make": "MINI",
+      "model": "John Cooper Works GP",
+      "year": "2021",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 599
+    },
+    {
+      "make": "MINI",
+      "model": "X-Raid All4 Racing Countryman",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 523,
+      "ev": false
+    },
+    {
+      "make": "MINI",
       "model": "X-Raid John Cooper Works Buggy",
       "year": "2018",
       "drive": "AWD",
@@ -3713,13 +4282,763 @@
     },
     {
       "make": "MINI",
-      "model": "John Cooper Works GP",
-      "year": "2021",
+      "model": "X-raid John Cooper Works Buggy",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 514
+    },
+    {
+      "make": "Maserati",
+      "model": "Ghibli Cup",
+      "year": "1997",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 591
+    },
+    {
+      "make": "Maserati",
+      "model": "MC12",
+      "year": "2004",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 751
+    },
+    {
+      "make": "Maserati",
+      "model": "MC12 Versione Corsa",
+      "year": "2008",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 912
+    },
+    {
+      "make": "Maserati",
+      "model": "MC20",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 753
+    },
+    {
+      "make": "Mazda",
+      "model": "#55 Mazda 787B",
+      "year": "1991",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 988
+    },
+    {
+      "make": "Mazda",
+      "model": "787B",
+      "year": "1991",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 988
+    },
+    {
+      "make": "Mazda",
+      "model": "Cosmo 110S Series II",
+      "year": "1972",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 394
+    },
+    {
+      "make": "Mazda",
+      "model": "Furai",
+      "year": "2008",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 926
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 432
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 499
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5 Cup",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 586
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5 Miata",
+      "year": "1990",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 451
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5 Miata",
+      "year": "1994",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 329
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5 Miata Forza Edition",
+      "year": "1994",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 850
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5 Miata RF",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 509
+    },
+    {
+      "make": "Mazda",
+      "model": "Mad Mike 808 Wagon FURSTY",
+      "year": "1974",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 702,
+      "ev": false
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazdaspeed 3",
+      "year": "2010",
       "drive": "FWD",
       "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 599
+      "pi": 536
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazdaspeed MX-5",
+      "year": "2005",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 469
+    },
+    {
+      "make": "Mazda",
+      "model": "RX-3",
+      "year": "1973",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 328
+    },
+    {
+      "make": "Mazda",
+      "model": "RX-3 Forza Edition",
+      "year": "1973",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 600
+    },
+    {
+      "make": "Mazda",
+      "model": "RX-7 GSL-SE",
+      "year": "1985",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 357
+    },
+    {
+      "make": "Mazda",
+      "model": "RX-7 Type R",
+      "year": "1992",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 548
+    },
+    {
+      "make": "Mazda",
+      "model": "RX-8 R3",
+      "year": "2011",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 508
+    },
+    {
+      "make": "Mazda",
+      "model": "Savanna RX-7",
+      "year": "1990",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 451
+    },
+    {
+      "make": "McLaren",
+      "model": "12C Coupe",
+      "year": "2011",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 727
+    },
+    {
+      "make": "McLaren",
+      "model": "12C Coup\u00e9",
+      "year": "2011",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 727
+    },
+    {
+      "make": "McLaren",
+      "model": "570S Coupe",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 721
+    },
+    {
+      "make": "McLaren",
+      "model": "570S Coup\u00e9",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 721
+    },
+    {
+      "make": "McLaren",
+      "model": "600LT Coupe",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 780,
+      "ev": false
+    },
+    {
+      "make": "McLaren",
+      "model": "600LT Coup\u00e9",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 780
+    },
+    {
+      "make": "McLaren",
+      "model": "620R",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 773
+    },
+    {
+      "make": "McLaren",
+      "model": "650S Spider",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 765,
+      "ev": false
+    },
+    {
+      "make": "McLaren",
+      "model": "765LT",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 829
+    },
+    {
+      "make": "McLaren",
+      "model": "765LT Coupe",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 829
+    },
+    {
+      "make": "McLaren",
+      "model": "Artura",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 766
+    },
+    {
+      "make": "McLaren",
+      "model": "F1",
+      "year": "1993",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 713
+    },
+    {
+      "make": "McLaren",
+      "model": "F1 GT",
+      "year": "1997",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 769
+    },
+    {
+      "make": "McLaren",
+      "model": "P1",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 848
+    },
+    {
+      "make": "McLaren",
+      "model": "Sabre",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 787
+    },
+    {
+      "make": "McLaren",
+      "model": "Speedtail",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 835
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "C 63 S Coupe",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 645,
+      "ev": false
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "C 63 S Coup\u00e9",
+      "year": "2016",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 645
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "E 63 S",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 674
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT 4-Door Coupe",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 664,
+      "ev": false
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT 4-Door Coup\u00e9",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 664
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT Black Series",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 782
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT Black Series",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 782
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT Black Series 'Welcome Pack'",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 782
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT Black Series Welcome Pack",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 900,
+      "ev": false
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT R",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 764
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "GT S",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 691
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "ONE",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 900
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "SL 63",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 690
+    },
+    {
+      "make": "Mercedes-AMG",
+      "model": "SLC 43 Final Edition",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 620
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "190E 2.5-16 Evolution II",
+      "year": "1990",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 460
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "190E 2.5-16 Evolution II Forza Edition",
+      "year": "1990",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 700
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "300 SL Coupe",
+      "year": "1954",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "pi": 388,
+      "ev": false
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "300 SL Coup\u00e9",
+      "year": "1954",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 388
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "300 SLR",
+      "year": "1955",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 599,
+      "ev": false
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "A 45 AMG",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 582
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "AMG CLK GTR",
+      "year": "1998",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 713,
+      "ev": false
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "AMG Hammer Coupe",
+      "year": "1987",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 565
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "C 63 AMG Coupe Black Series",
+      "year": "2012",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 654,
+      "ev": false
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "C 63 AMG Coup\u00e9 Black Series",
+      "year": "2012",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 654
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "G 63 AMG 6x6",
+      "year": "2014",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 489
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "G 65 AMG",
+      "year": "2013",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 530
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "G 65 AMG 6x6",
+      "year": "2014",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 489
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "SL 65 AMG Black Series",
+      "year": "2009",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 699
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "SLC 43 Final Edition",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 900
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Unimog U5023",
+      "year": "2014",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 100
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "X-Class",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 258
+    },
+    {
+      "make": "Meyers",
+      "model": "Manx",
+      "year": "1971",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 201
+    },
+    {
+      "make": "Meyers",
+      "model": "Manx 2.0",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 540
+    },
+    {
+      "make": "Meyers",
+      "model": "Manx 2.0 EV",
+      "year": "2023",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 540
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "#1 Sierra Lancer Evolution Time Attack",
+      "year": "2005",
+      "drive": "AWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 962
     },
     {
       "make": "Mitsubishi",
@@ -3733,16 +5052,6 @@
     },
     {
       "make": "Mitsubishi",
-      "model": "Galant VR-4",
-      "year": "1992",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 431
-    },
-    {
-      "make": "Mitsubishi",
       "model": "Eclipse GSX",
       "year": "1995",
       "drive": "AWD",
@@ -3750,26 +5059,6 @@
       "weight": 0,
       "ev": false,
       "pi": 436
-    },
-    {
-      "make": "Mitsubishi",
-      "model": "Lancer Evolution III GSR",
-      "year": "1995",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 518
-    },
-    {
-      "make": "Mitsubishi",
-      "model": "Montero Exceed 2800 TD",
-      "year": "1995",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 190
     },
     {
       "make": "Mitsubishi",
@@ -3783,13 +5072,43 @@
     },
     {
       "make": "Mitsubishi",
-      "model": "Montero Evolution",
-      "year": "1997",
+      "model": "Galant VR-4",
+      "year": "1992",
       "drive": "AWD",
-      "cls": "D",
+      "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 346
+      "pi": 431
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Lancer Evolution III GSR",
+      "year": "1995",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 518
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Lancer Evolution IX MR",
+      "year": "2006",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 521
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Lancer Evolution Time Attack",
+      "year": "2005",
+      "drive": "AWD",
+      "cls": "R",
+      "weight": 0,
+      "pi": 962,
+      "ev": false
     },
     {
       "make": "Mitsubishi",
@@ -3823,29 +5142,149 @@
     },
     {
       "make": "Mitsubishi",
-      "model": "#1 Sierra Lancer Evolution Time Attack",
-      "year": "2005",
-      "drive": "AWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 962
-    },
-    {
-      "make": "Mitsubishi",
-      "model": "Lancer Evolution IX MR",
-      "year": "2006",
+      "model": "Lancer Evolution X GSR",
+      "year": "2008",
       "drive": "AWD",
       "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 521
+      "pi": 534
     },
     {
       "make": "Mitsubishi",
-      "model": "Lancer Evolution X GSR",
-      "year": "2008",
+      "model": "Minicab Time Attack",
+      "year": "1990",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "pi": 166,
+      "ev": false
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Montero Evolution",
+      "year": "1997",
       "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 346
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Montero Exceed 2800 TD",
+      "year": "1995",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 190
+    },
+    {
+      "make": "Nissan",
+      "model": "#11 Tomica Skyline Turbo Super Silhouette",
+      "year": "1983",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 847
+    },
+    {
+      "make": "Nissan",
+      "model": "#23 Pennzoil Nismo Skyline GT-R",
+      "year": "1998",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 774
+    },
+    {
+      "make": "Nissan",
+      "model": "#32 Skyline WTAC 'Xtreme GTR'",
+      "year": "1993",
+      "drive": "AWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 923
+    },
+    {
+      "make": "Nissan",
+      "model": "#36 Silvia WTAC",
+      "year": "2000",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 996
+    },
+    {
+      "make": "Nissan",
+      "model": "240SX",
+      "year": "1993",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 339
+    },
+    {
+      "make": "Nissan",
+      "model": "370Z",
+      "year": "2010",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 568
+    },
+    {
+      "make": "Nissan",
+      "model": "370Z NISMO",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 603
+    },
+    {
+      "make": "Nissan",
+      "model": "370Z Nismo",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 603
+    },
+    {
+      "make": "Nissan",
+      "model": "Be-1",
+      "year": "1987",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 175
+    },
+    {
+      "make": "Nissan",
+      "model": "Dream Project S15 Silvia WTAC",
+      "year": "2000",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "pi": 996,
+      "ev": false
+    },
+    {
+      "make": "Nissan",
+      "model": "Fairlady Z",
+      "year": "2003",
+      "drive": "RWD",
       "cls": "B",
       "weight": 0,
       "ev": false,
@@ -3863,113 +5302,13 @@
     },
     {
       "make": "Nissan",
-      "model": "Skyline 2000GT-R",
-      "year": "1971",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 380
-    },
-    {
-      "make": "Nissan",
-      "model": "Skyline H/T 2000GT-R",
-      "year": "1973",
+      "model": "Fairlady Z Version S Twin Turbo",
+      "year": "1994",
       "drive": "RWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 407
-    },
-    {
-      "make": "Nissan",
-      "model": "#11 Tomica Skyline Turbo Super Silhouette",
-      "year": "1983",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 847
-    },
-    {
-      "make": "Nissan",
-      "model": "Safari Turbo",
-      "year": "1985",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 123
-    },
-    {
-      "make": "Nissan",
-      "model": "Be-1",
-      "year": "1987",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 175
-    },
-    {
-      "make": "Nissan",
-      "model": "Skyline GTS-R (HR31)",
-      "year": "1987",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 432
-    },
-    {
-      "make": "Nissan",
-      "model": "PAO",
-      "year": "1989",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 145
-    },
-    {
-      "make": "Nissan",
-      "model": "S-Cargo",
-      "year": "1989",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 131
-    },
-    {
-      "make": "Nissan",
-      "model": "S-Cargo Forza Edition",
-      "year": "1989",
-      "drive": "FWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 800
-    },
-    {
-      "make": "Nissan",
-      "model": "Silvia K's",
-      "year": "1989",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 455
-    },
-    {
-      "make": "Nissan",
-      "model": "Pulsar GTI-R",
-      "year": "1990",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 486
+      "pi": 497
     },
     {
       "make": "Nissan",
@@ -3983,173 +5322,13 @@
     },
     {
       "make": "Nissan",
-      "model": "Skyline GT-R",
-      "year": "1992",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 541
-    },
-    {
-      "make": "Nissan",
-      "model": "#32 Skyline WTAC 'Xtreme GTR'",
-      "year": "1993",
-      "drive": "AWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 923
-    },
-    {
-      "make": "Nissan",
-      "model": "240SX",
-      "year": "1993",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 339
-    },
-    {
-      "make": "Nissan",
-      "model": "Skyline GT-R V-Spec",
-      "year": "1993",
-      "drive": "AWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 923
-    },
-    {
-      "make": "Nissan",
-      "model": "Fairlady Z Version S Twin Turbo",
-      "year": "1994",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 497
-    },
-    {
-      "make": "Nissan",
-      "model": "Silvia K's",
-      "year": "1994",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 499
-    },
-    {
-      "make": "Nissan",
-      "model": "Gloria Gran Turismo",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 498
-    },
-    {
-      "make": "Nissan",
-      "model": "Nismo GT-R LM",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 545
-    },
-    {
-      "make": "Nissan",
-      "model": "Skyline GT-R V-Spec",
-      "year": "1997",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 555
-    },
-    {
-      "make": "Nissan",
-      "model": "Stagea RS Four V",
-      "year": "1997",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 439
-    },
-    {
-      "make": "Nissan",
-      "model": "#23 Pennzoil Nismo Skyline GT-R",
-      "year": "1998",
+      "model": "GT-R (R35)",
+      "year": "2017",
       "drive": "AWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 774
-    },
-    {
-      "make": "Nissan",
-      "model": "Silvia K's Aero",
-      "year": "1998",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 494
-    },
-    {
-      "make": "Nissan",
-      "model": "#36 Silvia WTAC",
-      "year": "2000",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 996
-    },
-    {
-      "make": "Nissan",
-      "model": "Skyline GT-R V-Spec II",
-      "year": "2000",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 590
-    },
-    {
-      "make": "Nissan",
-      "model": "Silvia Spec-R",
-      "year": "2002",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 551
-    },
-    {
-      "make": "Nissan",
-      "model": "Fairlady Z",
-      "year": "2003",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 534
-    },
-    {
-      "make": "Nissan",
-      "model": "370Z",
-      "year": "2010",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 568
+      "pi": 709
     },
     {
       "make": "Nissan",
@@ -4183,23 +5362,13 @@
     },
     {
       "make": "Nissan",
-      "model": "GT-R (R35)",
-      "year": "2017",
+      "model": "GT-R NISMO",
+      "year": "2024",
       "drive": "AWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 709
-    },
-    {
-      "make": "Nissan",
-      "model": "370Z NISMO",
-      "year": "2019",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 603
+      "pi": 741
     },
     {
       "make": "Nissan",
@@ -4213,13 +5382,323 @@
     },
     {
       "make": "Nissan",
-      "model": "GT-R NISMO",
+      "model": "GT-R Nismo",
       "year": "2024",
-      "drive": "AWD",
+      "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
       "pi": 741
+    },
+    {
+      "make": "Nissan",
+      "model": "GT-R R35",
+      "year": "2017",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 709
+    },
+    {
+      "make": "Nissan",
+      "model": "Gloria Gran Turismo",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 498
+    },
+    {
+      "make": "Nissan",
+      "model": "NISMO GT-R LM",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 545
+    },
+    {
+      "make": "Nissan",
+      "model": "Nismo GT-R LM",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 545
+    },
+    {
+      "make": "Nissan",
+      "model": "PAO",
+      "year": "1989",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 145
+    },
+    {
+      "make": "Nissan",
+      "model": "Pennzoil NISMO Skyline GT-R",
+      "year": "1998",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 848
+    },
+    {
+      "make": "Nissan",
+      "model": "Pulsar GTI-R",
+      "year": "1990",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 486
+    },
+    {
+      "make": "Nissan",
+      "model": "R390 GT1",
+      "year": "1998",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 774,
+      "ev": false
+    },
+    {
+      "make": "Nissan",
+      "model": "S-Cargo",
+      "year": "1989",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 131
+    },
+    {
+      "make": "Nissan",
+      "model": "S-Cargo Forza Edition",
+      "year": "1989",
+      "drive": "FWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 800
+    },
+    {
+      "make": "Nissan",
+      "model": "Safari Turbo",
+      "year": "1985",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 123
+    },
+    {
+      "make": "Nissan",
+      "model": "Silvia K's",
+      "year": "1989",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 455
+    },
+    {
+      "make": "Nissan",
+      "model": "Silvia K's",
+      "year": "1994",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 499
+    },
+    {
+      "make": "Nissan",
+      "model": "Silvia K's Aero",
+      "year": "1998",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 494
+    },
+    {
+      "make": "Nissan",
+      "model": "Silvia Ks",
+      "year": "1989",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 455
+    },
+    {
+      "make": "Nissan",
+      "model": "Silvia Ks",
+      "year": "1994",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 499
+    },
+    {
+      "make": "Nissan",
+      "model": "Silvia Ks Aero",
+      "year": "1998",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 494
+    },
+    {
+      "make": "Nissan",
+      "model": "Silvia Spec-R",
+      "year": "2002",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 551
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline 2000GT-R",
+      "year": "1971",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 380
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GT-R",
+      "year": "1992",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 541
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GT-R 40th Anniversary",
+      "year": "1998",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 547,
+      "ev": false
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GT-R BNR32 JTC",
+      "year": "1990",
+      "drive": "AWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 858,
+      "ev": false
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GT-R V-Spec",
+      "year": "1993",
+      "drive": "AWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 923
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GT-R V-Spec",
+      "year": "1997",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 555
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GT-R V-Spec II",
+      "year": "2000",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 590
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GTS-R",
+      "year": "1987",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "pi": 432,
+      "ev": false
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline GTS-R (HR31)",
+      "year": "1987",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 432
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline H/T 2000GT-R",
+      "year": "1973",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 407
+    },
+    {
+      "make": "Nissan",
+      "model": "Skyline WTAC Xtreme GTR",
+      "year": "1993",
+      "drive": "AWD",
+      "cls": "R",
+      "weight": 0,
+      "pi": 923,
+      "ev": false
+    },
+    {
+      "make": "Nissan",
+      "model": "Stagea RS Four V",
+      "year": "1997",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 439
+    },
+    {
+      "make": "Nissan",
+      "model": "Tomica Skyline Turbo Super Silhouette",
+      "year": "1983",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 847
     },
     {
       "make": "Nissan",
@@ -4253,16 +5732,6 @@
     },
     {
       "make": "Pagani",
-      "model": "Zonda Cinque Roadster",
-      "year": "2009",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 918
-    },
-    {
-      "make": "Pagani",
       "model": "Huayra BC Coupe",
       "year": "2016",
       "drive": "RWD",
@@ -4280,6 +5749,36 @@
       "weight": 0,
       "ev": false,
       "pi": 954
+    },
+    {
+      "make": "Pagani",
+      "model": "Zonda Cinque Roadster",
+      "year": "2009",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 918
+    },
+    {
+      "make": "Pagani",
+      "model": "Zonda Cinque Roadster",
+      "year": "2010",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 812
+    },
+    {
+      "make": "Pagani",
+      "model": "Zonda R",
+      "year": "2009",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 918
     },
     {
       "make": "Peel",
@@ -4313,16 +5812,6 @@
     },
     {
       "make": "Peugeot",
-      "model": "205 Turbo 16",
-      "year": "1984",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 500
-    },
-    {
-      "make": "Peugeot",
       "model": "205 Rallye",
       "year": "1991",
       "drive": "FWD",
@@ -4333,6 +5822,16 @@
     },
     {
       "make": "Peugeot",
+      "model": "205 Turbo 16",
+      "year": "1984",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 500
+    },
+    {
+      "make": "Peugeot",
       "model": "207 Super 2000",
       "year": "2007",
       "drive": "FWD",
@@ -4340,16 +5839,6 @@
       "weight": 0,
       "ev": false,
       "pi": 632
-    },
-    {
-      "make": "Plymouth",
-      "model": "Fury",
-      "year": "1958",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 361
     },
     {
       "make": "Plymouth",
@@ -4372,8 +5861,28 @@
       "pi": 441
     },
     {
+      "make": "Plymouth",
+      "model": "Fury",
+      "year": "1958",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 361
+    },
+    {
       "make": "Polaris",
-      "model": "RZR Pro XP Ultimate",
+      "model": "RZR Pro XP Factory Racing",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "pi": 439,
+      "ev": false
+    },
+    {
+      "make": "Polaris",
+      "model": "RZR Pro XP Factory Racing Limited Edition",
       "year": "2021",
       "drive": "AWD",
       "cls": "C",
@@ -4383,7 +5892,7 @@
     },
     {
       "make": "Polaris",
-      "model": "RZR Pro XP Factory Racing Limited Edition",
+      "model": "RZR Pro XP Ultimate",
       "year": "2021",
       "drive": "AWD",
       "cls": "C",
@@ -4413,36 +5922,6 @@
     },
     {
       "make": "Porsche",
-      "model": "#3 917 LH",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 998
-    },
-    {
-      "make": "Porsche",
-      "model": "911 Carrera RS",
-      "year": "1973",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 490
-    },
-    {
-      "make": "Porsche",
-      "model": "911 Turbo 3.3",
-      "year": "1982",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 550
-    },
-    {
-      "make": "Porsche",
       "model": "#185 959 Prodrive Rally Raid",
       "year": "1986",
       "drive": "AWD",
@@ -4453,103 +5932,13 @@
     },
     {
       "make": "Porsche",
-      "model": "928 GTS",
-      "year": "1993",
+      "model": "#3 917 LH",
+      "year": "1970",
       "drive": "RWD",
-      "cls": "B",
+      "cls": "R",
       "weight": 0,
       "ev": false,
-      "pi": 563
-    },
-    {
-      "make": "Porsche",
-      "model": "968 Turbo S",
-      "year": "1993",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 594
-    },
-    {
-      "make": "Porsche",
-      "model": "911 GT2",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 644
-    },
-    {
-      "make": "Porsche",
-      "model": "911 GT1 Strassenversion",
-      "year": "1997",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 746
-    },
-    {
-      "make": "Porsche",
-      "model": "Carrera GT",
-      "year": "2003",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 758
-    },
-    {
-      "make": "Porsche",
-      "model": "911 GT3",
-      "year": "2004",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 674
-    },
-    {
-      "make": "Porsche",
-      "model": "911 GT3 RS 4.0",
-      "year": "2012",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 726
-    },
-    {
-      "make": "Porsche",
-      "model": "918 Spyder",
-      "year": "2014",
-      "drive": "AWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 858
-    },
-    {
-      "make": "Porsche",
-      "model": "718 Cayman GTS",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 675
-    },
-    {
-      "make": "Porsche",
-      "model": "Macan LPR Rally Raid",
-      "year": "2018",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 528
+      "pi": 998
     },
     {
       "make": "Porsche",
@@ -4563,6 +5952,36 @@
     },
     {
       "make": "Porsche",
+      "model": "718 Cayman GT4 RS",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 737
+    },
+    {
+      "make": "Porsche",
+      "model": "718 Cayman GTS",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 675
+    },
+    {
+      "make": "Porsche",
+      "model": "911 Carrera RS",
+      "year": "1973",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 490
+    },
+    {
+      "make": "Porsche",
       "model": "911 Carrera S",
       "year": "2019",
       "drive": "RWD",
@@ -4573,13 +5992,43 @@
     },
     {
       "make": "Porsche",
-      "model": "911 GT3 RS",
-      "year": "2019",
+      "model": "911 GT1 Strassenversion",
+      "year": "1997",
       "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 760
+      "pi": 746
+    },
+    {
+      "make": "Porsche",
+      "model": "911 GT2",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 644
+    },
+    {
+      "make": "Porsche",
+      "model": "911 GT2 RS",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 803
+    },
+    {
+      "make": "Porsche",
+      "model": "911 GT3",
+      "year": "2004",
+      "drive": "RWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 674
     },
     {
       "make": "Porsche",
@@ -4593,23 +6042,13 @@
     },
     {
       "make": "Porsche",
-      "model": "Mission R",
-      "year": "2021",
-      "drive": "AWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 865
-    },
-    {
-      "make": "Porsche",
-      "model": "718 Cayman GT4 RS",
-      "year": "2022",
+      "model": "911 GT3 RS",
+      "year": "2019",
       "drive": "RWD",
       "cls": "S1",
       "weight": 0,
       "ev": false,
-      "pi": 737
+      "pi": 760
     },
     {
       "make": "Porsche",
@@ -4623,6 +6062,16 @@
     },
     {
       "make": "Porsche",
+      "model": "911 GT3 RS 4.0",
+      "year": "2012",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 726
+    },
+    {
+      "make": "Porsche",
       "model": "911 Rallye",
       "year": "2023",
       "drive": "AWD",
@@ -4633,6 +6082,16 @@
     },
     {
       "make": "Porsche",
+      "model": "911 Turbo 3.3",
+      "year": "1982",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 550
+    },
+    {
+      "make": "Porsche",
       "model": "911 Turbo S",
       "year": "2023",
       "drive": "AWD",
@@ -4640,6 +6099,226 @@
       "weight": 0,
       "ev": false,
       "pi": 774
+    },
+    {
+      "make": "Porsche",
+      "model": "911 Turbo S Leichtbau",
+      "year": "1993",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 652,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "917 LH",
+      "year": "1970",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 777
+    },
+    {
+      "make": "Porsche",
+      "model": "917 LH Forza Edition",
+      "year": "1970",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "pi": 998,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "918 Spyder",
+      "year": "2014",
+      "drive": "AWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 858
+    },
+    {
+      "make": "Porsche",
+      "model": "928 GTS",
+      "year": "1993",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 563
+    },
+    {
+      "make": "Porsche",
+      "model": "935",
+      "year": "2019",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 853,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "944 Turbo",
+      "year": "1989",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 539,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "959",
+      "year": "1987",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 661,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "959 Prodrive Rally Raid",
+      "year": "1985",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 623
+    },
+    {
+      "make": "Porsche",
+      "model": "959 Prodrive Rally Raid",
+      "year": "1986",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 623,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "968 Turbo S",
+      "year": "1993",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 594
+    },
+    {
+      "make": "Porsche",
+      "model": "Carrera GT",
+      "year": "2003",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 758
+    },
+    {
+      "make": "Porsche",
+      "model": "Cayenne Turbo",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 638,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "Cayman GT3 WTAC",
+      "year": "2005",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 856,
+      "ev": false
+    },
+    {
+      "make": "Porsche",
+      "model": "Macan LPR Rally Raid",
+      "year": "2018",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 528
+    },
+    {
+      "make": "Porsche",
+      "model": "Mission R",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 865
+    },
+    {
+      "make": "Porsche",
+      "model": "Mission R",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "S2",
+      "weight": 0,
+      "pi": 865,
+      "ev": true
+    },
+    {
+      "make": "Porsche",
+      "model": "Taycan Turbo S",
+      "year": "2020",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 725,
+      "ev": true
+    },
+    {
+      "make": "RJ Anderson",
+      "model": "#37 Polaris RZR Pro 4 Truck",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 677
+    },
+    {
+      "make": "RJ Anderson",
+      "model": "#37 Polaris RZR-Rockstar Pro 2 Truck",
+      "year": "2016",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "ev": false,
+      "pi": 674
+    },
+    {
+      "make": "RJ Anderson",
+      "model": "Polaris RZR Pro 2 Truck",
+      "year": "2016",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 674,
+      "ev": false
+    },
+    {
+      "make": "RJ Anderson",
+      "model": "Polaris RZR Pro 4 Truck",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 677,
+      "ev": false
     },
     {
       "make": "Radical",
@@ -4673,16 +6352,6 @@
     },
     {
       "make": "Renault",
-      "model": "8 Gordini",
-      "year": "1967",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 322
-    },
-    {
-      "make": "Renault",
       "model": "5 Turbo",
       "year": "1980",
       "drive": "RWD",
@@ -4693,6 +6362,16 @@
     },
     {
       "make": "Renault",
+      "model": "8 Gordini",
+      "year": "1967",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 322
+    },
+    {
+      "make": "Renault",
       "model": "Clio Williams",
       "year": "1993",
       "drive": "FWD",
@@ -4700,6 +6379,16 @@
       "weight": 0,
       "ev": false,
       "pi": 400
+    },
+    {
+      "make": "Renault",
+      "model": "Megane R.S.",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 547
     },
     {
       "make": "Renault",
@@ -4732,6 +6421,26 @@
       "pi": 547
     },
     {
+      "make": "Rimac",
+      "model": "Nevera",
+      "year": "2021",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 913
+    },
+    {
+      "make": "Rivian",
+      "model": "R1T",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "A",
+      "weight": 0,
+      "pi": 607,
+      "ev": true
+    },
+    {
       "make": "Rivian",
       "model": "R1T",
       "year": "2022",
@@ -4742,24 +6451,54 @@
       "pi": 607
     },
     {
-      "make": "RJ Anderson",
-      "model": "#37 Polaris RZR-Rockstar Pro 2 Truck",
-      "year": "2016",
+      "make": "SIERRA Cars",
+      "model": "#23 Yokohama Alpha",
+      "year": "2020",
       "drive": "AWD",
-      "cls": "A",
+      "cls": "R",
       "weight": 0,
       "ev": false,
-      "pi": 674
+      "pi": 926
     },
     {
-      "make": "RJ Anderson",
-      "model": "#37 Polaris RZR Pro 4 Truck",
+      "make": "SIERRA Cars",
+      "model": "700R",
+      "year": "2021",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 346
+    },
+    {
+      "make": "SIERRA Cars",
+      "model": "RX3",
       "year": "2021",
       "drive": "AWD",
       "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 677
+      "pi": 635
+    },
+    {
+      "make": "SIERRA Cars",
+      "model": "Yokohama ALPHA",
+      "year": "2020",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 926
+    },
+    {
+      "make": "SRT",
+      "model": "Viper GTS",
+      "year": "2013",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 707
     },
     {
       "make": "Saleen",
@@ -4793,6 +6532,16 @@
     },
     {
       "make": "Shelby",
+      "model": "Cobra Daytona Coupe",
+      "year": "1965",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "pi": 515,
+      "ev": false
+    },
+    {
+      "make": "Shelby",
       "model": "Cobra Daytona Coup\u00e9",
       "year": "1965",
       "drive": "RWD",
@@ -4800,36 +6549,6 @@
       "weight": 0,
       "ev": false,
       "pi": 515
-    },
-    {
-      "make": "SIERRA Cars",
-      "model": "#23 Yokohama Alpha",
-      "year": "2020",
-      "drive": "AWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 926
-    },
-    {
-      "make": "SIERRA Cars",
-      "model": "700R",
-      "year": "2021",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 346
-    },
-    {
-      "make": "SIERRA Cars",
-      "model": "RX3",
-      "year": "2021",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 635
     },
     {
       "make": "Subaru",
@@ -4843,43 +6562,33 @@
     },
     {
       "make": "Subaru",
-      "model": "Legacy RS",
-      "year": "1990",
-      "drive": "AWD",
+      "model": "BRZ",
+      "year": "2013",
+      "drive": "RWD",
       "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 406
+      "pi": 463
     },
     {
       "make": "Subaru",
-      "model": "Vivio RX-R",
-      "year": "1994",
-      "drive": "AWD",
-      "cls": "D",
+      "model": "BRZ",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 281
+      "pi": 551
     },
     {
       "make": "Subaru",
-      "model": "Vivio RX-R Forza Edition",
-      "year": "1994",
-      "drive": "AWD",
-      "cls": "S2",
+      "model": "BRZ Forza Edition",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 900
-    },
-    {
-      "make": "Subaru",
-      "model": "SVX",
-      "year": "1996",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 466
+      "pi": 700
     },
     {
       "make": "Subaru",
@@ -4890,6 +6599,16 @@
       "weight": 0,
       "ev": false,
       "pi": 600
+    },
+    {
+      "make": "Subaru",
+      "model": "Impreza WRX STI",
+      "year": "2008",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 539
     },
     {
       "make": "Subaru",
@@ -4923,13 +6642,63 @@
     },
     {
       "make": "Subaru",
-      "model": "Impreza WRX STI",
-      "year": "2008",
+      "model": "Legacy RS",
+      "year": "1990",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 406
+    },
+    {
+      "make": "Subaru",
+      "model": "STI S209",
+      "year": "2019",
       "drive": "AWD",
       "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 539
+      "pi": 574
+    },
+    {
+      "make": "Subaru",
+      "model": "SVX",
+      "year": "1996",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 466
+    },
+    {
+      "make": "Subaru",
+      "model": "Vivio RX-R",
+      "year": "1994",
+      "drive": "AWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 281
+    },
+    {
+      "make": "Subaru",
+      "model": "Vivio RX-R Forza Edition",
+      "year": "1994",
+      "drive": "AWD",
+      "cls": "S2",
+      "weight": 0,
+      "ev": false,
+      "pi": 900
+    },
+    {
+      "make": "Subaru",
+      "model": "WRX",
+      "year": "2022",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 538
     },
     {
       "make": "Subaru",
@@ -4940,16 +6709,6 @@
       "weight": 0,
       "ev": false,
       "pi": 547
-    },
-    {
-      "make": "Subaru",
-      "model": "BRZ",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 463
     },
     {
       "make": "Subaru",
@@ -4972,174 +6731,34 @@
       "pi": 757
     },
     {
-      "make": "Subaru",
-      "model": "STI S209",
-      "year": "2019",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 574
-    },
-    {
-      "make": "Subaru",
-      "model": "BRZ",
-      "year": "2022",
+      "make": "TVR",
+      "model": "Cerbera Speed 12",
+      "year": "1998",
       "drive": "RWD",
-      "cls": "B",
+      "cls": "S1",
       "weight": 0,
-      "ev": false,
-      "pi": 551
+      "pi": 770,
+      "ev": false
     },
     {
-      "make": "Subaru",
-      "model": "BRZ Forza Edition",
-      "year": "2022",
+      "make": "TVR",
+      "model": "Griffith",
+      "year": "2018",
+      "drive": "RWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 729
+    },
+    {
+      "make": "TVR",
+      "model": "Sagaris",
+      "year": "2005",
       "drive": "RWD",
       "cls": "A",
       "weight": 0,
       "ev": false,
-      "pi": 700
-    },
-    {
-      "make": "Subaru",
-      "model": "WRX",
-      "year": "2022",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 538
-    },
-    {
-      "make": "Toyota",
-      "model": "Sports 800",
-      "year": "1965",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 141
-    },
-    {
-      "make": "Toyota",
-      "model": "Sports 800 Fanta Edition",
-      "year": "1965",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 141
-    },
-    {
-      "make": "Toyota",
-      "model": "2000GT",
-      "year": "1969",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 377
-    },
-    {
-      "make": "Toyota",
-      "model": "Corolla SR5",
-      "year": "1974",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 197
-    },
-    {
-      "make": "Toyota",
-      "model": "FJ40",
-      "year": "1979",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 157
-    },
-    {
-      "make": "Toyota",
-      "model": "Sprinter Trueno GT Apex",
-      "year": "1985",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 376
-    },
-    {
-      "make": "Toyota",
-      "model": "Sprinter Trueno GT Apex Forza Edition",
-      "year": "1985",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 600
-    },
-    {
-      "make": "Toyota",
-      "model": "Sprinter Trueno GT Apex Touge Edition",
-      "year": "1985",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 600
-    },
-    {
-      "make": "Toyota",
-      "model": "MR2 SC",
-      "year": "1989",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 397
-    },
-    {
-      "make": "Toyota",
-      "model": "Chaser GT Twin Turbo",
-      "year": "1991",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 484
-    },
-    {
-      "make": "Toyota",
-      "model": "Sera",
-      "year": "1991",
-      "drive": "FWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 344
-    },
-    {
-      "make": "Toyota",
-      "model": "Celica GT-Four RC ST185",
-      "year": "1992",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 438
-    },
-    {
-      "make": "Toyota",
-      "model": "Supra 2.0 GT",
-      "year": "1992",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 454
+      "pi": 672
     },
     {
       "make": "Toyota",
@@ -5153,83 +6772,23 @@
     },
     {
       "make": "Toyota",
-      "model": "Celica GT-Four ST205",
-      "year": "1994",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 479
-    },
-    {
-      "make": "Toyota",
-      "model": "J&J Motorsport Supra WTAC",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 828
-    },
-    {
-      "make": "Toyota",
-      "model": "MR2 GT",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 522
-    },
-    {
-      "make": "Toyota",
-      "model": "Chaser 2.5 Tourer V",
-      "year": "1997",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 504
-    },
-    {
-      "make": "Toyota",
-      "model": "Soarer 2.5 GT-T",
-      "year": "1997",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 491
-    },
-    {
-      "make": "Toyota",
-      "model": "Supra RZ",
-      "year": "1998",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 529
-    },
-    {
-      "make": "Toyota",
-      "model": "Celica Sport Specialty II",
-      "year": "2003",
-      "drive": "FWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 433
-    },
-    {
-      "make": "Toyota",
-      "model": "Crown Super Deluxe Taxi",
-      "year": "2005",
+      "model": "2000GT",
+      "year": "1969",
       "drive": "RWD",
       "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 181
+      "pi": 377
+    },
+    {
+      "make": "Toyota",
+      "model": "4Runner TRD Pro",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 421
     },
     {
       "make": "Toyota",
@@ -5253,53 +6812,113 @@
     },
     {
       "make": "Toyota",
-      "model": "Land Cruiser Arctic Trucks AT37",
-      "year": "2016",
-      "drive": "AWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 332
+      "model": "Altezza RS200 Z Edition",
+      "year": "1999",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 2998,
+      "pi": 461,
+      "ev": false
     },
     {
       "make": "Toyota",
-      "model": "JPN Taxi",
-      "year": "2017",
+      "model": "Camry TRD",
+      "year": "2023",
       "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 525
+    },
+    {
+      "make": "Toyota",
+      "model": "Celica GT-Four RC ST185",
+      "year": "1992",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 438
+    },
+    {
+      "make": "Toyota",
+      "model": "Celica GT-Four ST205",
+      "year": "1994",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 479
+    },
+    {
+      "make": "Toyota",
+      "model": "Celica Sport Specialty II",
+      "year": "2003",
+      "drive": "FWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 433
+    },
+    {
+      "make": "Toyota",
+      "model": "Chaser 2.5 Tourer V",
+      "year": "1997",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 504
+    },
+    {
+      "make": "Toyota",
+      "model": "Chaser GT Twin Turbo",
+      "year": "1991",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 484
+    },
+    {
+      "make": "Toyota",
+      "model": "Corolla SR5",
+      "year": "1974",
+      "drive": "RWD",
       "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 248
+      "pi": 197
     },
     {
       "make": "Toyota",
-      "model": "4Runner TRD Pro",
-      "year": "2019",
-      "drive": "AWD",
-      "cls": "C",
+      "model": "Crown Super Deluxe Taxi",
+      "year": "2005",
+      "drive": "RWD",
+      "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 421
+      "pi": 181
     },
     {
       "make": "Toyota",
-      "model": "Tacoma TRD Pro",
-      "year": "2019",
+      "model": "FJ40",
+      "year": "1979",
       "drive": "AWD",
-      "cls": "C",
+      "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 409
+      "pi": 157
     },
     {
       "make": "Toyota",
-      "model": "Tacoma TRD Pro Forza Edition",
-      "year": "2019",
+      "model": "GR Corolla",
+      "year": "2023",
       "drive": "AWD",
-      "cls": "R",
+      "cls": "B",
       "weight": 0,
-      "ev": false,
-      "pi": 998
+      "pi": 596,
+      "ev": false
     },
     {
       "make": "Toyota",
@@ -5333,13 +6952,23 @@
     },
     {
       "make": "Toyota",
-      "model": "Camry TRD",
-      "year": "2023",
-      "drive": "FWD",
-      "cls": "B",
+      "model": "J&J Motorsport Supra WTAC",
+      "year": "1995",
+      "drive": "RWD",
+      "cls": "S2",
       "weight": 0,
       "ev": false,
-      "pi": 525
+      "pi": 828
+    },
+    {
+      "make": "Toyota",
+      "model": "JPN Taxi",
+      "year": "2017",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 248
     },
     {
       "make": "Toyota",
@@ -5353,47 +6982,207 @@
     },
     {
       "make": "Toyota",
-      "model": "Altezza RS200 Z Edition",
-      "year": "1999",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 2998,
-      "pi": 461,
-      "ev": false
-    },
-    {
-      "make": "TVR",
-      "model": "Sagaris",
-      "year": "2005",
-      "drive": "RWD",
-      "cls": "A",
+      "model": "Land Cruiser Arctic Trucks AT37",
+      "year": "2016",
+      "drive": "AWD",
+      "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 672
+      "pi": 332
     },
     {
-      "make": "TVR",
-      "model": "Griffith",
-      "year": "2018",
+      "make": "Toyota",
+      "model": "MR2 GT",
+      "year": "1995",
       "drive": "RWD",
-      "cls": "S1",
+      "cls": "B",
       "weight": 0,
       "ev": false,
-      "pi": 729
+      "pi": 522
     },
     {
-      "make": "Volkswagen",
-      "model": "Beetle",
-      "year": "1963",
+      "make": "Toyota",
+      "model": "MR2 SC",
+      "year": "1989",
       "drive": "RWD",
       "cls": "D",
       "weight": 0,
       "ev": false,
-      "pi": 100
+      "pi": 397
+    },
+    {
+      "make": "Toyota",
+      "model": "Sera",
+      "year": "1991",
+      "drive": "FWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 344
+    },
+    {
+      "make": "Toyota",
+      "model": "Soarer 2.5 GT-T",
+      "year": "1997",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 491
+    },
+    {
+      "make": "Toyota",
+      "model": "Sports 800",
+      "year": "1965",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 141
+    },
+    {
+      "make": "Toyota",
+      "model": "Sports 800 Fanta Edition",
+      "year": "1965",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 141
+    },
+    {
+      "make": "Toyota",
+      "model": "Sprinter Trueno GT Apex",
+      "year": "1985",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 376
+    },
+    {
+      "make": "Toyota",
+      "model": "Sprinter Trueno GT Apex Forza Edition",
+      "year": "1985",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 600
+    },
+    {
+      "make": "Toyota",
+      "model": "Sprinter Trueno GT Apex Touge Edition",
+      "year": "1985",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 600
+    },
+    {
+      "make": "Toyota",
+      "model": "Starlet Glanza V",
+      "year": "1996",
+      "drive": "FWD",
+      "cls": "C",
+      "weight": 0,
+      "pi": 435,
+      "ev": false
+    },
+    {
+      "make": "Toyota",
+      "model": "Supra 2.0 GT",
+      "year": "1992",
+      "drive": "RWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 454
+    },
+    {
+      "make": "Toyota",
+      "model": "Supra RZ",
+      "year": "1998",
+      "drive": "RWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 529
+    },
+    {
+      "make": "Toyota",
+      "model": "T100 Baja Truck",
+      "year": "1993",
+      "drive": "AWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 584
+    },
+    {
+      "make": "Toyota",
+      "model": "Tacoma TRD Pro",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "ev": false,
+      "pi": 409
+    },
+    {
+      "make": "Toyota",
+      "model": "Tacoma TRD Pro Forza Edition",
+      "year": "2019",
+      "drive": "AWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 998
+    },
+    {
+      "make": "Ultima",
+      "model": "Evolution Coupe 1020",
+      "year": "2015",
+      "drive": "RWD",
+      "cls": "R",
+      "weight": 0,
+      "ev": false,
+      "pi": 925
     },
     {
       "make": "Volkswagen",
-      "model": "Type 2 De Luxe",
+      "model": "#34 Volkswagen Andretti Rallycross Beetle",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "ev": false,
+      "pi": 764
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Andretti Rally Cross Beetle",
+      "year": "2017",
+      "drive": "AWD",
+      "cls": "S1",
+      "weight": 0,
+      "pi": 764,
+      "ev": false
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Baja Bug",
+      "year": "1969",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 260
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Beetle",
       "year": "1963",
       "drive": "RWD",
       "cls": "D",
@@ -5413,13 +7202,13 @@
     },
     {
       "make": "Volkswagen",
-      "model": "Pickup LX",
-      "year": "1982",
-      "drive": "RWD",
-      "cls": "D",
+      "model": "Corrado VR6",
+      "year": "1995",
+      "drive": "FWD",
+      "cls": "C",
       "weight": 0,
       "ev": false,
-      "pi": 100
+      "pi": 426
     },
     {
       "make": "Volkswagen",
@@ -5443,16 +7232,6 @@
     },
     {
       "make": "Volkswagen",
-      "model": "Corrado VR6",
-      "year": "1995",
-      "drive": "FWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 426
-    },
-    {
-      "make": "Volkswagen",
       "model": "Golf R",
       "year": "2010",
       "drive": "AWD",
@@ -5463,16 +7242,6 @@
     },
     {
       "make": "Volkswagen",
-      "model": "Scirocco R",
-      "year": "2011",
-      "drive": "FWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 548
-    },
-    {
-      "make": "Volkswagen",
       "model": "Golf R",
       "year": "2014",
       "drive": "AWD",
@@ -5480,16 +7249,6 @@
       "weight": 0,
       "ev": false,
       "pi": 536
-    },
-    {
-      "make": "Volkswagen",
-      "model": "#34 Volkswagen Andretti Rallycross Beetle",
-      "year": "2017",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 764
     },
     {
       "make": "Volkswagen",
@@ -5512,6 +7271,46 @@
       "pi": 548
     },
     {
+      "make": "Volkswagen",
+      "model": "Pickup LX",
+      "year": "1982",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 100
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Rallye Golf",
+      "year": "1989",
+      "drive": "AWD",
+      "cls": "C",
+      "weight": 0,
+      "pi": 440,
+      "ev": false
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Scirocco R",
+      "year": "2011",
+      "drive": "FWD",
+      "cls": "B",
+      "weight": 0,
+      "ev": false,
+      "pi": 548
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Type 2 De Luxe",
+      "year": "1963",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": false,
+      "pi": 100
+    },
+    {
       "make": "Volvo",
       "model": "242 Turbo Evolution",
       "year": "1983",
@@ -5520,6 +7319,26 @@
       "weight": 0,
       "ev": false,
       "pi": 435
+    },
+    {
+      "make": "Wuling",
+      "model": "Hongguang Mini EV",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "pi": 100,
+      "ev": true
+    },
+    {
+      "make": "Wuling",
+      "model": "Hongguang Mini EV Macaron",
+      "year": "2022",
+      "drive": "RWD",
+      "cls": "D",
+      "weight": 0,
+      "ev": true,
+      "pi": 100
     },
     {
       "make": "Wuling",
@@ -5543,13 +7362,13 @@
     },
     {
       "make": "Wuling",
-      "model": "Hongguang Mini EV Macaron",
-      "year": "2022",
+      "model": "Sunshine S Forza Edition",
+      "year": "2020",
       "drive": "RWD",
-      "cls": "D",
+      "cls": "S1",
       "weight": 0,
-      "ev": true,
-      "pi": 100
+      "pi": 800,
+      "ev": false
     },
     {
       "make": "Zenvo",
@@ -5560,866 +7379,6 @@
       "weight": 0,
       "ev": false,
       "pi": 906
-    },
-    {
-      "make": "Alfa Romeo",
-      "model": "8C Competizione",
-      "year": "2007",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 635
-    },
-    {
-      "make": "Apollo",
-      "model": "Intensa Emozione",
-      "year": "2019",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 916
-    },
-    {
-      "make": "Aston Martin",
-      "model": "Vulcan",
-      "year": "2016",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 884
-    },
-    {
-      "make": "Audi",
-      "model": "Sport quattro",
-      "year": "1984",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 526
-    },
-    {
-      "make": "Audi",
-      "model": "#2 Audi Sport quattro S1",
-      "year": "1986",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 726
-    },
-    {
-      "make": "Audi",
-      "model": "RS 5 Coupe",
-      "year": "2011",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 613
-    },
-    {
-      "make": "Audi",
-      "model": "R8 Coupe V10 plus",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 694
-    },
-    {
-      "make": "Audi",
-      "model": "R8 V10 performance",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 738
-    },
-    {
-      "make": "Audi",
-      "model": "R8 Coupe V10 GT RWD",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 769
-    },
-    {
-      "make": "Austin-Healey",
-      "model": "3000 MkIII",
-      "year": "1965",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 352
-    },
-    {
-      "make": "BMW",
-      "model": "Z4 M Coupe",
-      "year": "2008",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 579
-    },
-    {
-      "make": "BMW",
-      "model": "M4 Coupe",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 679
-    },
-    {
-      "make": "Cadillac",
-      "model": "XTS Limousine",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 381
-    },
-    {
-      "make": "Casey Currie Motorsports",
-      "model": "#4402 Ultra 4 Trophy Jeep",
-      "year": "2019",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 641
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Camaro Z28",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 430
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Corvette ZR-1",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 497
-    },
-    {
-      "make": "Chevrolet",
-      "model": "K-10 Custom",
-      "year": "1972",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 268
-    },
-    {
-      "make": "Chevrolet",
-      "model": "Camaro Z28",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 695
-    },
-    {
-      "make": "Datsun",
-      "model": "2000 Roadster",
-      "year": "1969",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 323
-    },
-    {
-      "make": "Datsun",
-      "model": "240Z Hill Climb Beast",
-      "year": "1972",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 951
-    },
-    {
-      "make": "DeBerti",
-      "model": "Jeep Wrangler Unlimited",
-      "year": "2013",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 645
-    },
-    {
-      "make": "Dodge",
-      "model": "Ram SRT-10",
-      "year": "2006",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 547
-    },
-    {
-      "make": "Dodge",
-      "model": "Viper SRT-10 ACR",
-      "year": "2008",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 735
-    },
-    {
-      "make": "Ferrari",
-      "model": "250 GTO",
-      "year": "1962",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 494
-    },
-    {
-      "make": "Ferrari",
-      "model": "512 S",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 774
-    },
-    {
-      "make": "Ferrari",
-      "model": "Enzo Ferrari",
-      "year": "2002",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 755
-    },
-    {
-      "make": "Ferrari",
-      "model": "FXX K",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 936
-    },
-    {
-      "make": "Ford",
-      "model": "Mustang GT Fastback",
-      "year": "1968",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 394
-    },
-    {
-      "make": "Ford",
-      "model": "Mustang SVT Cobra R",
-      "year": "1993",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 432
-    },
-    {
-      "make": "Ford",
-      "model": "F-150 Trophy Truck",
-      "year": "2014",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 613
-    },
-    {
-      "make": "Ford",
-      "model": "Bronco R",
-      "year": "2020",
-      "drive": "AWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 441
-    },
-    {
-      "make": "Ford",
-      "model": "Supervan 4",
-      "year": "2022",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 919
-    },
-    {
-      "make": "Funco Motorsports",
-      "model": "F9",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 752
-    },
-    {
-      "make": "Gordon Murray Automotive",
-      "model": "T.50",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 871
-    },
-    {
-      "make": "Hennessey",
-      "model": "Ford F-150 VelociRaptor 6X6",
-      "year": "2019",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 520
-    },
-    {
-      "make": "HSV",
-      "model": "Limited Edition GEN-F GTS Maloo",
-      "year": "2014",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 629
-    },
-    {
-      "make": "Jaguar",
-      "model": "E-type",
-      "year": "1961",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 414
-    },
-    {
-      "make": "Jaguar",
-      "model": "Sport XJR-15",
-      "year": "1991",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 716
-    },
-    {
-      "make": "Jaguar",
-      "model": "XJ220S TWR",
-      "year": "1993",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 750
-    },
-    {
-      "make": "Jeep",
-      "model": "JT",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 336
-    },
-    {
-      "make": "Koenigsegg",
-      "model": "Agera RS",
-      "year": "2017",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 890
-    },
-    {
-      "make": "Koenigsegg",
-      "model": "Gemera",
-      "year": "2024",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 900
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Murcielago LP 670-4 SV",
-      "year": "2010",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 707
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Sesto Elemento",
-      "year": "2011",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 871
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Huracan LP 610-4",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 738
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Huracan EVO",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 761
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Huracan STO",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 783
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Sian Roadster",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 797
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Aventador LP 780-4 Ultimae",
-      "year": "2022",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 794
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Huracan Sterrato",
-      "year": "2022",
-      "drive": "AWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 738
-    },
-    {
-      "make": "Lamborghini",
-      "model": "Huracan Tecnica",
-      "year": "2022",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 747
-    },
-    {
-      "make": "Maserati",
-      "model": "MC12",
-      "year": "2004",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 751
-    },
-    {
-      "make": "Maserati",
-      "model": "MC12 Versione Corsa",
-      "year": "2008",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 912
-    },
-    {
-      "make": "Mazda",
-      "model": "787B",
-      "year": "1991",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 988
-    },
-    {
-      "make": "McLaren",
-      "model": "12C Coupe",
-      "year": "2011",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 727
-    },
-    {
-      "make": "McLaren",
-      "model": "570S Coupe",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 721
-    },
-    {
-      "make": "McLaren",
-      "model": "765LT Coupe",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 829
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "GT S",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 691
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "GT R",
-      "year": "2017",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 764
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "GT Black Series",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 782
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "SLC 43 Final Edition",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 620
-    },
-    {
-      "make": "Mercedes-AMG",
-      "model": "ONE",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 900
-    },
-    {
-      "make": "Mercedes-Benz",
-      "model": "G 63 AMG 6x6",
-      "year": "2014",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 489
-    },
-    {
-      "make": "Meyers",
-      "model": "Manx 2.0",
-      "year": "2023",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 540
-    },
-    {
-      "make": "MINI",
-      "model": "X-raid John Cooper Works Buggy",
-      "year": "2018",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 514
-    },
-    {
-      "make": "Nissan",
-      "model": "Tomica Skyline Turbo Super Silhouette",
-      "year": "1983",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 847
-    },
-    {
-      "make": "Nissan",
-      "model": "Silvia Ks",
-      "year": "1989",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 455
-    },
-    {
-      "make": "Nissan",
-      "model": "Silvia Ks",
-      "year": "1994",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 499
-    },
-    {
-      "make": "Nissan",
-      "model": "NISMO GT-R LM",
-      "year": "1995",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 545
-    },
-    {
-      "make": "Nissan",
-      "model": "Pennzoil NISMO Skyline GT-R",
-      "year": "1998",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 848
-    },
-    {
-      "make": "Nissan",
-      "model": "Silvia Ks Aero",
-      "year": "1998",
-      "drive": "RWD",
-      "cls": "C",
-      "weight": 0,
-      "ev": false,
-      "pi": 494
-    },
-    {
-      "make": "Nissan",
-      "model": "GT-R R35",
-      "year": "2017",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 709
-    },
-    {
-      "make": "Nissan",
-      "model": "370Z Nismo",
-      "year": "2019",
-      "drive": "RWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 603
-    },
-    {
-      "make": "Nissan",
-      "model": "GT-R Nismo",
-      "year": "2024",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 741
-    },
-    {
-      "make": "Pagani",
-      "model": "Zonda R",
-      "year": "2009",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 918
-    },
-    {
-      "make": "Pagani",
-      "model": "Zonda Cinque Roadster",
-      "year": "2010",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 812
-    },
-    {
-      "make": "Porsche",
-      "model": "917 LH",
-      "year": "1970",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 777
-    },
-    {
-      "make": "Porsche",
-      "model": "959 Prodrive Rally Raid",
-      "year": "1985",
-      "drive": "AWD",
-      "cls": "A",
-      "weight": 0,
-      "ev": false,
-      "pi": 623
-    },
-    {
-      "make": "Porsche",
-      "model": "911 GT2 RS",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "S2",
-      "weight": 0,
-      "ev": false,
-      "pi": 803
-    },
-    {
-      "make": "Renault",
-      "model": "Megane R.S.",
-      "year": "2018",
-      "drive": "RWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 547
-    },
-    {
-      "make": "Rimac",
-      "model": "Nevera",
-      "year": "2021",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 913
-    },
-    {
-      "make": "SIERRA Cars",
-      "model": "Yokohama ALPHA",
-      "year": "2020",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 926
-    },
-    {
-      "make": "SRT",
-      "model": "Viper GTS",
-      "year": "2013",
-      "drive": "RWD",
-      "cls": "S1",
-      "weight": 0,
-      "ev": false,
-      "pi": 707
-    },
-    {
-      "make": "Toyota",
-      "model": "T100 Baja Truck",
-      "year": "1993",
-      "drive": "AWD",
-      "cls": "B",
-      "weight": 0,
-      "ev": false,
-      "pi": 584
-    },
-    {
-      "make": "Ultima",
-      "model": "Evolution Coupe 1020",
-      "year": "2015",
-      "drive": "RWD",
-      "cls": "R",
-      "weight": 0,
-      "ev": false,
-      "pi": 925
-    },
-    {
-      "make": "Volkswagen",
-      "model": "Baja Bug",
-      "year": "1969",
-      "drive": "RWD",
-      "cls": "D",
-      "weight": 0,
-      "ev": false,
-      "pi": 260
     }
   ]
 }
