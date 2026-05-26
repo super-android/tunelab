@@ -4,7 +4,15 @@
   "webDir":   "dist",
   "server": {
     "androidScheme": "https",
-    "cleartext":     false
+    "cleartext":     false,
+    "allowNavigation": [
+      "generativelanguage.googleapis.com",
+      "api.anthropic.com",
+      "api.openai.com",
+      "api.x.ai",
+      "gemini.google.com",
+      "aistudio.google.com"
+    ]
   },
   "android": {
     "buildOptions": {

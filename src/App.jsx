@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, Component } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo, Component } from "react";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
-const VERSION       = "1.5.7";
+const VERSION       = "1.7.0";
 
 // PI defaults and ranges per class
 const CLASS_PI = {
@@ -129,7 +129,7 @@ const RPM_SCALES = [
   {label:"Custom",max:null},
 ];
 
-const COMPOUNDS = ["Street","Sport","Race Semi-Slick","Race Slick","Rally","Snow","Drag"];
+const COMPOUNDS = ["Street","Sport","Race Semi-Slick","Race Slick","Rally","Drift","Snow","Drag"];
 const SURFACES  = ["Road","Dirt","Snow","Mixed"];
 
 const INPUT_DEVICES = [
@@ -151,7 +151,7 @@ const PROBLEMS = [
    subs:[{id:"tw_str",label:"Nervous on straights"},{id:"tw_bump",label:"Bouncy over bumps"},{id:"tw_snap",label:"Snaps unexpectedly"},{id:"tw_stiff",label:"Too stiff / harsh"}]},
 ];
 
-const TUNE_PAGES = ["Tires","Gearing","Alignment","Suspension","ARB","Damping","Braking","Diff"];
+const TUNE_PAGES = ["Tires","Gearing","Alignment","Suspension","ARB","Damping","Braking","Diff","Aero"];
 
 const AI_PROVIDERS = [
   {id:"none",   label:"Offline only",   icon:"⚙",  color:"#888899", free:true,  soon:false, key:null,      hint:null,            docs:null},
@@ -181,8 +181,7 @@ function calcTune(s) {
     weight, weightDist, redlineRpm, peakTorqueRpm, maxTorque,
     topspeed, gears, tireWF, tireWR, compound,
     hasAero, aeroF, aeroR, dragCd, pi, carClass,
-    units, feelBalance, feelAggression, includeGearing,
-    carHeight, // mm — used for roll moment ARB calculation
+    units, feelBalance, feelAggression, includeGearing, dragDist,
   } = s;
 
   const wKg        = units.weight === "lbs" ? weight / 2.205 : weight;
@@ -228,9 +227,12 @@ function calcTune(s) {
   // K = M × (2πf)²  then convert to display unit
   const calcSpring = (cornerMass, f) => {
     const kNm = cornerMass * Math.pow(2 * Math.PI * f, 2);       // N/m
-    if (sUnit === "lbs/in") return +(kNm / 175.127).toFixed(1);  // N/m → lbs/in
-    if (sUnit === "n/mm")   return +(kNm / 1000).toFixed(2);     // N/m → N/mm
-    if (sUnit === "kgf/mm") return +(kNm / 9806.65 * 1000).toFixed(2);
+    // Forza's N/MM scale is ~9x real-world N/mm — apply scaling factor
+    // TODO: replace with telemetry-validated nonlinear mapping
+    const FORZA_SCALE = 9.0;
+    if (sUnit === "lbs/in") return +(kNm / 175.127).toFixed(1);  // N/m → lbs/in (no scale needed, different unit)
+    if (sUnit === "n/mm")   return +(kNm / 1000 * FORZA_SCALE).toFixed(1);  // N/m → Forza N/mm
+    if (sUnit === "kgf/mm") return +(kNm / (9806.65 * 1000) * FORZA_SCALE).toFixed(2); // N/m → kgf/mm
     return +(kNm / 175.127).toFixed(1); // default lbs/in
   };
   let fSpring = calcSpring(cwFL, freq.f);
@@ -242,22 +244,30 @@ function calcTune(s) {
   rSpring = +(rSpring * (1 - balanceMod)).toFixed(1);
 
   // ── RIDE HEIGHT
-  const fRide = isDrift ? 3.5 : isRally ? 5.5 : isSnow ? 6.0 : isDrag ? 2.8 : 3.8;
-  const rRide = isDrift ? 3.2 : isRally ? 5.2 : isSnow ? 5.8 : isDrag ? 2.6 : 3.5;
+  // Ride height in cm (native Forza unit) — validated against in-game suspension screen
+  // Ride height — game minimum is 15cm. Drag nose-down via rear bias not front lowering.
+  const fRideCm = isDrift ? 15.5 : isRally ? 20.0 : isSnow ? 22.0 : isDrag ? 15.0 : 15.0;
+  const rRideCm = isDrift ? 15.0 : isRally ? 19.0 : isSnow ? 21.0 : isDrag ? 17.0 : 15.0;
+  const fRide = fRideCm; // cm
+  const rRide = rRideCm; // cm
 
   // ── DAMPING (critical damping ratio method)
   // Rebound ≈ 0.65–0.75 × critical, Bump ≈ 0.5–0.6 × critical
-  const critDampF = 2 * Math.sqrt(cwFL * (sUnit === "lbs/in" ? fSpring * 175.127 : fSpring * 1000));
-  const critDampR = 2 * Math.sqrt(cwRL * (sUnit === "lbs/in" ? rSpring * 175.127 : rSpring * 1000));
+  // Use physics-scale springs (before Forza scaling) for damping calc
+  const fSpringPhys = sUnit === "lbs/in" ? fSpring * 175.127 / 9.0 : fSpring * 1000 / 9.0;
+  const rSpringPhys = sUnit === "lbs/in" ? rSpring * 175.127 / 9.0 : rSpring * 1000 / 9.0;
+  const critDampF = 2 * Math.sqrt(cwFL * fSpringPhys);
+  const critDampR = 2 * Math.sqrt(cwRL * rSpringPhys);
   // Damping ratios from PHYSICS constants, scaled by horizonDampMult for FH6
   const rebRatio  = (isDrift ? 0.70 : isRally ? 0.60 : PHYSICS.dampRebound) * PHYSICS.horizonDampMult;
   const bumRatio  = (isDrift ? 0.45 : isRally ? 0.42 : PHYSICS.dampBump)    * PHYSICS.horizonDampMult;
-  // FH6 uses 1–20 scale, map from real damping
-  const mapDamp = (v) => +Math.max(1, Math.min(20, v / critDampF * 10 * dampMod)).toFixed(1);
-  const fRebound = mapDamp(critDampF * rebRatio);
-  const rRebound = mapDamp(critDampR * rebRatio);
-  const fBump    = mapDamp(critDampF * bumRatio);
-  const rBump    = mapDamp(critDampR * bumRatio);
+  // FH6 uses 1–20 scale — separate front/rear normalisation
+  const mapDampF = (v) => +Math.max(1, Math.min(20, v / critDampF * 10 * dampMod)).toFixed(1);
+  const mapDampR = (v) => +Math.max(1, Math.min(20, v / critDampR * 10 * dampMod)).toFixed(1);
+  const fRebound = mapDampF(critDampF * rebRatio);
+  const rRebound = mapDampR(critDampR * rebRatio);
+  const fBump    = mapDampF(critDampF * bumRatio);
+  const rBump    = mapDampR(critDampR * bumRatio);
 
   // ── ARB — weight transfer timing method (FH6 FM engine validated)
   // ARB controls roll stiffness and weight transfer rate, NOT roll moment magnitude.
@@ -291,10 +301,11 @@ function calcTune(s) {
   } else {
     // Race / Touge / Wangan / General — core meta
     if (isAWD) {
-      // 1/65 meta: minimum front, maximum rear
-      // Scales very slightly with power — high power AWD needs even more rear lock
-      fARB = 1 + Math.round(pwr2wtNorm * 3);   // 1–4
-      rARB = 58 + Math.round(pwr2wtNorm * 6);  // 58–64
+      // Moderate AWD baseline — forza.guide says start high and soften to 0.55-0.65 balance
+      // 1/65 meta is valid for top-level builds but too aggressive as a default
+      // Starting at 15/55 gives users room to adjust both directions
+      fARB = 12 + Math.round(pwr2wtNorm * 8);  // 12–20
+      rARB = 50 + Math.round(pwr2wtNorm * 10); // 50–60
     } else if (isFWD) {
       // FWD: LOW front (reduce push), HIGH rear (rotate on entry)
       // Opposite of what seems intuitive — rear ARB transfers weight to outside front
@@ -387,26 +398,32 @@ function calcTune(s) {
   const isHighPower = pwr2wt > 600; // high power threshold for wheelie risk
   let fAccel=0,fDecel=0,rAccel=0,rDecel=0,center=0;
   if (isFWD) {
-    fAccel = isDrift?80:isDrag?85:isRally?65:55;
-    fDecel = isDrift?0:isDrag?10:20;
+    // forza.guide: 85% accel / 0% decel — high accel, no decel = best FWD rotation
+    fAccel = isDrift?80:isDrag?85:isRally?65:85;
+    fDecel = isDrift?0:isDrag?5:isRally?10:0;
   } else if (isRWD) {
-    // Drag: high accel for launch grip, low decel — wheelie risk flagged in output
-    // High power RWD: slightly lower accel to prevent snap oversteer on FM engine
-    rAccel = isDrift?82:isDrag?90:isRally?60:Math.round(45 + pN*20);
-    rDecel = isDrift?30:isDrag?5:isRally?20:18;
+    // forza.guide: 55% accel / 15% decel baseline. Up to 90% aggressive builds.
+    rAccel = isDrift?100:isDrag?90:isRally?60:Math.round(55 + pN*20); // 55–75%
+    rDecel = isDrift?10:isDrag?5:isRally?20:Math.round(10 + pN*8);    // 10–18%
   } else {
-    // AWD: center balance controls torque split feel
-    fAccel = isDrift?30:isDrag?15:isRally?50:35;
-    fDecel = isDrift?0:isDrag?5:isRally?15:15;
-    rAccel = isDrift?78:isDrag?90:isRally?65:Math.round(50 + pN*15);
-    rDecel = isDrift?28:isDrag?5:isRally?25:18;
-    center = isDrift?30:isDrag?15:isRally?50:42;
+    // AWD — forza.guide validated: front 85/0, rear 55–75/10–15, center 70–78% rear
+    fAccel = isDrift?30:isDrag?15:isRally?65:85;
+    fDecel = isDrift?0:isDrag?5:isRally?5:0;
+    rAccel = isDrift?85:isDrag?90:isRally?70:Math.round(55 + pN*20); // 55–75%
+    rDecel = isDrift?10:isDrag?5:isRally?15:Math.round(10 + pN*5);   // 10–15%
+    center = isDrift?50:isDrag?20:isRally?55:Math.round(70 + pN*8);  // 70–78% rear
   }
 
   // ── GEARING (only if includeGearing + RPM data available)
-  const hasRPM = redlineRpm > 0 && peakTorqueRpm > 0 && topspeed > 0;
+  // For drag mode: use class-based RPM defaults if user hasn't entered S-mode data
+  const dragRpmDefaults = {D:{red:6500,peak:4500},C:{red:7000,peak:5000},B:{red:7500,peak:5200},A:{red:8000,peak:5500},S1:{red:8500,peak:6000},S2:{red:9000,peak:6500},R:{red:9500,peak:7000},X:{red:10000,peak:7500}};
+  const dragDefaults = isDrag && dragRpmDefaults[carClass] ? dragRpmDefaults[carClass] : null;
+  const effectiveRedline = redlineRpm > 0 ? redlineRpm : (dragDefaults ? dragDefaults.red : 0);
+  const effectivePeakRpm = peakTorqueRpm > 0 ? peakTorqueRpm : (dragDefaults ? dragDefaults.peak : 0);
+  const effectiveTopspeed = topspeed > 0 ? topspeed : (units.speed==="mph" ? 120 : 193);
+  const hasRPM = effectiveRedline > 0 && effectivePeakRpm > 0 && effectiveTopspeed > 0;
   let gearingData = null;
-  if (includeGearing && hasRPM) {
+  if (includeGearing && (hasRPM || isDrag)) {
     // Rear tire rolling circumference — rear drives the gearing calculation
     // Front spec stored for display; if rim diameters differ it's a staggered fitment
     const [tw, ta, tr] = (tireWR||"275/35R19").split(/[\/R]/).map(Number);
@@ -414,27 +431,49 @@ function calcTune(s) {
     const wheel_radius_mm = (tr * 25.4 / 2) + sidewall_mm;
     const circumference_m = 2 * Math.PI * wheel_radius_mm / 1000;
 
-    // Final drive: v = (rpm × circ) / (finalDrive × 60 × 1000) in km/h
-    // → finalDrive = (redlineRpm × circ × 3.6) / (topKmh × 60)
-    const topKmh = units.speed === "mph" ? topspeed * 1.609 : topspeed;
-    const finalDrive = +((redlineRpm * circumference_m * 3.6) / (topKmh * 60)).toFixed(3);
-    const clampedFD   = +Math.max(2.50, Math.min(5.50, finalDrive)).toFixed(2);
+    const topKmh = units.speed === "mph" ? effectiveTopspeed * 1.609 : effectiveTopspeed;
 
-    // Gear ratios: geometric progression from 1st to last
-    // 1st gear = finalDrive × (redline / peakTorque) — keeps engine in powerband
-    // ForzaTune logarithmic 1st gear limiter — prevents wheelspin on high torque cars
-    // Math.exp(-0.5 * (gears - 2)) + 0.9 scales the limiter by number of gears
-    const gearLimiter = Math.exp(-0.5 * (gears - 2)) + 0.9;
-    const rawRatio1   = redlineRpm / peakTorqueRpm * 0.95;
-    // Sigmoid cap: limits how tall 1st gear can be on high-torque cars
-    const torqueNorm  = Math.min(1, torqueNm / 800);
-    const ratio1Limit = 32 * gearLimiter / (1 + Math.exp(-0.8 * (torqueNorm * 100 - 45) / (8 * gearLimiter))) + 30;
-    const ratio1 = +(Math.min(rawRatio1, ratio1Limit / 10)).toFixed(2);
-    const ratioN = 1.0; // top gear = 1.0 overdrive baseline
-    const step = Math.pow(ratioN / ratio1, 1 / (gears - 1));
-    const ratios = Array.from({length: gears}, (_, i) => +(ratio1 * Math.pow(step, i)).toFixed(2));
+    let finalDrive, ratios;
 
-    gearingData = { finalDrive: clampedFD, ratios };
+    if (isDrag) {
+      // Drag gearing: short final drive for max acceleration off the line
+      // Final drive targets 60mph (96kmh) at redline in 1st — launches hard
+      // Quarter mile ~145km/h peak, half mile ~200km/h, top speed = full topspeed
+      const launch_kmh = dragDist==="half" ? 130 : dragDist==="top" ? topKmh : 96;
+      // Gear count cap: community standard — quarter=4, half=5, top speed=6
+      // Too many gears = too many shifts = lost time
+      const maxDragGears = dragDist==="top" ? 6 : dragDist==="half" ? 5 : 4;
+      const effectiveGears = Math.min(gears, maxDragGears);
+      const rawFD = (effectiveRedline * circumference_m * 3.6) / (launch_kmh * 60);
+      finalDrive = +Math.max(3.20, Math.min(6.50, rawFD)).toFixed(2);
+
+      // Ratio stack: tight geometric progression, all gears below 1.6
+      // 1st gear tall enough to hook up, top gear hits trap speed at redline
+      // 1st gear: launch without wheelspin — lower for high power RWD
+      const launchMod = isRWD ? 0.72 : isAWD ? 0.80 : 0.85;
+      const ratio1 = +(Math.min(2.8, effectiveRedline / effectivePeakRpm * launchMod)).toFixed(2);
+      // Top gear: cross trap near redline
+      const ratioN = +((topKmh * 60) / (effectiveRedline * circumference_m * 3.6) * finalDrive).toFixed(2);
+      const clampedRatioN = +Math.max(0.70, Math.min(1.20, ratioN)).toFixed(2);
+      const step = Math.pow(clampedRatioN / ratio1, 1 / (effectiveGears - 1));
+      ratios = Array.from({length: effectiveGears}, (_, i) => +(ratio1 * Math.pow(step, i)).toFixed(2));
+    } else {
+      // Road/race gearing: final drive targets top speed at redline
+      const finalDriveRaw = +((effectiveRedline * circumference_m * 3.6) / (topKmh * 60)).toFixed(3);
+      finalDrive = +Math.max(2.50, Math.min(6.50, finalDriveRaw)).toFixed(2);
+
+      // Gear ratios: logarithmic spread — forza.guide method
+      // 1st gear: safe launch ratio by drivetrain (controllable wheelspin)
+      // Top gear: just reaches redline at top speed (= ratioN already set by finalDrive)
+      // Middle gears: geometric progression — more spread at bottom, tighter at top
+      const ratio1 = isAWD ? 2.50 : isFWD ? 2.80 : 2.20; // AWD hooks up, RWD needs shorter 1st
+      const ratioN = +((topKmh * 60) / (effectiveRedline * circumference_m * 3.6) * finalDrive).toFixed(2);
+      const clampedRatioN = +Math.max(0.75, Math.min(1.10, ratioN)).toFixed(2);
+      const step = Math.pow(clampedRatioN / ratio1, 1 / (gears - 1));
+      ratios = Array.from({length: gears}, (_, i) => +(ratio1 * Math.pow(step, i)).toFixed(2));
+    }
+
+    gearingData = { finalDrive, ratios };
   }
 
   // ── FORMAT HELPERS
@@ -481,8 +520,8 @@ function calcTune(s) {
     Suspension: { values:[
       {key:"Front Spring", value:sStr(fSpring)},
       {key:"Rear Spring",  value:sStr(rSpring)},
-      {key:"Front Ride Height", value:`${fRide.toFixed(1)} in`},
-      {key:"Rear Ride Height",  value:`${rRide.toFixed(1)} in`},
+      {key:"Front Ride Height", value:units.weight==="kg"?`${fRide.toFixed(1)} cm`:`${(fRide/2.54).toFixed(1)} in`},
+      {key:"Rear Ride Height",  value:units.weight==="kg"?`${rRide.toFixed(1)} cm`:`${(rRide/2.54).toFixed(1)} in`},
     ], tip: isRally?"Prioritise ground clearance over aero — ride height matters more than spring stiffness on dirt.":"Front equal to or slightly lower than rear for high-speed stability."},
 
     ARB: { values:[
@@ -504,6 +543,13 @@ function calcTune(s) {
     ], tip: isWheel?"Trail brake: gradually release as you turn in — don't release all at once.":"Under ABS: hold threshold pressure and steer — the game manages lockup."},
 
     Diff: { values: diffValues, tip: isDrift?"High rear accel keeps the slide going. Adjust decel for entry rotation.":isDrag&&isRWD&&isHighPower?"⚠ High power RWD drag: if wheelie tendency, raise front ARB 5 points and lower rear ride height 0.5 cm.":isDrag?"Launch tune: high rear accel for grip, low decel to avoid lockup on shifts.":isFWD?"Low front accel reduces torque steer. High rear diff rotates the car on entry.":"Rear accel controls exit traction. Center balance shifts torque character." },
+
+    Aero: hasAero ? { values:[
+      {key:"Front Downforce", value:`${aeroF} kg`},
+      {key:"Rear Downforce",  value:`${aeroR} kg`},
+      {key:"Drag Cd",         value:dragCd.toFixed(2)},
+      {key:"Aero Balance",    value:aeroF+aeroR>0?`${Math.round(aeroF/(aeroF+aeroR)*100)}% F / ${Math.round(aeroR/(aeroF+aeroR)*100)}% R`:"N/A"},
+    ], tip: isDrag?"Drag tune: minimise front downforce, run max rear for straight-line stability. Cd matters more than balance.":isWangan?"High speed: raise rear downforce first for stability, match front to taste.":"Rear-heavy aero balance (40F/60R) keeps the car planted without inducing understeer. Increase rear if fast corners feel loose." } : null,
   };
 }
 
@@ -650,6 +696,17 @@ function buildEnhancePrompt(s, tune) {
   return {
     sys: `You are a Forza Horizon 6 tuning expert. Return ONLY a raw JSON object. No markdown, no backticks, no text before or after. Start with { and end with }.
 
+FH6 META KNOWLEDGE — apply this when evaluating tunes:
+TIRES: Slick 28–32.5psi, Semi-slick 27–29.5psi, Street/Rally 24–26.5psi, Off-road 15.5–21psi. D/C class = stock tires. B = stock/street. A = street/semi-slick. S1/S2 = semi-slick/slick.
+ARB: Start both at max, soften to reach mechanical balance 0.55–0.65. Stiffer front = understeer. Stiffer rear = oversteer. Off-road = both near minimum. High-power RWD often needs softer rear.
+SPRINGS: Set at 1/3–1/2 slider range. Heavier end gets stiffer spring. Stiffer front = understeer, stiffer rear = oversteer. Off-road = soft both ends.
+DAMPING: Bump should be 30–55% of rebound (target ~40%). Heavier springs = stiffer dampers. Softer front damping reduces understeer. Softer rear reduces oversteer.
+DIFF AWD: Front 85%/0%, Rear 55–75%/10–15%, Center 70–80% rear bias. FWD: 85%/0%. RWD: 55–75%/10–18%.
+GEARING: Final drive so car just hits rev limiter in top gear at end of longest straight. 1st gear for controllable wheelspin at launch. Logarithmic spread — more gap between lower gears, less at top.
+ALIGNMENT: Camber 0 to -1.0° front/rear as baseline. Caster 6.5–7.0°. Rear toe-in only for snap oversteer on RWD.
+RIDE HEIGHT: Start at minimum for road. Off-road start at maximum. Raise only if bottoming out.
+AERO: Balance stat 0.40–0.45. RWD slight rear bias. FWD/AWD slight front bias. Only matters at high speed.
+
 Structure:
 {
   "notes": { "Section/Key": "note including specific adjustment if needed e.g. try reducing by 2" },
@@ -660,9 +717,10 @@ Structure:
 Rules:
 - notes keys MUST match Section/Key exactly as provided (e.g. "Gearing/Final Drive" not just "Gearing")
 - Each gear in Gearing gets its own specific note — do not repeat the same note for every gear
-- Where a value seems wrong for the mode, suggest a specific change (e.g. "reduce by 3", "try 28.5 psi")
+- Where a value seems wrong for the mode or meta, suggest a specific change (e.g. "reduce by 3", "try 28.5 psi")
+- Flag values outside expected FH6 ranges
 - Keep each note under 12 words
-- Be specific to the car, drivetrain, and tune mode given`,
+- Be specific to the car, drivetrain, class, and tune mode given`,
     usr: `Car: ${s.make} ${s.model} | ${s.driveType} | ${tm?.id} mode | ${s.surface} | ${s.weightDist}%F weight | ${s.pi}${s.carClass} | ${s.inputDevice}
 
 Tune values:
@@ -705,6 +763,12 @@ function formatTuneText(s, pages) {
     // values only — no notes/tooltips in shared output
     (d.values||[]).forEach(r => out.push(`  ${r.key.padEnd(22)} ${r.value}`));
   });
+  out.push(`\n─────────────────────────────`);
+  out.push(`Tune inputs`);
+  out.push(`  Car:     ${s.make} ${s.model}`);
+  out.push(`  Class:   ${s.carClass} · ${s.pi}PI · ${s.driveType}`);
+  out.push(`  Mode:    ${s.tuneId} · ${s.surface} · ${s.compound}`);
+  out.push(`  Weight:  ${s.weight} ${s.units?.weight||"lbs"} · ${s.weightDist}% front`);
   out.push(`\n─────────────────────────────`);
   out.push(`Tuned with TuneLab — free FH6 tuning calculator`);
   if(PLAY_STORE) out.push(`Get it: ${PLAY_STORE}`);
@@ -769,13 +833,18 @@ function Seg({label, opts, val, set, color, onColor}) {
 
 function NumIn({label, value, onChange, unit="", min, max, step=1, hint}) {
   const [f,setF] = useState(false);
+  const [local, setLocal] = useState(String(value));
+  // Keep local in sync if parent value changes externally
+  const prevVal = useRef(value);
+  if(prevVal.current !== value && !f){ prevVal.current = value; setLocal(String(value)); }
   return (
     <div style={{marginBottom:10}}>
       <span style={S.label}>{label}{unit?<span style={{color:C.dim,marginLeft:6}}>{unit}</span>:null}</span>
       <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <input type="number" value={value} min={min} max={max} step={step}
-          onChange={e=>{const v=parseFloat(e.target.value);if(!isNaN(v))onChange(v);}}
-          onFocus={()=>setF(true)} onBlur={()=>setF(false)}
+        <input type="number" value={local} min={min} max={max} step={step}
+          onChange={e=>{ setLocal(e.target.value); const v=parseFloat(e.target.value); if(!isNaN(v)) onChange(v); }}
+          onFocus={()=>{setF(true);}}
+          onBlur={()=>{ setF(false); const v=parseFloat(local); if(!isNaN(v)){ const clamped=Math.min(max??v,Math.max(min??v,v)); onChange(clamped); setLocal(String(clamped)); } else { setLocal(String(value)); } }}
           style={{flex:1,fontFamily:C.fMono,background:f?C.card:C.surface,
             border:`1px solid ${f?"rgba(0,255,133,0.4)":C.border}`,
             borderLeft:f?"3px solid rgba(0,255,133,0.6)":`3px solid ${C.border}`,
@@ -846,8 +915,8 @@ function WeightDistSlider({value, onChange, color}) {
         style={{width:"100%",accentColor:ac,cursor:"pointer"}}
       />
       <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
-        <span style={{fontFamily:C.fBody,fontSize:12,color:C.dim}}>Front-heavy</span>
         <span style={{fontFamily:C.fBody,fontSize:12,color:C.dim}}>Rear-heavy</span>
+        <span style={{fontFamily:C.fBody,fontSize:12,color:C.dim}}>Front-heavy</span>
       </div>
     </div>
   );
@@ -1109,7 +1178,7 @@ function Wizard({ctx, onClose}) {
     setStep("fixing"); setLoading(true);
     try {
       if(hasAI){
-        const sys=`You are a Forza Horizon expert tuner. Return ONLY raw JSON, no markdown.`;
+        const sys=`You are a Forza Horizon 6 expert tuner. FH6 meta: ARB start max then soften to 0.55-0.65 balance; bump 30-55% of rebound; AWD diff front 85/0 rear 55-75/10-15 center 70-80% rear; ride height start minimum road; caster 6.5-7.0 degrees. Return ONLY raw JSON, no markdown.`;
         const usr=`Issue: "${problem.label}" — "${sub.label}"\nCar: ${ctx.make} ${ctx.model} | ${ctx.driveType} | ${ctx.tuneId}\nInput: ${ctx.inputDevice}\nFH6 traction circle physics.\nReturn: {"diagnosis":"1-2 sentences","fixes":[{"setting":"Name","change":"What","why":"Why"},{"setting":"Name","change":"What","why":"Why"},{"setting":"Name","change":"What","why":"Why"}],"tip":"One driving tip"}`;
         const raw=await callAI(provider,keys[provider],sys,usr);
         const m=raw.match(/\{[\s\S]*\}/);
@@ -1236,7 +1305,80 @@ class OutputErrorBoundary extends Component {
   }
 }
 
-function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
+// ─── HAMBURGER MENU ──────────────────────────────────────────────────────────
+function HamburgerMenu({onClose, onNav, isOutputScreen, appState}) {
+  const items = [
+    {id:"ai",    icon:"✦", label:"AI settings",       sub:"Configure your Gemini key"},
+    ...(isOutputScreen ? [{id:"copyinputs", icon:"📋", label:"Copy tune inputs", sub:"Paste in Discord for bug reports"}] : []),
+    null,
+    {id:"paintlab", icon:"🎨", label:"PaintLab",       sub:"Browse FH6 paint colors · v1.0"},
+    null,
+    {id:"settings", icon:"⚙", label:"Settings",       sub:"Units, input device"},
+    {id:"refresh",  icon:"↻", label:"Refresh car database", sub:"Force fetch latest cars"},
+    {id:"about",    icon:"ℹ", label:"About TuneLab",  sub:"Version, credits, links"},
+    null,
+    {id:"reset",    icon:"🗑", label:"Reset all data", danger:true},
+  ];
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:50,display:"flex",flexDirection:"column",justifyContent:"flex-start"}}>
+      <div style={{height:"calc(env(safe-area-inset-top,0px) + 60px)"}} onClick={onClose}/>
+      <div style={{background:C.bg,borderTop:`1px solid ${C.border}`,maxWidth:480,width:"100%",margin:"0 auto"}}>
+        {items.map((item,i)=>item===null?(
+          <div key={i} style={{height:1,background:C.border,margin:"4px 0"}}/>
+        ):(
+          <div key={item.id} onClick={()=>{onNav(item.id,appState);}}
+            style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",cursor:"pointer",borderBottom:`1px solid ${C.border}00`}}>
+            <span style={{fontSize:15,width:20,textAlign:"center"}}>{item.icon}</span>
+            <div>
+              <div style={{fontSize:13,color:item.danger?"#ff6b6b":C.text}}>{item.label}</div>
+              {item.sub && <div style={{fontSize:11,color:C.dim,marginTop:1}}>{item.sub}</div>}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{flex:1}} onClick={onClose}/>
+    </div>
+  );
+}
+
+// ─── ENHANCE DRAWER ──────────────────────────────────────────────────────────
+function EnhanceDrawer({accentColor, hasAI, prov, onClose, onEnhance}) {
+  const [prompt, setPrompt] = useState("");
+  const [locks, setLocks] = useState({Tires:false,Compound:false,Aero:false,Gearing:false,Diff:false,Springs:false});
+  const toggleLock = (k) => setLocks(l=>({...l,[k]:!l[k]}));
+  const lockKeys = Object.keys(locks);
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:50,display:"flex",flexDirection:"column",justifyContent:"flex-end"}} onClick={onClose}>
+      <div style={{background:C.bg,borderTop:`2px solid ${accentColor}30`,borderRadius:"20px 20px 0 0",padding:"16px 14px 32px",maxHeight:"80vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:36,height:3,background:"#333",borderRadius:2,margin:"0 auto 14px"}}/>
+        <div style={{fontFamily:C.fMono,fontSize:10,color:accentColor,letterSpacing:"0.2em",textTransform:"uppercase",marginBottom:12}}>✦ Enhance tune</div>
+
+        <div style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:6}}>What do you want to improve? (optional)</div>
+        <textarea value={prompt} onChange={e=>setPrompt(e.target.value)} rows={3}
+          placeholder="e.g. I want more rear rotation on corner exit, the car feels too stable under braking..."
+          style={{width:"100%",background:C.surface,border:`1px solid ${C.border}`,borderRadius:6,padding:"9px 10px",color:C.text,fontFamily:C.fBody,fontSize:13,outline:"none",marginBottom:12,resize:"none"}}
+        />
+
+        <div style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:8}}>Lock — AI won't change these</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:14}}>
+          {lockKeys.map(k=>(
+            <button key={k} onClick={()=>toggleLock(k)} style={{...S.btn,padding:"7px 4px",borderRadius:6,border:`1px solid ${locks[k]?accentColor+"40":C.border}`,background:locks[k]?accentColor+"10":"transparent",textAlign:"center"}}>
+              <span style={{display:"block",fontSize:14,marginBottom:2}}>{locks[k]?"🔒":"🔓"}</span>
+              <span style={{fontFamily:C.fMono,fontSize:9,color:locks[k]?accentColor:C.muted,letterSpacing:"0.05em"}}>{k}</span>
+            </button>
+          ))}
+        </div>
+
+        <button onClick={()=>onEnhance(prompt, locks)}
+          style={{...S.btn,width:"100%",padding:13,background:`${accentColor}14`,border:`1px solid ${accentColor}44`,borderRadius:6,color:accentColor,fontFamily:C.fMono,fontSize:14,fontWeight:700,letterSpacing:"0.2em",textTransform:"uppercase"}}>
+          ✦ Generate
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune, units, inputDevice, onSaveUnits, onGoToPaintLab}) {
   const [tunePage,    setTunePage]    = useState("Tires");
   const [toast,       setToast]       = useState(null);
   const [overlay,     setOverlay]     = useState(null);
@@ -1387,6 +1529,37 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
     setAiEnhancing(false);
   }, [aiEnhancing, hasAI, prov, aiKeys, appState, tunePages]);
 
+  // Enhance with optional custom prompt injected
+  const handleAIEnhanceWithPrompt = useCallback(async(extraPrompt="") => {
+    if(aiEnhancing) return;
+    if(!hasAI){setOverlay("ai");return;}
+    setAiEnhancing(true);
+    try {
+      const {sys, usr} = buildEnhancePrompt(appState, tunePages);
+      const fullUsr = extraPrompt ? `${usr}
+
+User request: ${extraPrompt}` : usr;
+      const raw = await callAI(prov.id, aiKeys[prov.id], sys, fullUsr);
+      const firstBrace = raw.indexOf('{');
+      const lastBrace  = raw.lastIndexOf('}');
+      const extracted  = firstBrace !== -1 && lastBrace > firstBrace ? raw.slice(firstBrace, lastBrace+1) : raw.replace(/```json\s*/gi,"").replace(/```\s*/g,"").trim();
+      const match = extracted.match(/\{[\s\S]*\}/);
+      if(match){
+        let enhanced;
+        try { enhanced = JSON.parse(match[0]); }
+        catch { let t=match[0]; const d=(t.match(/[{]/g)||[]).length-(t.match(/[}]/g)||[]).length; for(let i=0;i<d;i++) t+="}"; enhanced=JSON.parse(t); }
+        setTunePages(mergeEnhancement(tunePages, enhanced));
+        const usage=LS.get(USAGE_KEY,{total:0,byProvider:{}}); usage.total=(usage.total||0)+1; usage.byProvider[prov.id]=(usage.byProvider[prov.id]||0)+1; LS.set(USAGE_KEY,usage);
+        setToast(`✦ Enhanced by ${prov.label}`);
+      } else { setToast("AI responded but couldn't parse — try again"); }
+    } catch(e) {
+      if(e.message==="RATE_LIMIT_EXHAUSTED") setToast("Daily quota hit — use Manual Copy below ↓");
+      else setToast(`AI error: ${e.message||"unknown"}`);
+    }
+    setAiEnhancing(false);
+  }, [aiEnhancing, hasAI, prov, aiKeys, appState, tunePages]);
+
+
   // Auto-switch to first valid tab if current is null (D mode skips Gearing)
   useEffect(()=>{
     if(!tunePages[tunePage]){
@@ -1403,9 +1576,44 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
       {toast&&<Toast msg={toast} onDone={()=>setToast(null)}/>}
       {overlay==="save"&&<SaveDrawer appState={appState} tunePages={tunePages} onLoad={()=>{}} onClose={()=>setOverlay(null)}/>}
       {overlay==="wizard"&&<Wizard ctx={{...appState}} onClose={()=>setOverlay(null)}/>}
+      {overlay==="menu"&&<HamburgerMenu
+        isOutputScreen={true}
+        appState={appState}
+        onClose={()=>setOverlay(null)}
+        onNav={(id, st)=>{
+          if(id==="ai") setOverlay("ai");
+          else if(id==="about") setOverlay("about");
+          else if(id==="settings") setOverlay("settings");
+          else if(id==="paintlab"){ setOverlay(null); if(onGoToPaintLab) onGoToPaintLab(); else onBack(); }
+          else if(id==="copyinputs"){
+            const txt = `Tune inputs\nCar: ${st.make} ${st.model}\nClass: ${st.carClass} · ${st.pi}PI · ${st.driveType}\nMode: ${st.tuneId} · ${st.surface} · ${st.compound}\nWeight: ${st.weight} ${st.units?.weight||"lbs"} · ${st.weightDist}% front`;
+            navigator.clipboard?.writeText(txt).catch(()=>{});
+            setToast("Tune inputs copied!");
+          }
+          else if(id==="refresh"){localStorage.removeItem("tl_v1_cardb_cache");localStorage.removeItem("tl_v1_cardb_version");window.location.reload();}
+          else if(id==="reset"){if(window.confirm("Reset all data? This cannot be undone.")){Object.keys(localStorage).filter(k=>k.startsWith("tl_")).forEach(k=>localStorage.removeItem(k));window.location.reload();}}
+        }}
+      />}
       {overlay==="ai"&&<AIScreen onClose={()=>setOverlay(null)}/>}
+      {overlay==="enhance"&&<EnhanceDrawer
+        accentColor={accentColor}
+        hasAI={hasAI}
+        prov={prov}
+        onClose={()=>setOverlay(null)}
+        onEnhance={(customPrompt, locks)=>{
+          setOverlay(null);
+          // Inject lock instructions into the enhance prompt
+          const lockList = Object.entries(locks).filter(([,v])=>v).map(([k])=>k);
+          const lockNote = lockList.length ? `
+
+IMPORTANT — do NOT change these settings: ${lockList.join(", ")}.` : "";
+          const fullPrompt = (customPrompt||"") + lockNote;
+          // Patch handleAIEnhance to use custom prompt
+          handleAIEnhanceWithPrompt(fullPrompt.trim());
+        }}
+      />}
       {overlay==="about"&&<AboutScreen onClose={()=>setOverlay(null)}/>}
-      {overlay==="settings"&&<SettingsScreen units={{}} device="controller" onSave={()=>setOverlay(null)} onClose={()=>setOverlay(null)}/>}
+      {overlay==="settings"&&<SettingsScreen units={units||{}} device={inputDevice||"controller"} onSave={(u,dev)=>{onSaveUnits&&onSaveUnits(u,dev);setOverlay(null);}} onClose={()=>setOverlay(null)}/>}
 
       {/* Paste-back modal */}
       {showPaste&&(
@@ -1442,15 +1650,10 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
           <button onClick={onBack} style={{...S.btn,background:"transparent",color:accentColor,fontFamily:C.fCond,fontSize:13,fontWeight:600,letterSpacing:"0.12em",textTransform:"uppercase",gap:4}}>
             ← New Config
           </button>
-          <div style={{display:"flex",gap:5}}>
-            <button onClick={()=>setOverlay("ai")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:12}}>✦</button>
-            <button onClick={()=>setOverlay("about")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:14}}>ℹ</button>
-            <button onClick={handleShare} style={{...S.btn,padding:"6px 11px",background:C.green+"22",border:`1px solid ${C.green}44`,borderRadius:8,color:C.green,fontFamily:C.fBody,fontSize:11,fontWeight:600,gap:4}}>
-              ↑ Share
-            </button>
-            <button onClick={()=>setOverlay("save")} style={{...S.btn,padding:"6px 11px",background:C.accentLo,border:`1px solid ${C.accent}44`,borderRadius:8,color:C.accent,fontFamily:C.fBody,fontSize:11,fontWeight:600,gap:4}}>
-              💾 Save
-            </button>
+          <div style={{display:"flex",gap:5,alignItems:"center"}}>
+            <button onClick={handleShare} style={{...S.btn,padding:"6px 11px",background:C.green+"22",border:`1px solid ${C.green}44`,borderRadius:8,color:C.green,fontFamily:C.fBody,fontSize:11,fontWeight:600,gap:4}}>↑ Share</button>
+            <button onClick={()=>setOverlay("save")} style={{...S.btn,padding:"6px 11px",background:C.accentLo,border:`1px solid ${C.accent}44`,borderRadius:8,color:C.accent,fontFamily:C.fBody,fontSize:11,fontWeight:600,gap:4}}>💾 Save</button>
+            <button onClick={()=>setOverlay("menu")} style={{...S.btn,width:32,height:32,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:17,letterSpacing:1}}>☰</button>
           </div>
         </div>
         <div style={{fontSize:14,color:C.muted}}>
@@ -1523,10 +1726,66 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
             </div>
 
             {/* Feel adjuster */}
-            <div style={{...S.card,padding:"12px 13px",marginBottom:10,minHeight:148}}>
+            <div style={{...S.card,padding:"12px 13px",marginBottom:10}}>
               <div style={{fontFamily:C.fMono,fontSize:9,color:accentColor,letterSpacing:"0.25em",textTransform:"uppercase",marginBottom:10}}>Feel adjuster</div>
-              <Slider value={feelBalance} onChange={v=>{setFeelBalance(v);recalc(v,feelAggress);setTunePage("Suspension");}} leftLabel="Stable (recommended)" rightLabel="Tail-happy" color={color} labelColor={C.text}/>
-              <Slider value={feelAggress} onChange={v=>{setFeelAggress(v);recalc(feelBalance,v);setTunePage("ARB");}} leftLabel="Planted" rightLabel="Aggressive" color={color} labelColor={C.text}/>
+              {/* Play style presets */}
+              <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:12}}>
+                {[
+                  {label:"Stable",     bal:0,  agg:20,  tip:"Max planted, easy to drive"},
+                  {label:"Balanced",   bal:30, agg:45,  tip:"Default — good all-round"},
+                  {label:"Tail-Happy", bal:65, agg:55,  tip:"More rotation on exit"},
+                  {label:"Oversteer",  bal:80, agg:70,  tip:"Rear rotates freely"},
+                  {label:"Late Brake", bal:25, agg:60,  tip:"Aggressive braking, stable entry"},
+                  {label:"Drift",      bal:90, agg:100, tip:"Maximum angle"},
+                ].map(({label,bal,agg,tip})=>{
+                  const active = feelBalance===bal && feelAggress===agg;
+                  return (
+                    <button key={label} title={tip} onClick={()=>{
+                      setFeelBalance(bal); setFeelAggress(agg);
+                      recalc(bal,agg); setTunePage("Suspension");
+                    }} style={{
+                      ...S.btn,padding:"4px 9px",borderRadius:4,
+                      border:`1px solid ${active?accentColor:C.border}`,
+                      background:active?`${accentColor}18`:"transparent",
+                      color:active?accentColor:C.muted,
+                      fontFamily:C.fMono,fontSize:9,letterSpacing:"0.08em",
+                      textTransform:"uppercase",transition:"all 0.15s",
+                    }}>{label}</button>
+                  );
+                })}
+              </div>
+              {/* Balance slider with value + fine controls */}
+              <div style={{marginBottom:12}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                  <span style={{fontSize:11,color:C.text}}>Balance</span>
+                  <span style={{fontFamily:C.fMono,fontSize:12,color:accentColor,fontWeight:700}}>{feelBalance}%</span>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  <button onClick={()=>{const v=Math.max(0,feelBalance-1);setFeelBalance(v);recalc(v,feelAggress);setTunePage("Suspension");}} style={{...S.btn,width:28,height:28,padding:0,borderRadius:5,border:`1px solid ${C.border}`,background:C.surface,color:C.muted,fontSize:16,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                  <input type="range" min={0} max={100} value={feelBalance} onChange={e=>{const v=+e.target.value;setFeelBalance(v);recalc(v,feelAggress);setTunePage("Suspension");}} style={{flex:1,accentColor:color,height:3,cursor:"pointer"}}/>
+                  <button onClick={()=>{const v=Math.min(100,feelBalance+1);setFeelBalance(v);recalc(v,feelAggress);setTunePage("Suspension");}} style={{...S.btn,width:28,height:28,padding:0,borderRadius:5,border:`1px solid ${accentColor}30`,background:C.surface,color:accentColor,fontSize:16,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+                  <span style={{fontSize:11,color:C.text}}>Stable</span>
+                  <span style={{fontSize:11,color:C.text}}>Tail-happy</span>
+                </div>
+              </div>
+              {/* Aggression slider with value + fine controls */}
+              <div style={{marginBottom:6}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                  <span style={{fontSize:11,color:C.text}}>Aggression</span>
+                  <span style={{fontFamily:C.fMono,fontSize:12,color:accentColor,fontWeight:700}}>{feelAggress}%</span>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  <button onClick={()=>{const v=Math.max(0,feelAggress-1);setFeelAggress(v);recalc(feelBalance,v);setTunePage("ARB");}} style={{...S.btn,width:28,height:28,padding:0,borderRadius:5,border:`1px solid ${C.border}`,background:C.surface,color:C.muted,fontSize:16,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                  <input type="range" min={0} max={100} value={feelAggress} onChange={e=>{const v=+e.target.value;setFeelAggress(v);recalc(feelBalance,v);setTunePage("ARB");}} style={{flex:1,accentColor:color,height:3,cursor:"pointer"}}/>
+                  <button onClick={()=>{const v=Math.min(100,feelAggress+1);setFeelAggress(v);recalc(feelBalance,v);setTunePage("ARB");}} style={{...S.btn,width:28,height:28,padding:0,borderRadius:5,border:`1px solid ${accentColor}30`,background:C.surface,color:accentColor,fontSize:16,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+                  <span style={{fontSize:11,color:C.text}}>Planted</span>
+                  <span style={{fontSize:11,color:C.text}}>Aggressive</span>
+                </div>
+              </div>
               <div style={{fontFamily:C.fBody,fontSize:12,fontWeight:300,color:C.ice2,marginTop:6,lineHeight:1.6}}>FH6 rewards stable, planted setups. Adjust from there to suit your style.</div>
             </div>
 
@@ -1535,7 +1794,7 @@ function OutputScreen({appState, tunePages, setTunePages, onBack, onNewTune}) {
               <button onClick={()=>setOverlay("wizard")} style={{...S.btn,padding:"11px",background:C.card,border:`1px solid ${C.border}`,borderRadius:10,color:C.text,fontFamily:C.fBody,fontSize:12,fontWeight:500,gap:5}}>
                 🔧 Wizard
               </button>
-              <button onClick={handleAIEnhance} disabled={aiEnhancing||!hasAI&&false}
+              <button onClick={()=>hasAI&&!aiEnhancing?setOverlay("enhance"):!hasAI?setOverlay("ai"):null} disabled={aiEnhancing}
                 style={{...S.btn,padding:"12px",
                   background:aiEnhancing?"transparent":hasAI?`${accentColor}12`:C.card,
                   border:`1px solid ${aiEnhancing?C.border:hasAI?`${accentColor}44`:C.border}`,
@@ -1656,6 +1915,19 @@ function AboutScreen({onClose}) {
             style={{...S.btn,width:"100%",padding:"11px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontFamily:C.fBody,fontSize:14,textDecoration:"none",gap:6}}>
             🐛 Report bug / request feature
           </a>
+        </div>
+
+        {/* Car database refresh */}
+        <div style={{...S.card,padding:"14px 16px",marginBottom:10}}>
+          <div style={{fontFamily:C.fMono,fontSize:9,color:C.green,letterSpacing:"0.2em",marginBottom:8}}>CAR DATABASE</div>
+          <div style={{fontFamily:C.fBody,fontSize:13,color:C.muted,marginBottom:12,lineHeight:1.6}}>Force a fresh download of the car list. Use this if a car you expect isn't showing up.</div>
+          <button onClick={()=>{
+            localStorage.removeItem("tl_v1_cardb_cache");
+            localStorage.removeItem("tl_v1_cardb_version");
+            window.location.reload();
+          }} style={{...S.btn,width:"100%",padding:"11px",background:`${C.green}10`,border:`1px solid ${C.green}30`,borderRadius:8,color:C.green,fontFamily:C.fBody,fontSize:14,gap:6}}>
+            ↻ Refresh car database
+          </button>
         </div>
 
         <div style={{...S.card,padding:"14px 16px",borderColor:"rgba(255,77,77,0.2)"}}>
@@ -1877,6 +2149,865 @@ const CAR_DB = {
 };
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
+
+// ─── PAINTLAB ────────────────────────────────────────────────────────────────
+
+// ─── THEME (matches TuneLab exactly) ─────────────────────────────────────────
+
+
+
+
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+// Pre-converted: hue/sat/bri → approximate RGB swatch, plus original Forza values
+// Full 10 936-entry dataset — Vehicle Colours + Wheel Colours
+
+// Inline a curated representative sample here.
+// In production, replace RAW with the full import from colors.json
+// Each entry: { m:make, n:name, t:paintType, sh:sheet, r1:hex, r2:hex|null,
+//              c1:[hue,sat,bri], c2:[hue,sat,bri]|null, cat:hueCategory, cm:comments }
+const HUE_CATS = ["All Colors","Red","Orange","Yellow","Green","Teal/Cyan","Blue","Purple","Pink/Magenta","Grey/Silver","White","Black"];
+const SHEETS   = ["All","Vehicle","Wheel","Favs"];
+
+function isLight(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return (0.299*r + 0.587*g + 0.114*b) / 255 > 0.82;
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+function hexToForzaHSB(hex) {
+  // Convert hex to standard HSB (0-360, 0-100, 0-100)
+  const r = parseInt(hex.slice(1,3),16)/255;
+  const g = parseInt(hex.slice(3,5),16)/255;
+  const b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max-min;
+  let h = 0;
+  if(d !== 0) {
+    if(max===r) h = ((g-b)/d)%6;
+    else if(max===g) h = (b-r)/d+2;
+    else h = (r-g)/d+4;
+    h = h*60; if(h<0) h+=360;
+  }
+  const s = max===0?0:d/max;
+  const v = max;
+  // Map to Forza 0.00-1.00 normalized with L/R direction
+  // Forza hue: 0.00=Red(right), slides L toward 0.5=green, R toward 1.0=back to red
+  // We normalize: hue/360 and assign L if <0.5, R if >=0.5
+  const fH = h/360; const fS = s; const fV = v;
+  const hDir = fH <= 0.5 ? "L" : "R";
+  const sDir = fS <= 0.5 ? "L" : "R";
+  const vDir = fV <= 0.5 ? "L" : "R";
+  return {
+    h: `${fH.toFixed(2)} ${hDir}`,
+    s: `${fS.toFixed(2)} ${sDir}`,
+    v: `${fV.toFixed(2)} ${vDir}`,
+    raw: {h:fH, s:fS, v:fV}
+  };
+}
+
+// ─── CANVAS COLOR PICKER ──────────────────────────────────────────────────────
+function hsvToHex(h, s, v) {
+  const f = n => { const k=(n+h/60)%6; return v-v*s*Math.max(0,Math.min(k,4-k,1)); };
+  const r=Math.round(f(5)*255),g=Math.round(f(3)*255),b=Math.round(f(1)*255);
+  return "#"+[r,g,b].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function hexToHSV(hex) {
+  if(!/^#[0-9A-Fa-f]{6}$/.test(hex)) return {h:0,s:1,v:1};
+  const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+  let h=0;
+  if(d!==0){if(max===r)h=((g-b)/d)%6;else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h=h*60;if(h<0)h+=360;}
+  return {h,s:max===0?0:d/max,v:max};
+}
+function sanitizeHex(raw) {
+  const v = String(raw).replace(/^#+/,"");
+  return "#"+v.slice(0,6);
+}
+
+function ColorPickerCanvas({hex, onChange}) {
+  const sqRef = useRef(null);
+  const hueRef = useRef(null);
+  const {h,s,v} = hexToHSV(hex);
+  const [dragging, setDragging] = useState(null);
+  const [localHex, setLocalHex] = useState(hex);
+  const [hexFocus, setHexFocus] = useState(false);
+  const isValidHex = (hx) => /^#[0-9A-Fa-f]{6}$/.test(hx);
+
+  useEffect(()=>{ if(!hexFocus) setLocalHex(hex); },[hex,hexFocus]);
+
+  const getPos = (e, ref) => {
+    const el=ref.current; if(!el) return {x:0,y:0};
+    const r=el.getBoundingClientRect();
+    const touch=e.touches?.[0]||e.changedTouches?.[0];
+    const cx=touch?touch.clientX:e.clientX, cy=touch?touch.clientY:e.clientY;
+    return {x:Math.max(0,Math.min(1,(cx-r.left)/r.width)),y:Math.max(0,Math.min(1,(cy-r.top)/r.height))};
+  };
+  const moveSq=(e)=>{e.preventDefault();const{x,y}=getPos(e,sqRef);onChange(hsvToHex(h,x,1-y));};
+  const moveHue=(e)=>{e.preventDefault();const{x}=getPos(e,hueRef);onChange(hsvToHex(x*360,s,v));};
+
+  useEffect(()=>{
+    if(!dragging) return;
+    const mv=dragging==="sq"?moveSq:moveHue;
+    const up=()=>setDragging(null);
+    window.addEventListener("mousemove",mv); window.addEventListener("mouseup",up);
+    window.addEventListener("touchmove",mv,{passive:false}); window.addEventListener("touchend",up);
+    return()=>{window.removeEventListener("mousemove",mv);window.removeEventListener("mouseup",up);window.removeEventListener("touchmove",mv);window.removeEventListener("touchend",up);};
+  },[dragging,h,s,v]);
+
+  const pureHue = hsvToHex(h,1,1);
+
+  return (
+    <div style={{marginBottom:10}}>
+      {/* Sat/Val square */}
+      <div ref={sqRef}
+        onMouseDown={e=>{setDragging("sq");moveSq(e);}} onTouchStart={e=>{setDragging("sq");moveSq(e);}}
+        style={{width:"100%",height:200,borderRadius:8,position:"relative",overflow:"hidden",
+          background:pureHue,cursor:"crosshair",userSelect:"none",touchAction:"none",marginBottom:8}}>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(to right,#fff,transparent)"}}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,transparent,#000)"}}/>
+        <div style={{position:"absolute",
+          left:`calc(${s*100}% - 8px)`,top:`calc(${(1-v)*100}% - 8px)`,
+          width:16,height:16,borderRadius:"50%",pointerEvents:"none",
+          border:"2px solid #fff",boxShadow:"0 0 0 1.5px rgba(0,0,0,0.5)",background:hex}}/>
+      </div>
+      {/* Hue bar */}
+      <div ref={hueRef}
+        onMouseDown={e=>{setDragging("hue");moveHue(e);}} onTouchStart={e=>{setDragging("hue");moveHue(e);}}
+        style={{width:"100%",height:22,borderRadius:4,position:"relative",
+          background:"linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)",
+          cursor:"crosshair",userSelect:"none",touchAction:"none",marginBottom:10}}>
+        <div style={{position:"absolute",
+          left:`calc(${(h/360)*100}% - 9px)`,top:-2,
+          width:18,height:26,borderRadius:4,pointerEvents:"none",
+          border:"2px solid #fff",boxShadow:"0 0 0 1.5px rgba(0,0,0,0.4)",background:hsvToHex(h,1,1)}}/>
+      </div>
+      {/* Hex input */}
+      <div style={{display:"flex",gap:8,alignItems:"center"}}>
+        <div style={{width:38,height:38,borderRadius:6,flexShrink:0,
+          background:isValidHex(hex)?hex:"#333",
+          outline:isValidHex(hex)&&isLight(hex)?`1px solid ${C.border}`:"none",outlineOffset:-1}}/>
+        <div style={{flex:1,position:"relative"}}>
+          <input
+            value={hexFocus?localHex:hex}
+            onFocus={()=>{setHexFocus(true);setLocalHex(hex);}}
+            onBlur={()=>{
+              setHexFocus(false);
+              const clean=sanitizeHex(localHex);
+              if(/^#[0-9A-Fa-f]{6}$/.test(clean)) onChange(clean);
+              else setLocalHex(hex);
+            }}
+            onChange={e=>{
+              let val=e.target.value.replace(/^#+/,"");
+              const withHash="#"+val.slice(0,6);
+              setLocalHex(withHash);
+              if(/^#[0-9A-Fa-f]{6}$/.test(withHash)) onChange(withHash);
+            }}
+            onKeyDown={e=>{if(e.key==="Enter"){const c=sanitizeHex(localHex);if(/^#[0-9A-Fa-f]{6}$/.test(c))onChange(c);e.target.blur();}}}
+            placeholder="#000000"
+            style={{width:"100%",background:hexFocus?C.card:C.surface,
+              border:`1px solid ${hexFocus?"rgba(0,255,133,0.4)":C.border}`,
+              borderLeft:`3px solid ${hexFocus?"rgba(0,255,133,0.6)":C.border}`,
+              borderRadius:4,padding:"9px 32px 9px 11px",
+              color:C.text,fontFamily:C.fMono,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
+          <button onMouseDown={e=>{e.preventDefault();onChange("#000000");setLocalHex("#000000");}}
+            style={{...S.btn,position:"absolute",right:6,top:"50%",transform:"translateY(-50%)",
+              color:C.muted,fontSize:16,padding:4}}>{"\u00d7"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InlineColorBuilder({accentColor, favs, setFavs}) {
+  const [hex1, setHex1] = useState("#cc0000");
+  const [hex2, setHex2] = useState("#003fae");
+  const [twoTone, setTwoTone] = useState(false);
+  const [activePicker, setActivePicker] = useState(1);
+  const [name, setName] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const isValid = h => /^#[0-9A-Fa-f]{6}$/.test(h);
+  const hsb1 = isValid(hex1) ? hexToForzaHSB(hex1) : null;
+  const hsb2 = twoTone && isValid(hex2) ? hexToForzaHSB(hex2) : null;
+  const currentHex = activePicker===1 ? hex1 : hex2;
+  const setCurrentHex = activePicker===1 ? setHex1 : setHex2;
+  const currentHsb = activePicker===1 ? hsb1 : hsb2;
+  const currentCol = activePicker===1 ? C.green : C.amber;
+
+  const copyResult = () => {
+    if(!hsb1) return;
+    const lbl=name.trim()||"Custom Color";
+    const lines=[lbl,"","COLOR 1",`  Hue:        ${hsb1.h}`,`  Saturation: ${hsb1.s}`,`  Brightness: ${hsb1.v}`];
+    if(hsb2) lines.push("","COLOR 2",`  Hue:        ${hsb2.h}`,`  Saturation: ${hsb2.s}`,`  Brightness: ${hsb2.v}`);
+    lines.push("","\u26a0 Approximate — fine-tune in game.");
+    navigator.clipboard?.writeText(lines.join("\n"));
+    setCopied(true); setTimeout(()=>setCopied(false),2000);
+  };
+  const saveToFavs = () => {
+    if(!hsb1||!name.trim()) return;
+    const key=`custom|${name.trim()}|${hex1}${twoTone?hex2:""}`;
+    const newFav={k:key,m:"Custom",n:name.trim(),nick:name.trim(),_custom:true,
+      r1:hex1,r2:twoTone&&isValid(hex2)?hex2:null,
+      c1:[hsb1.h,hsb1.s,hsb1.v],c2:hsb2?[hsb2.h,hsb2.s,hsb2.v]:null,
+      t:twoTone?"Custom Two-Tone":"Custom",sh:"Vehicle",cat:"Custom"};
+    setFavs(prev=>{
+      if(prev.some(f=>f.k===key)) return prev;
+      const next=[...prev,newFav];
+      try{localStorage.setItem("tl_v1_paintfavs",JSON.stringify(next));}catch{}
+      return next;
+    });
+    setSaved(true); setTimeout(()=>setSaved(false),2000);
+  };
+  const HSBRow = ({label,val,col}) => !val?null:(
+    <div style={{display:"flex",alignItems:"center",padding:"7px 10px",borderBottom:`1px solid ${C.border}66`}}>
+      <span style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.12em",width:72,flexShrink:0}}>{label}</span>
+      <span style={{fontFamily:C.fMono,fontSize:16,color:col,letterSpacing:"0.04em"}}>{val.split(" ")[0]}</span>
+      <span style={{marginLeft:6,fontFamily:C.fCond,fontSize:11,fontWeight:700,
+        color:val.includes("L")?C.ice2:C.amber,
+        background:(val.includes("L")?C.ice2:C.amber)+"18",
+        border:`1px solid ${(val.includes("L")?C.ice2:C.amber)}44`,
+        borderRadius:3,padding:"1px 6px"}}>{val.split(" ")[1]}</span>
+    </div>
+  );
+
+  return (
+    <div>
+      {/* Header row */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+        <div style={{fontFamily:C.fMono,fontSize:9,color:accentColor||C.accent,letterSpacing:"0.2em",textTransform:"uppercase"}}>Custom Color Builder</div>
+        <div style={{display:"flex",gap:6}}>
+          <button onClick={copyResult} style={{...S.btn,background:copied?`${C.green}22`:"transparent",border:`1px solid ${copied?C.green:C.border}`,borderRadius:4,padding:"4px 10px",fontFamily:C.fMono,fontSize:9,color:copied?C.green:C.muted,letterSpacing:"0.08em"}}>{copied?"COPIED \u2713":"COPY HSB"}</button>
+          <button onClick={saveToFavs} style={{...S.btn,opacity:name.trim()&&hsb1?1:0.4,background:saved?`${C.green}22`:`${accentColor||C.accent}18`,border:`1px solid ${saved?C.green:accentColor||C.accent}`,borderRadius:4,padding:"4px 10px",fontFamily:C.fMono,fontSize:9,color:saved?C.green:accentColor||C.accent,letterSpacing:"0.08em"}}>{saved?"SAVED \u2713":"SAVE TO FAVS"}</button>
+        </div>
+      </div>
+
+      {/* Name input */}
+      <input value={name} onChange={e=>setName(e.target.value)}
+        placeholder='Name this color (e.g. "Midnight Purple")'
+        style={{width:"100%",background:C.bg,
+          border:`1px solid ${name.trim()?`${accentColor||C.accent}44`:C.border}`,
+          borderLeft:`3px solid ${name.trim()?accentColor||C.accent:C.border}`,
+          borderRadius:4,padding:"8px 10px",color:C.text,fontFamily:C.fBody,fontSize:13,
+          outline:"none",marginBottom:10,boxSizing:"border-box"}}/>
+
+      {/* Two-tone toggle + active color tabs */}
+      <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:10}}>
+        {twoTone?(
+          <>
+            <button onClick={()=>setActivePicker(1)} style={{...S.btn,flex:1,padding:"6px 8px",borderRadius:4,
+              border:`1px solid ${activePicker===1?C.green:C.border}`,
+              background:activePicker===1?`${C.green}18`:"transparent",
+              display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:14,height:14,borderRadius:3,flexShrink:0,background:hex1,outline:isLight(hex1)?`1px solid ${C.border}`:"none",outlineOffset:-1}}/>
+              <span style={{fontFamily:C.fMono,fontSize:9,color:activePicker===1?C.green:C.muted,letterSpacing:"0.06em"}}>COLOR 1</span>
+            </button>
+            <button onClick={()=>setActivePicker(2)} style={{...S.btn,flex:1,padding:"6px 8px",borderRadius:4,
+              border:`1px solid ${activePicker===2?C.amber:C.border}`,
+              background:activePicker===2?`${C.amber}18`:"transparent",
+              display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:14,height:14,borderRadius:3,flexShrink:0,background:hex2,outline:isLight(hex2)?`1px solid ${C.border}`:"none",outlineOffset:-1}}/>
+              <span style={{fontFamily:C.fMono,fontSize:9,color:activePicker===2?C.amber:C.muted,letterSpacing:"0.06em"}}>COLOR 2</span>
+            </button>
+          </>
+        ):(
+          <div style={{flex:1,display:"flex",alignItems:"center",gap:6}}>
+            <div style={{width:14,height:14,borderRadius:3,flexShrink:0,background:hex1,outline:isLight(hex1)?`1px solid ${C.border}`:"none",outlineOffset:-1}}/>
+            <span style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.06em"}}>COLOR</span>
+          </div>
+        )}
+        <button onClick={()=>{setTwoTone(t=>!t);if(!twoTone)setActivePicker(1);}}
+          style={{...S.btn,padding:"5px 10px",borderRadius:4,flexShrink:0,
+            border:`1px solid ${twoTone?accentColor||C.accent:C.border}`,
+            background:twoTone?`${accentColor||C.accent}18`:"transparent",
+            fontFamily:C.fMono,fontSize:9,color:twoTone?accentColor||C.accent:C.muted,letterSpacing:"0.08em"}}>
+          {twoTone?"2-TONE":"+ 2-TONE"}
+        </button>
+      </div>
+
+      {/* Canvas picker for active color */}
+      <ColorPickerCanvas hex={currentHex} onChange={setCurrentHex}/>
+
+      {/* Preview swatch + Forza HSB values */}
+      {currentHsb && (
+        <div style={{display:"flex",gap:8,marginTop:4,marginBottom:4}}>
+          {twoTone?(
+            <div style={{width:44,flexShrink:0,borderRadius:6,overflow:"hidden",display:"flex",flexDirection:"column"}}>
+              <div style={{flex:1,background:hex1,outline:isLight(hex1)?`1px solid ${C.border}`:"none",outlineOffset:-1}}/>
+              <div style={{flex:1,background:hex2,outline:isLight(hex2)?`1px solid ${C.border}`:"none",outlineOffset:-1}}/>
+            </div>
+          ):(
+            <div style={{width:44,borderRadius:6,flexShrink:0,background:hex1,minHeight:72,outline:isLight(hex1)?`1px solid ${C.border}`:"none",outlineOffset:-1}}/>
+          )}
+          <div style={{flex:1,...S.card,overflow:"hidden"}}>
+            <HSBRow label="HUE" val={currentHsb.h} col={currentCol}/>
+            <HSBRow label="SAT" val={currentHsb.s} col={currentCol}/>
+            <HSBRow label="BRI" val={currentHsb.v} col={currentCol}/>
+          </div>
+        </div>
+      )}
+      <div style={{fontFamily:C.fMono,fontSize:8,color:C.dim,letterSpacing:"0.08em",marginTop:6}}>{"Approximate conversion · fine-tune in game · name required to save"}</div>
+    </div>
+  );
+}
+
+
+const COLORS_URL = "https://raw.githubusercontent.com/super-android/tunelab/main/colors.json";
+const COLORS_CACHE_KEY = "tl_v1_colors_cache";
+const COLORS_VER_KEY = "tl_v1_colors_version";
+const RAW_FALLBACK = [{"m":"3M","n":"Gloss Atomic Teal","t":"Metal Flake","sh":"Vehicle","r1":"#017791","r2":"#039fc1","c1":["0.53 L","0.99 R","0.57 L"],"c2":["0.53 L","0.98 R","0.76 L"],"cat":"Teal/Cyan"},{"m":"3M","n":"Gloss Black Rose","t":"Metal Flake","sh":"Vehicle","r1":"#3a271d","r2":"#e55e7e","c1":["0.06 L","0.50 R","0.23 L"],"c2":["0.96 L","0.59 R","0.90 L"],"cat":"Orange"},{"m":"3M","n":"Gloss Blue Fire","t":"Metal Flake","sh":"Vehicle","r1":"#0754c6","r2":"#00c6f2","c1":["0.60 L","0.96 R","0.78 L"],"c2":["0.53 L","1.00 R","0.95 L"],"cat":"Blue"},{"m":"3M","n":"Gloss Wicked","t":"Metal Flake","sh":"Vehicle","r1":"#0f0d14","r2":"#72658e","c1":["0.73 L","0.35 R","0.08 L"],"c2":["0.72 L","0.29 R","0.56 L"],"cat":"Purple"},{"m":"3M","n":"Matte Indigo","t":"Two-Tone Matte","sh":"Vehicle","r1":"#283b56","r2":"#283b56","c1":["0.60 L","0.53 R","0.34 L"],"c2":["0.60 R","0.53 L","0.34 R"],"cat":"Blue"},{"m":"3M","n":"Satin Bitter Yellow","t":"Two-Tone Matte","sh":"Vehicle","r1":"#d1bc06","r2":"#d1bc06","c1":["0.15 L","0.97 R","0.82 L"],"c2":["0.15 R","0.97 L","0.82 R"],"cat":"Yellow"},{"m":"Abarth","n":"Abarth Red","t":"Normal","sh":"Vehicle","r1":"#d62626","r2":null,"c1":["1.00 R","0.82 R","0.84 L"],"c2":null,"cat":"Red"},{"m":"Abarth","n":"Arancia Veloce","t":"Metal Flake","sh":"Vehicle","r1":"#ffc328","r2":"#f7b918","c1":["0.12 L","0.84 L","1.00 R"],"c2":["0.12 L","0.90 R","0.97 L"],"cat":"Orange"},{"m":"Abarth","n":"Bianco 1970","t":"Normal","sh":"Vehicle","r1":"#fcfbf7","r2":null,"c1":["0.13 R","0.02 L","0.99 L"],"c2":null,"cat":"White"},{"m":"Abarth","n":"Bianco Gara","t":"Normal","sh":"Vehicle","r1":"#eae8e1","r2":null,"c1":["0.13 L","0.04 L","0.92 L"],"c2":null,"cat":"White"}];
+
+function ForzaColorsInner({accentColor, onCountChange}) {
+  const [search,  setSearch]  = useState("");
+  const [make,    setMake]    = useState("All Makes");
+  const [cat,     setCat]     = useState("All Colors");
+  const [sheet,   setSheet]   = useState("All");
+  const [detail,  setDetail]  = useState(null);
+  const [copied,  setCopied]  = useState(false);
+  const [visibleCount, setVisibleCount] = useState(60);
+  const [favs, setFavs] = useState(() => { try { return JSON.parse(localStorage.getItem("tl_v1_paintfavs")||"[]"); } catch{return [];} });
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [renamingFav, setRenamingFav] = useState(null);
+  const [renameVal, setRenameVal] = useState("");
+  const [colorData, setColorData] = useState(() => { try { const c=localStorage.getItem(COLORS_CACHE_KEY); return c?JSON.parse(c):RAW_FALLBACK; } catch{return RAW_FALLBACK;} });
+  const listRef = useRef(null);
+  const isFavSheet = sheet === "Favs";
+  const RAW = colorData;
+
+  useEffect(() => {
+    const cachedVer = parseInt(localStorage.getItem(COLORS_VER_KEY)||"0");
+    fetch(COLORS_URL)
+      .then(r=>r.json())
+      .then(data=>{
+        if(data.version >= cachedVer){
+          setColorData(data.colors);
+          try{localStorage.setItem(COLORS_CACHE_KEY,JSON.stringify(data.colors));localStorage.setItem(COLORS_VER_KEY,String(data.version));}catch{}
+          if(onCountChange) onCountChange(data.colors.length);
+        }
+      }).catch(()=>{ if(onCountChange) onCountChange(colorData.length); });
+  }, []);
+
+  const toggleFav = (entry) => {
+    const key = `${entry.m}|${entry.n}`;
+    setFavs(prev => {
+      const next = prev.some(f=>f.k===key) ? prev.filter(f=>f.k!==key) : [...prev, {k:key, m:entry.m, n:entry.n, nick:""}];
+      try { localStorage.setItem("tl_v1_paintfavs", JSON.stringify(next)); } catch{}
+      return next;
+    });
+  };
+  const isFav = (entry) => favs.some(f=>f.k===`${entry.m}|${entry.n}`);
+  const getFavNick = (entry) => { const f=favs.find(x=>x.k===`${entry.m}|${entry.n}`); return f?.nick||""; };
+
+  const saveFavNick = (key, nick) => {
+    setFavs(prev => {
+      const next = prev.map(f=>f.k===key?{...f,nick:nick.trim()}:f);
+      try { localStorage.setItem("tl_v1_paintfavs", JSON.stringify(next)); } catch{}
+      return next;
+    });
+    setRenamingFav(null);
+  };
+
+  // derive sorted make list — filtered by current sheet (not Favs)
+  const makes = useMemo(() => {
+    const s = [...new Set(RAW.filter(d => sheet === "All" || sheet === "Favs" || d.sh === sheet).map(d => d.m))].sort();
+    return ["All Makes", ...s];
+  }, [sheet]);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    const favKeys = new Set(favs.map(f=>f.k));
+    if(isFavSheet) {
+      // Favs tab: show RAW entries + custom entries, in fav order
+      return favs.map(fav => {
+        if(fav._custom) return fav; // custom-built color
+        return RAW.find(d=>`${d.m}|${d.n}`===fav.k);
+      }).filter(Boolean).filter(d=>{
+        if(q && !d.n.toLowerCase().includes(q) && !d.m.toLowerCase().includes(q)) return false;
+        return true;
+      });
+    }
+    return RAW.filter(d => {
+      if (sheet !== "All" && d.sh !== sheet) return false;
+      if (make !== "All Makes" && d.m !== make) return false;
+      if (cat  !== "All Colors" && d.cat !== cat) return false;
+      if (q && !d.n.toLowerCase().includes(q) && !d.m.toLowerCase().includes(q) && !d.t.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [search, make, cat, sheet, favs]);
+
+  // reset make when sheet changes
+  useEffect(() => { if(!isFavSheet) setMake("All Makes"); }, [sheet]);
+
+  const ITEM_H = 76;
+  const [scrollTop, setScrollTop] = useState(0);
+  const [listHeight, setListHeight] = useState(700);
+  const BUFFER = 8;
+  const startIdx = Math.max(0, Math.floor(scrollTop / ITEM_H) - BUFFER);
+  const endIdx   = Math.min(filtered.length, Math.floor((scrollTop + listHeight) / ITEM_H) + BUFFER + 1);
+  const paddingTop    = startIdx * ITEM_H;
+  const paddingBottom = Math.max(0, (filtered.length - endIdx) * ITEM_H);
+  const handleScroll  = (e) => setScrollTop(e.currentTarget.scrollTop);
+
+  // measure actual list height on mount and resize
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const measure = () => setListHeight(el.clientHeight || 700);
+    measure();
+    const ro = window.ResizeObserver ? new ResizeObserver(measure) : null;
+    if (ro) ro.observe(el);
+    return () => ro && ro.disconnect();
+  }, []);
+
+  // reset scroll on filter change
+  useEffect(() => {
+    if (listRef.current) { listRef.current.scrollTop = 0; setScrollTop(0); }
+  }, [filtered]);
+
+
+  const copyValues = (entry) => {
+    const lines = [
+      `${entry.m} — ${entry.n}`,
+      `Type: ${entry.t}`,
+      ``,
+      `COLOR 1`,
+      `  Hue:        ${entry.c1[0]}`,
+      `  Saturation: ${entry.c1[1]}`,
+      `  Brightness: ${entry.c1[2]}`,
+    ];
+    if (entry.c2) {
+      lines.push(``, `COLOR 2`, `  Hue:        ${entry.c2[0]}`, `  Saturation: ${entry.c2[1]}`, `  Brightness: ${entry.c2[2]}`);
+    }
+    if (entry.cm) lines.push(``, `Notes: ${entry.cm}`);
+    navigator.clipboard?.writeText(lines.join("\n"));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (detail) return <DetailScreen entry={detail} onBack={() => setDetail(null)} onCopy={copyValues} copied={copied} isFav={isFav(detail)} onToggleFav={()=>toggleFav(detail)} />;
+
+  return (
+    <div style={{ background: "transparent", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", fontFamily: C.fBody, minHeight: "100%" }}>
+      {/* ── HEADER */}
+      <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 16px 12px", flexShrink: 0 }}>
+
+
+        {/* Top action row: search + builder + favs */}
+        <div style={{display:"flex",gap:6,marginBottom:8}}>
+          <div style={{flex:1}}><SearchBar value={search} onChange={v => setSearch(v)} /></div>
+          <button onClick={()=>setShowBuilder(b=>!b)} title="Custom color builder" style={{...S.btn,width:36,height:38,borderRadius:4,border:`1px solid ${showBuilder?accentColor||C.accent:C.border}`,background:showBuilder?`${accentColor||C.accent}15`:C.surface,color:showBuilder?accentColor||C.accent:C.muted,fontSize:16,flexShrink:0}}>🎨</button>
+        </div>
+
+        {/* Sheet toggle */}
+        <div style={{ display: "flex", gap: 0, marginTop: 8, marginBottom: 8 }}>
+          {SHEETS.map((s, i) => {
+            const active = sheet === s;
+            return (
+              <button key={s} onClick={() => setSheet(s)} style={{
+                ...S.btn, flex: 1, padding: "7px 4px",
+                border: `1px solid ${active ? (accentColor||C.accent) : C.border}`,
+                borderRight: i < SHEETS.length - 1 ? "none" : `1px solid ${active ? (accentColor||C.accent) : C.border}`,
+                borderRadius: i === 0 ? "4px 0 0 4px" : i === SHEETS.length - 1 ? "0 4px 4px 0" : "0",
+                background: active ? `${accentColor||C.accent}15` : "transparent",
+                color: active ? (accentColor||C.accent) : C.muted,
+                fontFamily: C.fCond, fontSize: 13, fontWeight: active ? 700 : 500,
+                letterSpacing: "0.1em", textTransform: "uppercase",
+              }}>
+                {s}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Make/cat dropdowns — hidden on Favs tab */}
+        {!isFavSheet && <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ flex: 1, position: "relative" }}>
+            <span style={{ ...S.label, marginBottom: 3 }}>Make</span>
+            <select value={make} onChange={e => setMake(e.target.value)} style={{
+              width: "100%", background: C.surface, border: `1px solid ${make !== "All Makes" ? C.accent + "66" : C.border}`,
+              borderRadius: 4, padding: "8px 10px", color: make !== "All Makes" ? C.text : C.muted,
+              fontFamily: C.fBody, fontSize: 13, outline: "none", appearance: "none",
+            }}>
+              {makes.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </div>
+          <div style={{ flex: 1 }}>
+            <span style={{ ...S.label, marginBottom: 3 }}>Color family</span>
+            <select value={cat} onChange={e => setCat(e.target.value)} style={{
+              width: "100%", background: C.surface, border: `1px solid ${cat !== "All Colors" ? C.accent + "66" : C.border}`,
+              borderRadius: 4, padding: "8px 10px", color: cat !== "All Colors" ? C.text : C.muted,
+              fontFamily: C.fBody, fontSize: 13, outline: "none", appearance: "none",
+            }}>
+              {HUE_CATS.map(h => <option key={h} value={h}>{h}</option>)}
+            </select>
+          </div>
+        </div>}
+
+        {/* Active filter pills — hidden on Favs tab */}
+        {(!isFavSheet && (make !== "All Makes" || cat !== "All Colors" || search)) ? (
+          <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+            {make !== "All Makes" && <FilterPill label={make} onClear={() => setMake("All Makes")} />}
+            {cat  !== "All Colors" && <FilterPill label={cat}  onClear={() => setCat("All Colors")} />}
+            {search ? <FilterPill label={search} onClear={() => setSearch("")} /> : null}
+            <button onClick={() => { setMake("All Makes"); setCat("All Colors"); setSearch(""); }} style={{ ...S.btn, fontFamily: C.fMono, fontSize: 9, color: C.muted, letterSpacing: "0.1em", padding: "2px 6px", border: `1px solid ${C.border}`, borderRadius: 3 }}>
+              CLEAR ALL
+            </button>
+          </div>
+        ) : null}
+      </div>
+
+      {/* ── INLINE BUILDER PANEL */}
+      {showBuilder && (
+        <div style={{background:C.surface,borderBottom:`1px solid ${C.border}`,padding:"14px 16px",flexShrink:0}}>
+          <InlineColorBuilder accentColor={accentColor} favs={favs} setFavs={setFavs}/>
+        </div>
+      )}
+
+      {/* ── LIST */}
+      <div ref={listRef} onScroll={handleScroll} style={{ flex: 1, overflowY: "auto" }}>
+        {filtered.length === 0 ? (
+          <div style={{ padding: 40, textAlign: "center" }}>
+            <div style={{ fontFamily: C.fMono, fontSize: 10, color: C.muted, letterSpacing: "0.15em", marginBottom: 8 }}>{isFavSheet?"NO FAVORITES YET":"NO RESULTS"}</div>
+            <div style={{ fontFamily: C.fBody, fontSize: 13, color: C.dim }}>{isFavSheet?"Tap ♥ on any color to save it here":"Try a different filter or search term"}</div>
+          </div>
+        ) : (
+          <div style={{paddingTop:paddingTop,paddingBottom:paddingBottom}}>
+          {filtered.slice(startIdx, endIdx).map((entry, i) => (
+            <React.Fragment key={`${entry.m}-${entry.n}-${startIdx+i}`}>
+            <ColorRow entry={entry} onPress={() => setDetail(entry)}
+              isFav={isFav(entry)} onToggleFav={()=>toggleFav(entry)}
+              favNick={getFavNick(entry)}
+              onCopyHSB={()=>{
+                const e=entry;
+                const lines=[`${e.m} — ${e.n}`,"",`COLOR 1`,`  Hue:        ${e.c1[0]}`,`  Saturation: ${e.c1[1]}`,`  Brightness: ${e.c1[2]}`];
+                if(e.c2){lines.push("",`COLOR 2`,`  Hue:        ${e.c2[0]}`,`  Saturation: ${e.c2[1]}`,`  Brightness: ${e.c2[2]}`);}
+                navigator.clipboard?.writeText(lines.join("\n"));
+              }}
+              onRename={isFavSheet?()=>{setRenamingFav(`${entry.m}|${entry.n}`);setRenameVal(getFavNick(entry));}:null}
+            />
+            {(()=>{ const isRenaming = isFavSheet && renamingFav===`${entry.m}|${entry.n}`; return isRenaming ? (
+              <div style={{display:"flex",gap:6,padding:"8px 16px",background:C.surface,borderBottom:`1px solid ${C.border}`}}>
+                <input autoFocus value={renameVal} onChange={e=>setRenameVal(e.target.value)}
+                  onKeyDown={e=>{if(e.key==="Enter")saveFavNick(renamingFav,renameVal);if(e.key==="Escape")setRenamingFav(null);}}
+                  placeholder="Nickname (e.g. Midnight Purple)"
+                  style={{flex:1,background:C.bg,border:`1px solid ${accentColor||C.accent}44`,borderRadius:4,padding:"7px 10px",color:C.text,fontFamily:C.fBody,fontSize:13,outline:"none"}}/>
+                <button onClick={()=>saveFavNick(renamingFav,renameVal)} style={{...S.btn,background:`${accentColor||C.accent}18`,border:`1px solid ${accentColor||C.accent}44`,borderRadius:4,padding:"7px 12px",fontFamily:C.fMono,fontSize:10,color:accentColor||C.accent,letterSpacing:"0.08em"}}>SAVE</button>
+                <button onClick={()=>setRenamingFav(null)} style={{...S.btn,border:`1px solid ${C.border}`,borderRadius:4,padding:"7px 10px",color:C.muted,fontSize:13}}>{"\u00d7"}</button>
+              </div>
+            ) : null })()}
+            </React.Fragment>
+          ))}
+          </div>
+        )}
+        <div style={{ height: 20 }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── COLOR ROW ────────────────────────────────────────────────────────────────
+function ColorRow({ entry, onPress, isFav, onToggleFav, onCopyHSB, favNick, onRename }) {
+  const isTwoTone = !!entry.r2 && entry.r2 !== entry.r1;
+  return (
+    <div
+      style={{
+        width: "100%", display:"flex", alignItems:"stretch",
+        borderBottom: `1px solid ${C.border}`,
+        background: "transparent",
+        animation: "fadeUp 0.15s ease both",
+      }}
+    >
+      <button onClick={onPress} style={{...S.btn,flex:1,textAlign:"left",padding:"10px 12px 10px 16px",display:"flex",alignItems:"center"}}>
+      {/* Two-tone split swatch */}
+      <div style={{ width: 44, flexShrink: 0, marginRight: 12, borderRadius: 6, overflow:"hidden", height:44, display:"flex", flexDirection:"column" }}>
+        <div style={{ flex: isTwoTone?1:1, background: entry.r1, outline: isLight(entry.r1) ? `1px solid ${C.border}` : "none", outlineOffset: -1 }} />
+        {isTwoTone && <div style={{ height: 14, background: entry.r2, outline: isLight(entry.r2) ? `1px solid ${C.border}` : "none", outlineOffset: -1 }} />}
+      </div>
+
+      {/* Text */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: C.fCond, fontSize: 16, fontWeight: 600, color: C.text, letterSpacing: "0.03em", lineHeight: 1.2, marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {entry.n}
+        </div>
+        <div style={{ fontFamily: C.fBody, fontSize: 12, color: C.muted }}>{entry.m}</div>
+        {favNick ? <div style={{ fontFamily: C.fMono, fontSize: 10, color: accentColor||C.green, letterSpacing:"0.06em", marginTop:2 }}>"{favNick}"</div> : null}
+        <div style={{ display: "flex", gap: 6, marginTop: 3, alignItems: "center", flexWrap: "wrap" }}>
+          <span style={{ fontFamily: C.fMono, fontSize: 9, color: C.dim, letterSpacing: "0.06em" }}>{entry.t.toUpperCase()}</span>
+          {isTwoTone && <span style={{ fontFamily: C.fMono, fontSize: 9, color: C.amber, letterSpacing: "0.06em", border: `1px solid ${C.amber}44`, borderRadius: 2, padding: "0 4px" }}>2-TONE</span>}
+          {entry.sh === "Wheel" && <span style={{ fontFamily: C.fMono, fontSize: 9, color: C.accent, letterSpacing: "0.06em", border: `1px solid ${C.accent}44`, borderRadius: 2, padding: "0 4px" }}>WHEEL</span>}
+        </div>
+      </div>
+
+      {/* Arrow */}
+      <span style={{ color: C.dim, fontSize: 18, marginLeft: 8 }}>›</span>
+      </button>
+      {/* Side actions */}
+      <div style={{display:"flex",flexDirection:"column",justifyContent:"center",gap:4,padding:"8px 10px 8px 0",flexShrink:0}}>
+        <button onClick={e=>{e.stopPropagation();onToggleFav&&onToggleFav();}} title={isFav?"Remove favorite":"Save favorite"} style={{...S.btn,width:28,height:28,borderRadius:5,border:`1px solid ${isFav?"#e05544":C.border}`,background:isFav?"#e0554422":"transparent",color:isFav?"#ff4466":C.dim,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>♥</button>
+        {onRename && <button onClick={e=>{e.stopPropagation();onRename();}} title="Rename" style={{...S.btn,width:28,height:28,borderRadius:5,border:`1px solid ${C.border}`,background:"transparent",color:C.dim,fontSize:11,fontFamily:C.fMono,display:"flex",alignItems:"center",justifyContent:"center"}}>✎</button>}
+        <button onClick={e=>{e.stopPropagation();onCopyHSB&&onCopyHSB();}} title="Copy HSB values" style={{...S.btn,width:28,height:28,borderRadius:5,border:`1px solid ${C.border}`,background:"transparent",color:C.dim,fontSize:11,fontFamily:C.fMono,display:"flex",alignItems:"center",justifyContent:"center",letterSpacing:"-0.05em"}}>HSB</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── DETAIL SCREEN ────────────────────────────────────────────────────────────
+function DetailScreen({ entry, onBack, onCopy, copied, isFav, onToggleFav }) {
+  const isTwoTone = !!entry.r2 && entry.r2 !== entry.r1;
+
+  return (
+    <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", fontFamily: C.fBody, display: "flex", flexDirection: "column" }}>
+      <style>{FONTS + THEME_STYLE}</style>
+
+      {/* Header */}
+      <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+        <button onClick={onBack} style={{ ...S.btn, color: C.text, fontSize: 22, padding: 0 }}>←</button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: C.fCond, fontSize: 18, fontWeight: 700, color: C.text, letterSpacing: "0.04em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {entry.n}
+          </div>
+          <div style={{ fontFamily: C.fBody, fontSize: 12, color: C.muted }}>{entry.m} · {entry.t}</div>
+        </div>
+        <button onClick={()=>onToggleFav&&onToggleFav()} style={{...S.btn,width:34,height:34,borderRadius:6,border:`1px solid ${isFav?"#e05544":C.border}`,background:isFav?"#e0554422":"transparent",color:isFav?"#ff4466":C.dim,fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>♥</button>
+        <button onClick={() => onCopy(entry)} style={{
+          ...S.btn, background: copied ? C.green + "22" : C.accentLo,
+          border: `1px solid ${copied ? C.green : C.accent}55`,
+          borderRadius: 6, padding: "6px 14px",
+          fontFamily: C.fMono, fontSize: 10, letterSpacing: "0.12em",
+          color: copied ? C.green : C.accent,
+        }}>
+          {copied ? "COPIED ✓" : "COPY"}
+        </button>
+      </div>
+
+      <div style={{ overflowY: "auto", flex: 1, padding: "16px 16px 40px" }}>
+
+        {/* Swatch(es) */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <div style={{
+            flex: 1, height: 90, borderRadius: 8, background: entry.r1,
+            outline: isLight(entry.r1) ? `1px solid ${C.border}` : "none", outlineOffset: -1,
+          }} />
+          {isTwoTone && (
+            <div style={{
+              flex: 1, height: 90, borderRadius: 8, background: entry.r2,
+              outline: isLight(entry.r2) ? `1px solid ${C.border}` : "none", outlineOffset: -1,
+            }} />
+          )}
+        </div>
+
+        {/* Tags row */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+          <Tag label={entry.cat} />
+          <Tag label={entry.t} />
+          {isTwoTone && <Tag label="Two-Tone" color={C.amber} />}
+          {entry.sh === "Wheel" && <Tag label="Wheel Color" color={C.accent} />}
+        </div>
+
+
+
+        {/* Color 1 values */}
+        <ColorBlock label="COLOR 1" color={entry.r1} vals={entry.c1} accentColor={C.green} />
+
+        {/* Color 2 values */}
+        {isTwoTone && (
+          <div style={{ marginTop: 12 }}>
+            <ColorBlock label="COLOR 2" color={entry.r2} vals={entry.c2} accentColor={C.amber} />
+          </div>
+        )}
+
+        {/* How to enter guide */}
+        <div style={{ ...S.card, marginTop: 16, padding: "12px 14px" }}>
+          <div style={{ fontFamily: C.fMono, fontSize: 9, color: C.muted, letterSpacing: "0.15em", marginBottom: 10 }}>HOW TO ENTER IN-GAME</div>
+          <div style={{ fontFamily: C.fBody, fontSize: 12, color: C.muted, lineHeight: 1.8 }}>
+            <span style={{ color: C.ice2 }}>Each value has a direction (L/R)</span> — this is which side of center the dial sits on.<br />
+            <span style={{ color: C.ice2 }}>L = Left of center &nbsp;·&nbsp; R = Right of center</span><br />
+            Count notches carefully — small values like <span style={{ fontFamily: C.fMono, color: C.accent }}>0.02</span> are only 1–2 clicks from center.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── COLOR BLOCK (hue / sat / bri values) ─────────────────────────────────────
+function ColorBlock({ label, color, vals, accentColor }) {
+  if (!vals) return null;
+  const rows = [
+    { key: "HUE",        val: vals[0] },
+    { key: "SATURATION", val: vals[1] },
+    { key: "BRIGHTNESS", val: vals[2] },
+  ];
+  // parse direction from value string e.g. "0.53 L"
+  const getDir = v => {
+    if (!v) return null;
+    const parts = v.split(" ");
+    return parts[1] || null;
+  };
+
+  return (
+    <div style={{ ...S.card, overflow: "hidden" }}>
+      {/* Label bar with color accent */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderBottom: `1px solid ${C.border}`, background: accentColor + "0a" }}>
+        <div style={{ width: 24, height: 24, borderRadius: 4, background: color, outline: isLight(color) ? `1px solid ${C.border}` : "none", outlineOffset: -1, flexShrink: 0 }} />
+        <span style={{ fontFamily: C.fMono, fontSize: 9, color: accentColor, letterSpacing: "0.2em" }}>{label}</span>
+      </div>
+      {/* Value rows */}
+      {rows.map(({ key, val }) => {
+        const dir = getDir(val);
+        const numPart = val ? val.split(" ")[0] : "—";
+        return (
+          <div key={key} style={{ display: "flex", alignItems: "center", padding: "11px 12px", borderBottom: `1px solid ${C.border + "66"}` }}>
+            <span style={{ fontFamily: C.fMono, fontSize: 10, color: C.muted, letterSpacing: "0.12em", width: 90, flexShrink: 0 }}>{key}</span>
+            <span style={{ fontFamily: C.fMono, fontSize: 22, fontWeight: 400, color: accentColor, letterSpacing: "0.04em", lineHeight: 1 }}>{numPart}</span>
+            {dir && (
+              <span style={{
+                marginLeft: 10, fontFamily: C.fCond, fontSize: 14, fontWeight: 700,
+                color: dir === "L" ? C.ice2 : C.amber,
+                background: (dir === "L" ? C.ice2 : C.amber) + "18",
+                border: `1px solid ${(dir === "L" ? C.ice2 : C.amber)}44`,
+                borderRadius: 4, padding: "2px 8px", letterSpacing: "0.08em",
+              }}>{dir}</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── SMALL COMPONENTS ─────────────────────────────────────────────────────────
+function SearchBar({ value, onChange }) {
+  const [focus, setFocus] = useState(false);
+  return (
+    <div style={{ position: "relative" }}>
+      <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: C.muted, fontSize: 14, pointerEvents: "none" }}>⌕</span>
+      <input
+        type="text" value={value} placeholder="Search make, color, paint type…"
+        onChange={e => onChange(e.target.value)}
+        onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+        style={{
+          width: "100%", background: focus ? C.card : C.surface,
+          border: `1px solid ${focus ? C.accent + "44" : C.border}`,
+          borderLeft: `3px solid ${focus ? C.accent + "88" : C.border}`,
+          borderRadius: 4, padding: "9px 10px 9px 30px",
+          color: C.text, fontFamily: C.fBody, fontSize: 14, outline: "none",
+        }}
+      />
+      {value && (
+        <button onClick={() => onChange("")} style={{ ...S.btn, position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", color: C.muted, fontSize: 16, padding: 4 }}>{"\u00d7"}</button>
+      )}
+    </div>
+  );
+}
+
+function FilterPill({ label, onClear }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 4, background: C.accentLo, border: `1px solid ${C.accent}44`, borderRadius: 3, padding: "2px 6px 2px 8px" }}>
+      <span style={{ fontFamily: C.fMono, fontSize: 9, color: C.accent, letterSpacing: "0.06em" }}>{label}</span>
+      <button onClick={onClear} style={{ ...S.btn, color: C.accent, fontSize: 13, padding: "0 1px", lineHeight: 1 }}>{"\u00d7"}</button>
+    </div>
+  );
+}
+
+function Tag({ label, color }) {
+  const c = color || C.dim;
+  return (
+    <span style={{ fontFamily: C.fMono, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: c, background: c + "18", border: `1px solid ${c}44`, borderRadius: 3, padding: "2px 8px" }}>
+      {label}
+    </span>
+  );
+}
+
+
+function PaintLabScreen({onBack, accentColor: paintAccent}) {
+  const [overlay, setOverlay] = useState(null);
+  const [colorCount, setColorCount] = useState(() => {
+    try { const c=localStorage.getItem("tl_v1_colors_cache"); return c?JSON.parse(c).length:null; } catch{return null;}
+  });
+  const menuItems = [
+    {id:"back",     icon:"←", label:"Back to TuneLab", sub:"Return to tuning"},
+    null,
+    {id:"about",    icon:"ℹ", label:"About PaintLab",  sub:"Color data credits"},
+  ];
+  return (
+    <div style={{minHeight:"100vh",background:C.bg,color:C.text,maxWidth:480,margin:"0 auto",fontFamily:C.fBody,display:"flex",flexDirection:"column"}}>
+      <style>{FONTS+THEME_STYLE}</style>
+
+      {/* Shared nav header — mirrors TuneLab */}
+      <div style={{position:"sticky",top:0,zIndex:20,background:C.bg,borderBottom:`1px solid ${C.border}`,padding:"calc(env(safe-area-inset-top,0px) + 10px) 14px 8px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontFamily:C.fCond,fontSize:22,fontWeight:700,color:C.text,letterSpacing:"0.12em",lineHeight:1}}><span style={{color:paintAccent||C.green}}>Paint</span>Lab</div>
+            <div style={{fontFamily:C.fMono,fontSize:8,color:C.green,letterSpacing:"0.08em",marginTop:2}}>● {(colorCount||"...").toLocaleString()} colors</div>
+          </div>
+          <button onClick={()=>setOverlay("menu")} style={{...S.btn,width:32,height:32,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:17,letterSpacing:1,flexShrink:0}}>☰</button>
+        </div>
+      </div>
+
+      {/* Hamburger menu */}
+      {overlay==="menu" && (
+        <div style={{position:"fixed",inset:0,zIndex:50,display:"flex",flexDirection:"column",justifyContent:"flex-start"}}>
+          <div style={{height:"calc(env(safe-area-inset-top,0px) + 60px)"}} onClick={()=>setOverlay(null)}/>
+          <div style={{background:C.bg,borderTop:`1px solid ${C.border}`,maxWidth:480,width:"100%",margin:"0 auto"}}>
+            {menuItems.map((item,i)=>item===null?(
+              <div key={i} style={{height:1,background:C.border,margin:"4px 0"}}/>
+            ):(
+              <div key={item.id} onClick={()=>{
+                setOverlay(null);
+                if(item.id==="back") onBack();
+                else if(item.id==="about") setOverlay("about");
+              }} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",cursor:"pointer"}}>
+                <span style={{fontSize:15,width:20,textAlign:"center"}}>{item.icon}</span>
+                <div>
+                  <div style={{fontSize:13,color:item.id==="back"?C.green:C.text}}>{item.label}</div>
+                  {item.sub && <div style={{fontSize:11,color:C.dim,marginTop:1}}>{item.sub}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{flex:1}} onClick={()=>setOverlay(null)}/>
+        </div>
+      )}
+
+      {/* About overlay */}
+      {overlay==="about" && (
+        <div style={{position:"fixed",inset:0,zIndex:50,background:"rgba(0,0,0,0.8)",display:"flex",alignItems:"flex-end"}} onClick={()=>setOverlay(null)}>
+          <div style={{background:C.bg,borderTop:`2px solid ${C.green}30`,borderRadius:"20px 20px 0 0",padding:"20px 16px 32px",width:"100%",maxWidth:480,margin:"0 auto"}} onClick={e=>e.stopPropagation()}>
+            <div style={{width:36,height:3,background:"#333",borderRadius:2,margin:"0 auto 16px"}}/>
+            <div style={{fontFamily:C.fMono,fontSize:10,color:C.green,letterSpacing:"0.2em",textTransform:"uppercase",marginBottom:12}}>About PaintLab</div>
+            <div style={{fontSize:13,color:C.muted,lineHeight:1.7,marginBottom:12}}>
+              Color data sourced from the FH6 community color spreadsheet. Hex values shown are approximate conversions of Forza's internal HSB color space — actual in-game appearance may vary.
+            </div>
+            <div style={{fontSize:13,color:C.muted,lineHeight:1.7}}>
+              Two-tone colors show both layers. Wheel colors are listed separately from vehicle colors.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ForzaColors content */}
+      <div style={{flex:1}}>
+        <ForzaColorsInner accentColor={paintAccent||C.green} onCountChange={setColorCount}/>
+      </div>
+    </div>
+  );
+}
+
+class PaintLabErrorBoundary extends Component {
+  constructor(p){super(p);this.state={error:null};}
+  static getDerivedStateFromError(e){return {error:e.message||"Unknown error"};}
+  componentDidCatch(e,info){console.error("PaintLab crash:",e.message,"\n",info.componentStack?.slice(0,500));}
+  render(){
+    if(this.state.error) return (
+      <div style={{padding:40,background:"#080a0f",minHeight:"100vh",color:"#e0e0e0"}}>
+        <div style={{fontFamily:"monospace",fontSize:11,color:"#ff4466",marginBottom:16}}>PAINTLAB ERROR</div>
+        <div style={{fontFamily:"monospace",fontSize:11,color:"#888",whiteSpace:"pre-wrap",wordBreak:"break-all"}}>{this.state.error}</div>
+        <button onClick={this.props.onBack} style={{marginTop:24,padding:"10px 20px",background:"transparent",border:"1px solid #333",color:"#888",borderRadius:6,fontFamily:"monospace",fontSize:11}}>← Back</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
 export default function ForzaTuner() {
   const [screen,      setScreen]      = useState(()=>{ const done = LS.get("tl_v1_done_units",false); return (done===true||done==="true")?"main":"units"; });
   const [units,       setUnits]       = useState(()=>LS.get("tl_v1_units",{weight:"lbs",springs:"lbs/in",pressure:"psi",speed:"mph"}));
@@ -1902,6 +3033,7 @@ export default function ForzaTuner() {
   const [tuneId,      setTuneId]      = useState("Race");
   const [surface,     setSurface]     = useState("Tarmac");
   const [compound,    setCompound]    = useState("Race Semi-Slick");
+  const [dragDist,     setDragDist]     = useState("quarter");
 
   const [redlineRpm,     setRedlineRpm]     = useState(7000);
   const [peakTorqueRpm,  setPeakTorqueRpm]  = useState(4500);
@@ -1909,13 +3041,12 @@ export default function ForzaTuner() {
   const [topspeed,       setTopspeed]       = useState(180);
   const [gears,          setGears]          = useState(6);
   const [includeGearing, setIncludeGearing] = useState(true);
-  const [tireWF,   setTireWF]   = useState(245);
-  const [tireWR,   setTireWR]   = useState(275);
-  const [tireARF,  setTireARF]  = useState(35);
-  const [tireAR,   setTireAR]   = useState(35);
-  const [tireRimF, setTireRimF] = useState(19);
-  const [tireRim,  setTireRim]  = useState(19);
-  const [carHeight,setCarHeight]= useState(1400);
+  const [tireWF,   setTireWF]   = useState(225);
+  const [tireWR,   setTireWR]   = useState(225);
+  const [tireARF,  setTireARF]  = useState(45);
+  const [tireAR,   setTireAR]   = useState(45);
+  const [tireRimF, setTireRimF] = useState(17);
+  const [tireRim,  setTireRim]  = useState(17);
   const [rpmScale, setRpmScale] = useState(0);
   const [generated,setGenerated]= useState(false);
 
@@ -1936,6 +3067,8 @@ export default function ForzaTuner() {
   // Remote car DB — fetches latest cars.json from GitHub on launch
   // Falls back to hardcoded CAR_DB_FULL if offline or fetch fails
   const [remoteCarDB, setRemoteCarDB] = useState(null);
+  const [showOnboard, setShowOnboard] = useState(()=>!LS.get("tl_seen_intro", false));
+  const [carFetchMeta, setCarFetchMeta] = useState(null); // {count, time}
   const carDB = remoteCarDB || CAR_DB_FULL;
 
   useEffect(()=>{
@@ -1949,13 +3082,14 @@ export default function ForzaTuner() {
       if(cached) setRemoteCarDB(JSON.parse(cached));
     } catch(e) {}
 
-    // Fetch latest in background
+// Fetch latest in background
     fetch(CAR_DB_URL)
       .then(r=>r.ok?r.json():null)
       .then(data=>{
         if(!data?.cars?.length) return;
+        setCarFetchMeta({count: data.cars.length, time: Date.now()});
         const cachedVer = parseInt(localStorage.getItem(VER_KEY)||"0");
-        if(data.version > cachedVer) {
+        if(data.version >= cachedVer) {
           setRemoteCarDB(data.cars);
           try {
             localStorage.setItem(CACHE_KEY, JSON.stringify(data.cars));
@@ -1967,14 +3101,13 @@ export default function ForzaTuner() {
   },[]);
 
   const getState = () => ({
-    make,model,driveType,tuneId,weight,weightDist,pi,carClass,surface,compound,
+    make,model,driveType,tuneId,weight,weightDist,pi,carClass,surface,compound,dragDist,
     redlineRpm: mode==="S"?redlineRpm:0,
     peakTorqueRpm: mode==="S"?peakTorqueRpm:0,
     maxTorque: mode==="S"?maxTorque:500,
     topspeed: mode==="S"?topspeed:180,
     gears: mode==="S"?gears:6,
     tireWF:`${tireWF}/${tireARF}R${tireRimF}`, tireWR:`${tireWR}/${tireAR}R${tireRim}`,
-    carHeight: carHeight||null,
     hasAero,aeroF,aeroR,dragCd,
     inputDevice,
     includeGearing: mode==="S"&&includeGearing,
@@ -2030,9 +3163,87 @@ export default function ForzaTuner() {
   useEffect(()=>{ LS.set("tl_v1_mode",mode); },[mode]);
 
   // Car search filter
-  const searchResults = carSearch.length > 0
-    ? (CAR_DB[make]||[]).filter(m=>m.toLowerCase().includes(carSearch.toLowerCase())).map(m=>({make,model:m}))
-    : (CAR_DB[make]||[]).slice(0,8).map(m=>({make,model:m}));
+const searchResults = carSearch.length > 0
+    ? carDB
+        .filter(c => c.make === make && c.model.toLowerCase().includes(carSearch.toLowerCase()))
+        .map(c => ({ make: c.make, model: c.year ? `${c.model} '${c.year.slice(-2)}` : c.model }))
+    : carDB
+        .filter(c => c.make === make)
+        .slice(0, 8)
+        .map(c => ({ make: c.make, model: c.year ? `${c.model} '${c.year.slice(-2)}` : c.model }));
+
+  // ── ONBOARDING OVERLAY (first launch only)
+  if(showOnboard) return (
+    <div style={{minHeight:"100vh",background:C.bg,color:C.text,maxWidth:480,margin:"0 auto",fontFamily:C.fBody,display:"flex",flexDirection:"column"}}>
+      <style>{FONTS+THEME_STYLE}</style>
+      <div style={{padding:"52px 20px 16px",borderBottom:`1px solid ${C.border}`}}>
+        <div style={{fontFamily:C.fCond,fontSize:28,fontWeight:700,letterSpacing:"0.12em",color:C.text}}><span style={{color:C.green}}>Tune</span>Lab</div>
+        <div style={{fontFamily:C.fMono,fontSize:9,color:C.dim,letterSpacing:"0.15em",marginTop:4}}>FH6 · FREE FOREVER · NO ADS</div>
+      </div>
+      <div style={{flex:1,padding:"20px",overflowY:"auto"}}>
+
+        {/* Step 1: Units */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontFamily:C.fMono,fontSize:9,color:C.green,letterSpacing:"0.2em",marginBottom:6}}>STEP 01 OF 04</div>
+          <div style={{fontSize:15,fontWeight:600,color:C.text,marginBottom:4}}>Pick your units</div>
+          <div style={{fontSize:12,color:"#888",lineHeight:1.6,marginBottom:10}}>Match what you use in-game. You can change this later in Settings.</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            {[{label:"Imperial",sub:"lbs · psi · mph",vals:{weight:"lbs",pressure:"psi",springs:"lbs/in",speed:"mph"}},{label:"Metric",sub:"kg · bar · km/h",vals:{weight:"kg",pressure:"bar",springs:"n/mm",speed:"km/h"}}].map(u=>{
+              const sel = units.speed===u.vals.speed;
+              return <button key={u.label} onClick={()=>setUnits(u.vals)} style={{background:sel?`${C.green}10`:"transparent",border:`2px solid ${sel?C.green:C.border}`,borderRadius:8,padding:"10px",textAlign:"left",cursor:"pointer"}}>
+                <div style={{fontFamily:C.fMono,fontSize:12,fontWeight:700,color:sel?C.green:C.text,marginBottom:3}}>{u.label}</div>
+                <div style={{fontSize:10,color:C.muted}}>{u.sub}</div>
+              </button>;
+            })}
+          </div>
+        </div>
+        <div style={{height:1,background:C.border,marginBottom:20}}/>
+
+        {/* Step 2: Find car stats */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontFamily:C.fMono,fontSize:9,color:C.green,letterSpacing:"0.2em",marginBottom:6}}>STEP 02 OF 04</div>
+          <div style={{fontSize:15,fontWeight:600,color:C.text,marginBottom:4}}>Find your car's stats in-game</div>
+          <div style={{fontSize:12,color:"#888",lineHeight:1.6}}>Go to <b style={{color:C.text}}>My Cars → Upgrade</b> and note your car's <b style={{color:C.text}}>PI rating, weight, and drivetrain</b> (AWD/RWD/FWD). That's all you need to get started.</div>
+        </div>
+        <div style={{height:1,background:C.border,marginBottom:20}}/>
+
+        {/* Step 3: Quick or Full */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontFamily:C.fMono,fontSize:9,color:C.green,letterSpacing:"0.2em",marginBottom:6}}>STEP 03 OF 04</div>
+          <div style={{fontSize:15,fontWeight:600,color:C.text,marginBottom:4}}>Quick or Full tune?</div>
+          <div style={{fontSize:12,color:"#888",lineHeight:1.6,marginBottom:10}}>Tap to select. You can switch anytime.</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            {[{id:"D",name:"⚡ Quick",desc:"Just PI, weight, drivetrain. Fast and clean.",rec:true},{id:"S",name:"⚙ Full",desc:"Add RPM, tire sizes, aero. More precise.",rec:false}].map(m=>(
+              <button key={m.id} onClick={()=>setMode(m.id)} style={{background:mode===m.id?`${C.green}10`:"transparent",border:`2px solid ${mode===m.id?C.green:C.border}`,borderRadius:8,padding:10,textAlign:"left",cursor:"pointer"}}>
+                <div style={{fontFamily:C.fMono,fontSize:11,fontWeight:700,letterSpacing:"0.1em",marginBottom:4,color:mode===m.id?C.green:"#888"}}>{m.name}</div>
+                <div style={{fontSize:10,color:"#666",lineHeight:1.5}}>{m.desc}</div>
+                {m.rec && <span style={{fontSize:9,color:C.green,background:C.green+"10",padding:"2px 6px",borderRadius:3,display:"inline-block",marginTop:4,fontFamily:C.fMono}}>RECOMMENDED</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{height:1,background:C.border,marginBottom:20}}/>
+
+        {/* Step 4: Feel adjuster tip */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontFamily:C.fMono,fontSize:9,color:C.green,letterSpacing:"0.2em",marginBottom:6}}>STEP 04 OF 04</div>
+          <div style={{fontSize:15,fontWeight:600,color:C.text,marginBottom:4}}>Tune to your style</div>
+          <div style={{fontSize:12,color:"#888",lineHeight:1.6}}>After generating, use the <b style={{color:C.text}}>Feel Adjuster</b> to shift between stable/tail-happy and planted/aggressive. FH6 rewards stable — start there.</div>
+        </div>
+
+      </div>
+      <div style={{padding:"16px 20px 32px",borderTop:`1px solid ${C.border}`}}>
+        <button onClick={()=>{LS.set("tl_seen_intro",true);setShowOnboard(false);}}
+          style={{width:"100%",padding:14,background:`${C.green}14`,border:`1px solid ${C.green}44`,borderRadius:8,color:C.green,fontFamily:C.fMono,fontSize:14,fontWeight:700,letterSpacing:"0.2em",textTransform:"uppercase",cursor:"pointer",marginBottom:8}}>
+          Get started →
+        </button>
+        <button onClick={()=>{LS.set("tl_seen_intro",true);setShowOnboard(false);}}
+          style={{width:"100%",padding:8,background:"transparent",border:"none",color:"#444",fontSize:12,cursor:"pointer"}}>
+          Skip intro
+        </button>
+      </div>
+    </div>
+  );
 
   if (screen==="units") return (
     <UnitsScreen onDone={(u,dev)=>{
@@ -2050,6 +3261,12 @@ export default function ForzaTuner() {
     </div>
   );
 
+  if (screen==="paintlab") return (
+    <PaintLabErrorBoundary onBack={()=>setScreen("main")}>
+      <PaintLabScreen onBack={()=>setScreen("main")} accentColor={TUNE_MODES.find(t=>t.id===tuneId)?.color||C.green}/>
+    </PaintLabErrorBoundary>
+  );
+
   if (screen==="output") return (
     <OutputErrorBoundary onBack={()=>setScreen("main")}>
       <OutputScreen
@@ -2058,6 +3275,10 @@ export default function ForzaTuner() {
         setTunePages={setTunePages}
         onBack={()=>setScreen("main")}
         onNewTune={()=>setScreen("main")}
+        units={units}
+        inputDevice={inputDevice}
+        onSaveUnits={(u,dev)=>{LS.set("tl_v1_units",u);LS.set("tl_v1_device",dev);setUnits(u);setInputDevice(dev);}}
+        onGoToPaintLab={()=>setScreen("paintlab")}
       />
     </OutputErrorBoundary>
   );
@@ -2073,51 +3294,57 @@ export default function ForzaTuner() {
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,maxWidth:480,margin:"0 auto",fontFamily:C.fBody,display:"flex",flexDirection:"column"}}>
       <style>{FONTS+THEME_STYLE+`input[type=number]::-webkit-inner-spin-button{opacity:1}`}</style>
       {toast&&<Toast msg={toast} onDone={()=>setToast(null)}/>}
+      {overlay==="menu"&&<HamburgerMenu
+        isOutputScreen={false}
+        appState={getState()}
+        onClose={()=>setOverlay(null)}
+        onNav={(id)=>{
+          if(id==="ai") setOverlay("ai");
+          else if(id==="about") setOverlay("about");
+          else if(id==="settings") setOverlay("settings");
+          else if(id==="paintlab"){ setOverlay(null); setScreen("paintlab"); }
+          else if(id==="refresh"){localStorage.removeItem("tl_v1_cardb_cache");localStorage.removeItem("tl_v1_cardb_version");window.location.reload();}
+          else if(id==="reset"){if(window.confirm("Reset all data? This cannot be undone.")){Object.keys(localStorage).filter(k=>k.startsWith("tl_")).forEach(k=>localStorage.removeItem(k));window.location.reload();}}
+        }}
+      />}
       {overlay==="save"&&<SaveDrawer appState={getState()} tunePages={tunePages} onLoad={loadTune} onClose={()=>setOverlay(null)}/>}
       {overlay==="ai"&&<AIScreen onClose={()=>setOverlay(null)}/>}
       {overlay==="about"&&<AboutScreen onClose={()=>setOverlay(null)}/>}
       {overlay==="settings"&&<SettingsScreen units={units} device={inputDevice} onSave={(u,dev)=>{LS.set("tl_v1_units",u);LS.set("tl_v1_device",dev);setUnits(u);setInputDevice(dev);setOverlay(null);}} onClose={()=>setOverlay(null)}/>}
 
       {/* Header */}
-      <div style={{position:"sticky",top:0,zIndex:20,background:C.bg,borderBottom:`1px solid ${C.border}`,padding:"calc(env(safe-area-inset-top, 0px) + 10px) 14px 8px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <div style={{lineHeight:1,position:"relative"}}>
-          <div style={{position:"absolute",bottom:-8,left:0,right:0,height:1,background:"linear-gradient(90deg,rgba(0,255,133,0.2),transparent)"}}/>
-          <div style={{fontFamily:C.fCond,fontSize:26,fontWeight:700,color:C.text,letterSpacing:"0.12em"}}><span style={{color:accentColor}}>Tune</span>Lab</div>
-          <div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}>
-            <div style={{width:7,height:7,borderRadius:"50%",background:C.green,boxShadow:`0 0 8px ${C.green}`,animation:"pulse 2s infinite"}}/>
-            <div style={{fontFamily:C.fMono,fontSize:9,color:C.muted,letterSpacing:"0.08em"}}>FH6 · <span style={{color:C.green}}>v{VERSION}</span></div>
+      <div style={{position:"sticky",top:0,zIndex:20,background:C.bg,borderBottom:`1px solid ${C.border}`,padding:"calc(env(safe-area-inset-top, 0px) + 10px) 14px 8px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          {/* Logo */}
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontFamily:C.fCond,fontSize:22,fontWeight:700,color:C.text,letterSpacing:"0.12em",lineHeight:1}}><span style={{color:accentColor}}>Tune</span>Lab</div>
+            <div style={{fontFamily:C.fMono,fontSize:8,color:C.green,letterSpacing:"0.08em",marginTop:2}}>
+              {carFetchMeta?`● ${carFetchMeta.count} cars · fetched ${Math.round((Date.now()-carFetchMeta.time)/60000)<1?"just now":Math.round((Date.now()-carFetchMeta.time)/60000)+"m ago"}`:"○ offline · cached cars"}
+            </div>
           </div>
-        </div>
-        {/* D/S toggle */}
-        <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:2}}>
-          <div style={{display:"flex",background:C.surface,borderRadius:9,border:`1px solid ${C.border}`,overflow:"hidden"}}>
-            {[{id:"D",label:"D — Quick"},{id:"S",label:"S — Advanced"}].map(m=>(
-              <button key={m.id} onClick={()=>setMode(m.id)} style={{...S.btn,padding:"5px 14px",background:mode===m.id?accentColor:"transparent",color:mode===m.id?onAccent:C.muted,fontFamily:C.fBody,fontSize:12,fontWeight:mode===m.id?600:400,transition:"all 0.15s"}}>
-                {m.id}
+          {/* Quick/Full toggle */}
+          <div style={{display:"flex",background:C.surface,borderRadius:8,border:`1px solid ${C.border}`,overflow:"hidden",flexShrink:0}}>
+            {[{id:"D",label:"⚡ Quick"},{id:"S",label:"⚙ Full"}].map(m=>(
+              <button key={m.id} onClick={()=>setMode(m.id)} style={{...S.btn,padding:"6px 11px",background:mode===m.id?`${accentColor}20`:"transparent",color:mode===m.id?accentColor:C.muted,fontFamily:C.fMono,fontSize:10,fontWeight:mode===m.id?700:400,letterSpacing:"0.05em",transition:"all 0.15s"}}>
+                {m.label}
               </button>
             ))}
           </div>
-          <span style={{fontSize:12,color:C.muted,fontFamily:C.fBody,letterSpacing:"0.02em"}}>
-            {mode==="D"?"D — instant":"S — full math"}
-          </span>
-        </div>
-        <div style={{display:"flex",gap:5}}>
-          <button onClick={()=>setOverlay("ai")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:12}}>✦</button>
-          <button onClick={()=>setOverlay("save")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:14}}>💾</button>
-          <button onClick={()=>setOverlay("about")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:14}}>ℹ</button>
-          <button onClick={()=>setOverlay("settings")} style={{...S.btn,width:30,height:30,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:12}}>⚙</button>
+          {/* Hamburger */}
+          <button onClick={()=>setOverlay("menu")} style={{...S.btn,width:32,height:32,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,color:C.muted,fontSize:17,letterSpacing:1,flexShrink:0}}>☰</button>
         </div>
       </div>
 
       <div style={{flex:1,overflowY:"auto",padding:"10px 14px 130px"}}>
 
-        {/* Car search */}
+{/* Car search */}
         <div style={{marginBottom:10,position:"relative"}}>
           {/* Manufacturer dropdown + search — two-step like ForzaDroid */}
           <div style={{display:"flex",gap:6,marginBottom:6}}>
             <select value={make} onChange={e=>{
               const newMake = e.target.value;
-              const firstModel = CAR_DB[newMake]?.[0]||"";
+              const firstCar = carDB.find(c => c.make === newMake);
+              const firstModel = firstCar ? (firstCar.year ? `${firstCar.model} '${firstCar.year.slice(-2)}` : firstCar.model) : "";
               setMake(newMake);setModel(firstModel);setCarSearch("");
               const details = carDB.find(car=>car.make===newMake&&(car.model===firstModel||car.model.startsWith(firstModel.split(" '")[0]))) || getCarDetails(newMake, firstModel);
               if(details?.drive) setDriveType(details.drive);
@@ -2206,9 +3433,7 @@ export default function ForzaTuner() {
                 </button>
               ))}
             </div>
-            <input type="number" value={pi} onChange={e=>setPi(+e.target.value)} min={100} max={999}
-              style={{width:"100%",...S.mono,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,padding:"7px 10px",color:C.text,fontSize:13,outline:"none"}}
-            />
+            <NumIn label="" value={pi} onChange={setPi} min={100} max={999} step={1}/>
           </div>
         </div>
 
@@ -2248,9 +3473,8 @@ export default function ForzaTuner() {
               <NumIn label="Redline RPM" value={redlineRpm} onChange={setRedlineRpm} unit="rpm" min={2000} max={RPM_SCALES[rpmScale]?.max||15000} step={100}/>
               <NumIn label="Peak torque RPM" value={peakTorqueRpm} onChange={setPeakTorqueRpm} unit="rpm" min={1000} max={redlineRpm} step={100}/>
               <NumIn label={`Max torque (${units.weight==="lbs"?"lb-ft":"Nm"})`} value={maxTorque} onChange={setMaxTorque} unit={units.weight==="lbs"?"lb-ft":"Nm"} min={50} max={2000} step={5}/>
-              <NumIn label={`Top speed (${units.speed})`} value={topspeed} onChange={setTopspeed} unit={units.speed} min={50} max={320} step={5}/>
+              <NumIn label={`Top speed (${units.speed})`} value={topspeed} onChange={setTopspeed} unit={units.speed} min={50} max={units.speed==="km/h"?450:280} step={5}/>
               <NumIn label="Number of gears" value={gears} onChange={setGears} min={4} max={10} step={1}/>
-              <NumIn label="Car height (mm)" value={carHeight} onChange={setCarHeight} unit="mm" min={900} max={2200} step={10} hint="From car specs — affects ARB roll moment calc"/>
             </div>
             {/* Tire sizes — front and rear, supports staggered rim diameters */}
             <div style={{marginBottom:10}}>
@@ -2329,6 +3553,19 @@ export default function ForzaTuner() {
                 ))}
               </div>
             </div>
+            {/* Drag distance selector */}
+            {tuneId==="Drag" && (
+              <div style={{...S.card,padding:"10px 12px",marginBottom:10}}>
+                <div style={{fontFamily:C.fMono,fontSize:9,color:accentColor,letterSpacing:"0.25em",textTransform:"uppercase",marginBottom:8}}>Drag distance</div>
+                <div style={{display:"flex",gap:4}}>
+                  {[["quarter","\u00bc Mile"],["half","\u00bd Mile"],["top","Top Speed"]].map(([val,label])=>(
+                    <button key={val} onClick={()=>setDragDist(val)} style={{...S.btn,flex:1,padding:"6px 4px",borderRadius:6,border:`1px solid ${dragDist===val?accentColor:C.border}`,background:dragDist===val?C.accentLo:"transparent",color:dragDist===val?accentColor:C.muted,fontFamily:C.fBody,fontSize:11,fontWeight:dragDist===val?600:400}}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -2339,7 +3576,7 @@ export default function ForzaTuner() {
           style={{...S.btn,width:"100%",padding:"15px",pointerEvents:"auto",background:`${accentColor}14`,border:`1px solid ${accentColor}44`,borderRadius:6,color:accentColor,fontFamily:C.fCond,fontSize:16,fontWeight:700,letterSpacing:"0.22em",textTransform:"uppercase",boxShadow:"none"}}>
           {loading?"Calculating…":"Deploy Setup"}
         </button>
-        {!isAdvanced && <div style={{textAlign:"center",marginTop:5,fontSize:10,color:C.dim,pointerEvents:"auto"}}>Switch to S mode for gearing + RPM-based math</div>}
+        {!isAdvanced && <div style={{textAlign:"center",marginTop:5,fontSize:10,color:C.dim,pointerEvents:"auto"}}>Switch to ⚙ Full for gearing + RPM-based math</div>}
       </div>
     </div>
   );
