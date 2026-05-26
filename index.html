@@ -1,23 +1,522 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TuneLab — FH6 Tuning Calculator</title>
+<meta name="description" content="Free Forza Horizon 6 tuning calculator. Physics-based suspension math, AI enhancement, 500+ cars. No ads, no paywall, open source.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00ff85;
+  --green-dim: rgba(0,255,133,0.12);
+  --green-border: rgba(0,255,133,0.25);
+  --bg: #080a0f;
+  --bg2: #0d1018;
+  --bg3: #12151e;
+  --text: #e0e0e0;
+  --muted: #666;
+  --dim: #333;
+  --border: #1a1e2a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
 
-  <!-- Edge-to-edge on Android — lets us control status/nav bar area -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 60px;
+  background: rgba(8,10,15,0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px; font-weight: 700;
+  letter-spacing: 0.08em; color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--green); }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a {
+  font-size: 13px; color: var(--muted);
+  text-decoration: none; letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  background: var(--green-dim) !important;
+  border: 1px solid var(--green-border) !important;
+  color: var(--green) !important;
+  padding: 8px 20px !important;
+  border-radius: 6px !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 12px !important;
+  letter-spacing: 0.1em !important;
+}
 
-  <!-- Theme color matches app background — status bar will match -->
-  <meta name="theme-color" content="#080a0f" />
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 80px 24px 60px;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,255,133,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; letter-spacing: 0.25em;
+  color: var(--green); text-transform: uppercase;
+  border: 1px solid var(--green-border);
+  background: var(--green-dim);
+  padding: 6px 16px; border-radius: 20px;
+  margin-bottom: 32px; display: inline-block;
+}
+.hero h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(42px, 8vw, 80px);
+  font-weight: 700; line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.hero h1 span { color: var(--green); }
+.hero-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(13px, 2vw, 16px);
+  color: var(--muted); letter-spacing: 0.2em;
+  text-transform: uppercase; margin-bottom: 24px;
+}
+.hero-desc {
+  max-width: 520px;
+  font-size: 17px; color: #aaa; line-height: 1.8;
+  margin: 0 auto 48px;
+}
+.hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--green); color: #000;
+  font-family: 'Space Mono', monospace;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 14px 28px; border-radius: 8px;
+  text-decoration: none; transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 13px; letter-spacing: 0.1em;
+  padding: 14px 28px; border-radius: 8px;
+  text-decoration: none; transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: #444; color: var(--text); }
+.hero-stats {
+  display: flex; gap: 48px; justify-content: center;
+  margin-top: 64px; flex-wrap: wrap;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px; font-weight: 700; color: var(--green);
+  display: block;
+}
+.stat-label {
+  font-size: 12px; color: var(--muted);
+  letter-spacing: 0.15em; text-transform: uppercase;
+}
 
-  <!-- Android specific -->
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+/* PHONE MOCKUP */
+.phone-wrap {
+  margin: 72px auto 0;
+  width: 260px; position: relative;
+}
+.phone-frame {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 32px;
+  padding: 12px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+}
+.phone-screen {
+  background: var(--bg);
+  border-radius: 22px;
+  overflow: hidden;
+  padding: 16px;
+}
+.phone-header {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px; font-weight: 700;
+  margin-bottom: 4px;
+}
+.phone-header span { color: var(--green); }
+.phone-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px; color: var(--green);
+  letter-spacing: 0.1em; margin-bottom: 14px;
+}
+.phone-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.phone-card-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 7px; color: var(--green);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.phone-row {
+  display: flex; justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #111;
+  font-size: 11px;
+}
+.phone-row:last-child { border-bottom: none; }
+.phone-key { color: #888; }
+.phone-val { color: var(--green); font-family: 'Space Mono', monospace; font-weight: 700; }
 
-  <title>TuneLab</title>
-  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+/* SECTIONS */
+section { padding: 100px 24px; }
+.container { max-width: 960px; margin: 0 auto; }
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; color: var(--green);
+  letter-spacing: 0.3em; text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 700; line-height: 1.2;
+  margin-bottom: 16px;
+}
+.section-desc { font-size: 17px; color: #aaa; max-width: 540px; line-height: 1.8; }
+
+/* FEATURES GRID */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px; margin-top: 56px;
+}
+.feature-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  transition: border-color 0.2s;
+}
+.feature-card:hover { border-color: var(--green-border); }
+.feature-icon {
+  font-size: 22px; margin-bottom: 14px; display: block;
+}
+.feature-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 8px; color: var(--text);
+}
+.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+/* MODES */
+.modes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px; margin-top: 48px;
+}
+.mode-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+.mode-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--muted);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.mode-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px;
+}
+.mode-desc { font-size: 13px; color: var(--muted); }
+
+/* FREE SECTION */
+.free-section {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.free-inner {
+  display: flex; align-items: center;
+  gap: 60px; flex-wrap: wrap;
+}
+.free-text { flex: 1; min-width: 260px; }
+.free-pills { display: flex; flex-direction: column; gap: 10px; min-width: 220px; }
+.pill {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px; color: var(--text);
+}
+.pill-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); flex-shrink: 0;
+}
+
+/* CTA SECTION */
+.cta-section { text-align: center; }
+.cta-section .section-title { margin: 0 auto 12px; }
+.cta-section .section-desc { margin: 0 auto 40px; text-align: center; }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 24px;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 8px;
+}
+.footer-logo span { color: var(--green); }
+.footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+.footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; }
+.footer-links a:hover { color: var(--text); }
+.footer-legal { font-size: 11px; color: var(--dim); line-height: 1.8; max-width: 480px; margin: 0 auto; }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero-stats { gap: 28px; }
+  .free-inner { flex-direction: column; }
+}
+</style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+
+<nav>
+  <a href="#" class="nav-logo"><span>Tune</span>Lab</a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#modes">Tune Modes</a>
+    <a href="https://github.com/super-android/tunelab">GitHub</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://play.google.com/store/apps/details?id=com.tunelab.forzah6" class="nav-cta">Get the app</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">Forza Horizon 6</div>
+  <h1><span>Tune</span>Lab</h1>
+  <div class="hero-sub">FH6 Tuning Calculator</div>
+  <p class="hero-desc">Physics-based suspension math for every car in FH6. Enter your car, pick a mode, get a complete tune in seconds.</p>
+  <div class="hero-actions">
+    <a href="https://play.google.com/store/apps/details?id=com.tunelab.forzah6" class="btn-primary">
+      ↓ Get on Google Play
+    </a>
+    <a href="https://github.com/super-android/tunelab" class="btn-secondary">
+      View on GitHub
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">500+</span><span class="stat-label">Cars</span></div>
+    <div class="stat"><span class="stat-num">8</span><span class="stat-label">Tune Modes</span></div>
+    <div class="stat"><span class="stat-num">Free</span><span class="stat-label">Always</span></div>
+    <div class="stat"><span class="stat-num">0</span><span class="stat-label">Ads</span></div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="phone-header"><span>Tune</span>Lab</div>
+        <div class="phone-meta">● 738 cars · fetched 1m ago</div>
+        <div class="phone-card">
+          <div class="phone-card-label">Nissan GT-R · S1 · AWD · Race</div>
+          <div class="phone-row"><span class="phone-key">Front Spring</span><span class="phone-val">798 lbs/in</span></div>
+          <div class="phone-row"><span class="phone-key">Rear Spring</span><span class="phone-val">1264 lbs/in</span></div>
+          <div class="phone-row"><span class="phone-key">Front ARB</span><span class="phone-val">11.0</span></div>
+          <div class="phone-row"><span class="phone-key">Rear ARB</span><span class="phone-val">60.0</span></div>
+          <div class="phone-row"><span class="phone-key">Final Drive</span><span class="phone-val">3.24</span></div>
+          <div class="phone-row"><span class="phone-key">Tire Pressure</span><span class="phone-val">29.5 psi</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="features">
+  <div class="container">
+    <div class="section-label">What it does</div>
+    <div class="section-title">Everything you need.<br>Nothing you don't.</div>
+    <p class="section-desc">TuneLab calculates a complete FH6 tune from your car's stats. Springs, damping, ARB, alignment, differential, gearing, tires — all of it.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-title">Quick mode</div>
+        <div class="feature-desc">Just PI, weight, and drivetrain. Full tune in under 30 seconds. No RPM data needed.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚙</span>
+        <div class="feature-title">Full mode</div>
+        <div class="feature-desc">Add RPM data, top speed, and tire sizes for a physics-based calculation including gear ratios and final drive.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">✦</span>
+        <div class="feature-title">AI enhancement</div>
+        <div class="feature-desc">Connect your free Gemini key. AI annotates every value with specific notes and flags issues. Your key, your data, your quota.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">◎</span>
+        <div class="feature-title">Feel adjuster</div>
+        <div class="feature-desc">Shift between stable and tail-happy, planted and aggressive. Real-time recalculation as you move the slider.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔧</span>
+        <div class="feature-title">Tuning wizard</div>
+        <div class="feature-desc">Tell the wizard what's wrong — understeer, snap oversteer, bouncy — and get specific fix suggestions.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📡</span>
+        <div class="feature-title">Live car database</div>
+        <div class="feature-desc">500+ FH6 cars updated without an app update. New cars added to the list appear automatically on next launch.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="free-section">
+  <div class="container">
+    <div class="free-inner">
+      <div class="free-text">
+        <div class="section-label">The deal</div>
+        <div class="section-title">Free.<br>Actually free.</div>
+        <p class="section-desc">No ads, no subscriptions, no paywalled features. The full app is free forever. Always has been, always will be. Open source on GitHub so you can see exactly what it does.</p>
+      </div>
+      <div class="free-pills">
+        <div class="pill"><span class="pill-dot"></span>No ads</div>
+        <div class="pill"><span class="pill-dot"></span>No paywall</div>
+        <div class="pill"><span class="pill-dot"></span>No subscriptions</div>
+        <div class="pill"><span class="pill-dot"></span>No account required</div>
+        <div class="pill"><span class="pill-dot"></span>Works offline</div>
+        <div class="pill"><span class="pill-dot"></span>Open source</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="modes">
+  <div class="container">
+    <div class="section-label">Tune modes</div>
+    <div class="section-title">Tuned for how<br>you actually drive.</div>
+    <p class="section-desc">Each mode adjusts the physics targets for its discipline. Pick the one that matches where you're racing.</p>
+    <div class="modes-grid">
+      <div class="mode-card">
+        <div class="mode-tag">Tarmac</div>
+        <div class="mode-name">Track Day</div>
+        <div class="mode-desc">Circuit and road racing</div>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tag">Mountain</div>
+        <div class="mode-name">Touge Run</div>
+        <div class="mode-desc">Tight technical corners</div>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tag">Highway</div>
+        <div class="mode-name">Wangan</div>
+        <div class="mode-desc">High-speed straights</div>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tag">Angle</div>
+        <div class="mode-name">Drift Session</div>
+        <div class="mode-desc">Style and sideways</div>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tag">Straight</div>
+        <div class="mode-name">Drag Run</div>
+        <div class="mode-desc">Launch-focused gearing</div>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tag">Loose</div>
+        <div class="mode-name">Rally Stage</div>
+        <div class="mode-desc">Gravel and dirt</div>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tag">Wet</div>
+        <div class="mode-name">Wet Control</div>
+        <div class="mode-desc">Rain and puddles</div>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tag">General</div>
+        <div class="mode-name">All-Round</div>
+        <div class="mode-desc">Balanced daily driver</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="section-label">Get started</div>
+    <div class="section-title">Stop guessing.<br>Start tuning.</div>
+    <p class="section-desc">Free on Google Play. No account, no setup, no ads. Open the app, pick your car, get your tune.</p>
+    <div class="hero-actions">
+      <a href="https://play.google.com/store/apps/details?id=com.tunelab.forzah6" class="btn-primary">↓ Download on Google Play</a>
+      <a href="https://discord.gg/tunelab" class="btn-secondary">Join the Discord</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo"><span>Tune</span>Lab</div>
+  <div class="footer-links">
+    <a href="https://play.google.com/store/apps/details?id=com.tunelab.forzah6">Google Play</a>
+    <a href="https://github.com/super-android/tunelab">GitHub</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="https://discord.gg/tunelab">Discord</a>
+  </div>
+  <div class="footer-legal">
+    TuneLab is not affiliated with Xbox, Turn 10, or Playground Games.<br>
+    Forza Horizon® is a registered trademark of Microsoft Corporation.
+  </div>
+</footer>
+
 </body>
 </html>
