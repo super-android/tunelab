@@ -10,6 +10,7 @@
         <domain includeSubdomains="true">api.anthropic.com</domain>
         <domain includeSubdomains="true">api.openai.com</domain>
         <domain includeSubdomains="true">api.x.ai</domain>
+        <domain includeSubdomains="true">raw.githubusercontent.com</domain>
         <trust-anchors>
             <certificates src="system"/>
         </trust-anchors>
