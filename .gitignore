@@ -141,3 +141,4 @@ vite.config.ts.timestamp-*
 tunelab.keystore
 *.keystore
 tunelab.keystore
+minecraft-modpack-maker/
