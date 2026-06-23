@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo, Component } from "react";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
-const VERSION       = "1.7.5";
+const VERSION       = "1.7.6";
 
 // PI defaults and ranges per class
 const CLASS_PI = {
@@ -3543,7 +3543,7 @@ const searchResults = carSearch.length > 0
         <div style={{fontFamily:C.fCond,fontSize:24,fontWeight:700,letterSpacing:"0.12em",color:C.text}}><span style={{color:C.green}}>Tune</span>Lab</div>
         <div style={{fontFamily:C.fMono,fontSize:9,color:C.dim,letterSpacing:"0.15em",marginTop:3}}>FH6 · FREE FOREVER · NO ADS</div>
       </div>
-      <div style={{flex:1,padding:"14px 20px",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+      <div style={{padding:"14px 20px 20px"}}>
         <div>
 
           {/* How do you play — units + input device together, one question */}
@@ -3593,7 +3593,7 @@ const searchResults = carSearch.length > 0
         </div>
 
         <button onClick={()=>{LS.set("tl_seen_intro",true);LS.set("tl_v1_units",units);LS.set("tl_v1_device",inputDevice);LS.set("tl_v1_mode",mode);setShowOnboard(false);}}
-          style={{width:"100%",padding:13,marginTop:14,background:`${C.green}14`,border:`1px solid ${C.green}44`,borderRadius:8,color:C.green,fontFamily:C.fMono,fontSize:13,fontWeight:700,letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",flexShrink:0}}>
+          style={{width:"100%",padding:13,marginTop:14,background:`${C.green}14`,border:`1px solid ${C.green}44`,borderRadius:8,color:C.green,fontFamily:C.fMono,fontSize:13,fontWeight:700,letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer"}}>
           Get started →
         </button>
       </div>
