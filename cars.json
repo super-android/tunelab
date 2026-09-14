@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "updated": "2026-06-26",
+  "version": 7,
+  "updated": "2026-09-13",
   "cars": [
     {"make": "Abarth", "model": "595 esseesse", "year": "1968", "drive": "RWD", "cls": "D", "weight": 1350, "ev": false, "pi": 100, "fd": 2.969, "gears": [1.839, 1.326, 1.321, 1.135, 1.12]},
     {"make": "Abarth", "model": "695 Biposto", "year": "2016", "drive": "RWD", "cls": "B", "weight": 997, "ev": false, "pi": 540, "fd": 3.658, "gears": [2.53, 1.646, 1.486, 1.43, 1.422]},
@@ -645,6 +645,30 @@
     {"make": "Wuling", "model": "Hongguang Mini EV Macaron", "year": "2022", "drive": "RWD", "cls": "D", "weight": 700, "ev": true, "pi": 100, "fd": 2.916, "gears": [1.941, 1.621, 1.494, 1.367, 1.367]},
     {"make": "Wuling", "model": "Sunshine S", "year": "2013", "drive": "RWD", "cls": "D", "weight": 1975, "ev": false, "pi": 107, "fd": 4.417, "gears": [2.72, 1.748, 1.684, 1.45, 1.43]},
     {"make": "Wuling", "model": "Sunshine S Forza Edition", "year": "2013", "drive": "RWD", "cls": "S1", "weight": 0, "ev": false, "pi": 800},
-    {"make": "Zenvo", "model": "TSR-S", "year": "2019", "drive": "RWD", "cls": "R", "weight": 1546, "ev": false, "pi": 906, "fd": 4.816, "gears": [2.906, 2.037, 1.651, 1.6, 1.199]}
+    {"make": "Zenvo", "model": "TSR-S", "year": "2019", "drive": "RWD", "cls": "R", "weight": 1546, "ev": false, "pi": 906, "fd": 4.816, "gears": [2.906, 2.037, 1.651, 1.6, 1.199]},
+    {"make": "Abarth", "model": "124 Spider", "year": "2017", "drive": "RWD", "cls": "C", "weight": 1060, "ev": false, "pi": 490, "fd": null, "gears": []},
+    {"make": "Alfa Romeo", "model": "Autodelta Tipo 33/2 Daytona", "year": "1968", "drive": "RWD", "cls": "A", "weight": 580, "ev": false, "pi": 650, "fd": null, "gears": []},
+    {"make": "Aston Martin", "model": "DB7 GT", "year": "2003", "drive": "RWD", "cls": "B", "weight": 1780, "ev": false, "pi": 550, "fd": null, "gears": []},
+    {"make": "Bentley", "model": "Continental GT Speed", "year": "2025", "drive": "AWD", "cls": "A", "weight": 2440, "ev": false, "pi": 699, "fd": null, "gears": []},
+    {"make": "Chevrolet", "model": "Camaro ZL1", "year": "2024", "drive": "RWD", "cls": "S1", "weight": 1770, "ev": false, "pi": 730, "fd": null, "gears": []},
+    {"make": "Dodge", "model": "Challenger SRT Demon 170", "year": "2023", "drive": "RWD", "cls": "A", "weight": 1940, "ev": false, "pi": 683, "fd": null, "gears": []},
+    {"make": "Exomotive", "model": "Exocet Sport V8 XP-5", "year": "2018", "drive": "RWD", "cls": "S1", "weight": 769, "ev": false, "pi": 750, "fd": null, "gears": []},
+    {"make": "Ford", "model": "Thunderbird", "year": "1957", "drive": "RWD", "cls": "D", "weight": 1515, "ev": false, "pi": 320, "fd": null, "gears": []},
+    {"make": "Ginetta", "model": "G40 Junior", "year": "2019", "drive": "RWD", "cls": "D", "weight": 850, "ev": false, "pi": 400, "fd": null, "gears": []},
+    {"make": "Honda", "model": "N600", "year": "1970", "drive": "FWD", "cls": "D", "weight": 550, "ev": false, "pi": 100, "fd": null, "gears": []},
+    {"make": "Honda", "model": "Z GT", "year": "1972", "drive": "FWD", "cls": "D", "weight": 595, "ev": false, "pi": 120, "fd": null, "gears": []},
+    {"make": "Jaguar", "model": "XKR-S GT", "year": "2015", "drive": "RWD", "cls": "A", "weight": 1713, "ev": false, "pi": 680, "fd": null, "gears": []},
+    {"make": "Lamborghini", "model": "Temerario", "year": "2025", "drive": "AWD", "cls": "S2", "weight": 1690, "ev": false, "pi": 860, "fd": null, "gears": []},
+    {"make": "Lancia", "model": "037 Stradale", "year": "1982", "drive": "RWD", "cls": "B", "weight": 1170, "ev": false, "pi": 520, "fd": null, "gears": []},
+    {"make": "Lotus", "model": "Esprit V8", "year": "2002", "drive": "RWD", "cls": "A", "weight": 1380, "ev": false, "pi": 620, "fd": null, "gears": []},
+    {"make": "McLaren", "model": "W1", "year": "2025", "drive": "RWD", "cls": "R", "weight": 1399, "ev": false, "pi": 918, "fd": null, "gears": []},
+    {"make": "Mitsubishi", "model": "Starion ESI-R", "year": "1988", "drive": "RWD", "cls": "C", "weight": 1340, "ev": false, "pi": 450, "fd": null, "gears": []},
+    {"make": "Nissan", "model": "Skyline 2000 Turbo RS", "year": "1983", "drive": "RWD", "cls": "C", "weight": 1175, "ev": false, "pi": 460, "fd": null, "gears": []},
+    {"make": "Porsche", "model": "#203 Porsche AG 961", "year": "1987", "drive": "AWD", "cls": "S1", "weight": 970, "ev": false, "pi": 780, "fd": null, "gears": []},
+    {"make": "Porsche", "model": "911 Carrera Coupe 'Luftauto 002'", "year": "1987", "drive": "RWD", "cls": "B", "weight": 1150, "ev": false, "pi": 561, "fd": null, "gears": []},
+    {"make": "Renault", "model": "Sport Spider", "year": "1998", "drive": "RWD", "cls": "B", "weight": 930, "ev": false, "pi": 508, "fd": null, "gears": []},
+    {"make": "Toyota", "model": "Celica GT", "year": "1974", "drive": "RWD", "cls": "D", "weight": 970, "ev": false, "pi": 250, "fd": null, "gears": []},
+    {"make": "Toyota", "model": "Prius Prime XSE Premium", "year": "2024", "drive": "AWD", "cls": "C", "weight": 1575, "ev": false, "pi": 420, "fd": null, "gears": []},
+    {"make": "Vauxhall", "model": "Astra VXR", "year": "2006", "drive": "FWD", "cls": "B", "weight": 1393, "ev": false, "pi": 599, "fd": null, "gears": []}
   ]
 }
