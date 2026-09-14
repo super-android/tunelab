@@ -156,7 +156,7 @@ const TUNE_PAGES = ["Tires","Gearing","Alignment","Antiroll Bars","Springs","Dam
 
 const AI_PROVIDERS = [
   {id:"none",   label:"Offline only",   icon:"⚙",  color:"#888899", free:true,  soon:false, key:null,      hint:null,            docs:null},
-  {id:"gemini", label:"Google Gemini",  icon:"✦",  color:"#4285f4", free:true,  soon:false, key:"AIza...", hint:"AIza...",        docs:"https://aistudio.google.com/app/apikey"},
+  {id:"gemini", label:"Google Gemini",  icon:"✦",  color:"#4285f4", free:true,  soon:false, key:"AQ...", hint:"AQ... or AIza...", docs:"https://aistudio.google.com/app/apikey"},
   {id:"openai", label:"OpenAI GPT-4o",  icon:"◈",  color:"#10a37f", free:false, soon:false, key:null,      hint:"sk-...",         docs:"https://platform.openai.com/api-keys"},
   {id:"claude", label:"Anthropic Claude",icon:"◇", color:"#6c6cff", free:false, soon:false, key:null,      hint:"sk-ant-api03-...",docs:"https://console.anthropic.com"},
 ];
@@ -196,19 +196,53 @@ function calcTune(s) {
   const cwFL = wKg * frontPct * 0.5;
   const cwRL = wKg * rearPct  * 0.5;
 
-  const isDrift  = tuneId === "Drift";
-  const isDrag   = tuneId === "Drag";
-  const isRain   = tuneId === "Rain";
+  // ── MODE FLAGS — declared early, used throughout including aero physics ──
+  const isDrift   = tuneId === "Drift";
+  const isDrag    = tuneId === "Drag";
+  const isRain    = tuneId === "Rain";
   const isRally   = tuneId === "Rally" || surface === "Dirt" || surface === "Mixed";
   const isOffRoad = tuneId === "Off-Road" || tuneId === "Cross-Country";
   const isTouge   = tuneId === "Touge";
-  const isWangan = tuneId === "Wangan";
-  const isFWD    = driveType === "FWD";
-  const isRWD    = driveType === "RWD";
-  const isAWD    = driveType === "AWD";
-  const isWheel  = inputDevice === "wheel";
-  const isSnow   = surface === "Snow";
-  const pwr2wt   = (units.weight === "lbs" ? maxTorque * 1.356 : maxTorque) / (wKg / 1000);
+  const isWangan  = tuneId === "Wangan";
+  const isFWD     = driveType === "FWD";
+  const isRWD     = driveType === "RWD";
+  const isAWD     = driveType === "AWD";
+  const isWheel   = inputDevice === "wheel";
+  const isSnow    = surface === "Snow";
+  const pwr2wt    = (units.weight === "lbs" ? maxTorque * 1.356 : maxTorque) / (wKg / 1000);
+
+  // ── AERO PHYSICS ─────────────────────────────────────────────────────────
+  // FH6 doesn't expose per-car Cd values anywhere in the UI, so we can't
+  // use real-world values. Instead we derive effective Cd from the setup:
+  //   Cd_eff = Cd_base(0.32) + k * totalDownforce_kg
+  //   where k=0.00008 is empirically calibrated so max wing (~1000kg total)
+  //   adds ~0.08 to Cd — consistent with community testing.
+  //
+  // More importantly: downforce presses the car at high speed, increasing
+  // effective corner weight. Springs and damping must be stiffer to handle
+  // this load. We add the aero contribution proportionally to each corner:
+  //   eff_cwFL = cwFL + aeroF * frontPct * 0.5
+  //   eff_cwRL = cwRL + aeroR * rearPct  * 0.5
+  // This flows through to calcSpring and fSpringPhys/rSpringPhys (which
+  // feed damping) automatically, without special-casing anything.
+  //
+  // For non-aero setups: aeroF=aeroR=0, so eff_cw = cw exactly — no change.
+  // For low aero (50F/100R kg): ~3% stiffer springs — negligible, correct.
+  // For full race aero (400F/600R kg): ~27-40% stiffer — significant, correct.
+  const aeroF_kg = hasAero ? aeroF : 0;
+  const aeroR_kg = hasAero ? aeroR : 0;
+
+  // Effective Cd — derived from setup, never user-entered (FH6 hides real Cd)
+  // Base 0.32 is a safe generic default; wing adds drag proportional to load
+  const effectiveCd = 0.32 + 0.00008 * (aeroF_kg + aeroR_kg);
+
+  // Aero-adjusted corner weights — flow into all spring/damping/ARB math
+  // Only applied for speed modes (circuit, wangan, drag) where aero loads
+  // are relevant. Rally/offroad/drift use base corner weights to avoid
+  // over-stiffening at lower speeds where downforce is negligible.
+  const aeroSpeedMode = !isRally && !isOffRoad && !isDrift && !isSnow;
+  const eff_cwFL = cwFL + (aeroSpeedMode ? aeroF_kg * frontPct * 0.5 : 0);
+  const eff_cwRL = cwRL + (aeroSpeedMode ? aeroR_kg * rearPct  * 0.5 : 0);
 
   // ── PI-based natural frequency (ForzaTune polynomial method)
   // baseFreq scales with car class: D≈2.45Hz → X≈3.8Hz
@@ -238,8 +272,8 @@ function calcTune(s) {
     if (sUnit === "kgf/mm") return +(k / 9806.65 * 10).toFixed(2);   // game's "kgf/mm" = true kgf/cm
     return +(k / 175.127).toFixed(1);
   };
-  let fSpring = calcSpring(cwFL, freq.f);
-  let rSpring = calcSpring(cwRL, freq.r);
+  let fSpring = calcSpring(eff_cwFL, freq.f);
+  let rSpring = calcSpring(eff_cwRL, freq.r);
 
   // Feel adjuster: balance slider shifts front/rear spring ratio
   const balanceMod = (feelBalance - 50) / 200; // -0.25 to +0.25
@@ -247,12 +281,26 @@ function calcTune(s) {
   rSpring = +(rSpring * (1 - balanceMod)).toFixed(1);
 
   // ── RIDE HEIGHT
-  // Ride height in cm (native Forza unit) — validated against in-game suspension screen
-  // Ride height — game minimum is 15cm. Drag nose-down via rear bias not front lowering.
-  const fRideCm = isDrift ? 15.5 : isRally ? 20.0 : isSnow ? 22.0 : isDrag ? 15.0 : 15.0;
-  const rRideCm = isDrift ? 15.0 : isRally ? 19.0 : isSnow ? 21.0 : isDrag ? 17.0 : 15.0;
-  const fRide = fRideCm; // cm
-  const rRide = rRideCm; // cm
+  // FH6 ride height in cm — slider minimum is 15.0 cm for road/race parts.
+  // Community standard: 1-2 clicks above minimum for race builds to allow
+  // suspension travel without bottoming. Rally/offroad/snow need real clearance.
+  // "1 click" = 0.1 cm on the in-game slider.
+  const fRideCm = isOffRoad ? 20.0
+                : isSnow    ? 21.0
+                : isRally   ? 19.0
+                : isDrag    ? 15.0   // nose-down for launch — stay at floor
+                : isDrift   ? 15.3   // slightly higher for angle transitions
+                : isWangan  ? 15.1   // flat road, 1 click clearance
+                :             15.2;  // circuit/touge/general — 2 clicks above floor
+  const rRideCm = isOffRoad ? 20.5
+                : isSnow    ? 21.5
+                : isRally   ? 19.5
+                : isDrag    ? 15.5   // rear slightly higher than front = nose-down
+                : isDrift   ? 15.2
+                : isWangan  ? 15.1
+                :             15.2;
+  const fRide = fRideCm;
+  const rRide = rRideCm;
 
   // ── DAMPING (critical damping ratio method)
   // Rebound ≈ 0.65–0.75 × critical, Bump ≈ 0.5–0.6 × critical
@@ -262,10 +310,15 @@ function calcTune(s) {
   // kgf/mm and N/mm display (FH6 mislabels per-cm as per-mm — see calcSpring).
   // Re-deriving physics spring directly from mass+frequency avoids the
   // 10x round-trip bug that previously sent every damping value to ceiling.
-  const fSpringPhys = cwFL * Math.pow(2 * Math.PI * freq.f, 2) * (1 + balanceMod);
-  const rSpringPhys = cwRL * Math.pow(2 * Math.PI * freq.r, 2) * (1 - balanceMod);
-  const critDampF = 2 * Math.sqrt(cwFL * fSpringPhys);
-  const critDampR = 2 * Math.sqrt(cwRL * rSpringPhys);
+  // CRITICAL: fSpringPhys uses eff_cwFL (aero-adjusted) for spring rate since
+  // springs must support total load at speed. But damping uses physical mass
+  // only (cwFL) — aerodynamic force is velocity-dependent and external, it
+  // does not add inertia to the chassis frame under suspension stroke recoil.
+  // Using eff_cwFL for damping overcooks shock stiffness on high-downforce builds.
+  const fSpringPhys = eff_cwFL * Math.pow(2 * Math.PI * freq.f, 2) * (1 + balanceMod);
+  const rSpringPhys = eff_cwRL * Math.pow(2 * Math.PI * freq.r, 2) * (1 - balanceMod);
+  const critDampF = 2 * Math.sqrt(cwFL * fSpringPhys);  // physical mass, not aero-adjusted
+  const critDampR = 2 * Math.sqrt(cwRL * rSpringPhys);  // physical mass, not aero-adjusted
   // Damping ratios from PHYSICS constants, scaled by horizonDampMult for FH6
   // ForzaTune FH6 step04 confirmed:
   // bump = critDamp×stepd×0.00101972 / (1+divisor), rebound = total - bump
@@ -335,6 +388,15 @@ function calcTune(s) {
   fARB = +Math.max(1, Math.min(65, fARB - arbFeel)).toFixed(1);
   rARB = +Math.max(1, Math.min(65, rARB + arbFeel)).toFixed(1);
 
+  // Aero balance adjustment: rear-heavy downforce = rear grip advantage,
+  // front ARB needs stiffening to match and prevent high-speed understeer.
+  // Capped at +8 on front so it doesn't override the base setup entirely.
+  // Not applied for drift/rally/offroad where aero isn't a significant factor.
+  if (hasAero && aeroSpeedMode && (aeroR_kg + aeroF_kg) > 50) {
+    const aeroImbalance = (aeroR_kg - aeroF_kg) / 200; // 0–4 range for typical values
+    fARB = +Math.max(1, Math.min(65, fARB + aeroImbalance * 2)).toFixed(1);
+  }
+
   // ── ALIGNMENT
   // Camber: FH6 uses 0 to -2° range — real-world aggressive camber doesn't work here
   // Community standard: RWD more front than rear, FWD more rear than front, AWD close together
@@ -358,6 +420,23 @@ function calcTune(s) {
     fCamber = +(avg - 0.1).toFixed(1);
     rCamber = +(avg + 0.1).toFixed(1);
     if (fCamber >= rCamber) rCamber = +(fCamber + 0.3).toFixed(1);
+  }
+
+  // ── FRONT TIRE WIDTH EFFECT ON CAMBER AND ARB ──────────────────────────
+  // Wider front tires have a larger contact patch, which increases grip
+  // but also requires the patch to be loaded more precisely — this means
+  // slightly more negative camber to keep it flat under cornering load.
+  // It also shifts the mechanical grip balance forward, so front ARB needs
+  // softening to prevent understeer from the extra front grip.
+  //
+  // Baseline: 225mm. Each 25mm above baseline: -0.1° camber, -1.5 pts ARB.
+  // Each 25mm below baseline: +0.1° camber (less contact = less negative needed).
+  // Only applied for modes where cornering grip matters — not drag/snow.
+  if (!isDrag && !isSnow) {
+    const fTireW = parseFloat((tireWF||"225").toString().split(/[\/R]/)[0]) || 225;
+    const fWidthDelta = (fTireW - 225) / 25; // units of 25mm deviation from baseline
+    fCamber = +Math.max(-2.0, Math.min(0, fCamber + fWidthDelta * -0.1)).toFixed(1);
+    fARB = +Math.max(1, Math.min(65, fARB + fWidthDelta * -1.5)).toFixed(1);
   }
   // Toe: max ±0.3°, prefer small front out for agility, rear in for stability
   let fToe = isDrag ? 0.0 : isDrift ? 0.2 : isRally ? 0.0 : -0.1; // slight out for rotation
@@ -670,9 +749,8 @@ function calcTune(s) {
     Aero: hasAero ? { values:[
       {key:"Front Downforce", value:units.weight==="lbs" ? `${Math.round(aeroF*2.205)} lbs` : `${aeroF} kg`},
       {key:"Rear Downforce",  value:units.weight==="lbs" ? `${Math.round(aeroR*2.205)} lbs` : `${aeroR} kg`},
-      {key:"Drag Cd",         value:dragCd.toFixed(2)},
       {key:"Aero Balance",    value:aeroF+aeroR>0?`${Math.round(aeroF/(aeroF+aeroR)*100)}% F / ${Math.round(aeroR/(aeroF+aeroR)*100)}% R`:"N/A"},
-    ], tip: isDrag?"Drag tune: minimise front downforce, run max rear for straight-line stability. Cd matters more than balance.":isWangan?"High speed: raise rear downforce first for stability, match front to taste.":"Rear-heavy aero balance (40F/60R) keeps the car planted without inducing understeer. Increase rear if fast corners feel loose." } : null,
+    ], tip: isDrag?"Drag tune: minimise front downforce, run max rear for straight-line stability.":isWangan?"High speed: raise rear downforce first for stability, match front to taste.":"Rear-heavy aero balance (40F/60R) keeps the car planted without inducing understeer. Increase rear if fast corners feel loose." } : null,
   };
 }
 
@@ -683,9 +761,9 @@ async function validateKey(providerId, apiKey) {
   try {
     if(providerId==="gemini") {
       // Use models list — no quota consumed, also tells us what models are available
-      const url=`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=20`;
+      const url=`https://generativelanguage.googleapis.com/v1beta/models?pageSize=20`;
       let r;
-      try { r = await fetch(url,{method:"GET"}); }
+      try { r = await fetch(url,{method:"GET",headers:{"x-goog-api-key":apiKey}}); }
       catch(e) { return {ok:false, msg:"Network error — check internet connection and try again"}; }
       if(r.status===400) return {ok:false, msg:"Invalid key — check you copied it correctly"};
       if(r.status===401) return {ok:false, msg:"Key rejected — regenerate it at aistudio.google.com"};
@@ -703,7 +781,7 @@ async function validateKey(providerId, apiKey) {
         const bestModel = has25?"gemini-2.5-flash":has20?"gemini-2.0-flash":has15?"gemini-1.5-flash":null;
         if(!bestModel) return {ok:false, msg:"No usable Gemini model found on this key"};
         // Test a tiny generation call to detect $0 spending cap
-        const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/${bestModel}:generateContent?key=${apiKey}`;
+        const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/${bestModel}:generateContent`;
         const testR = await fetch(testUrl,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":apiKey},body:JSON.stringify({contents:[{role:"user",parts:[{text:"Hi"}]}],generationConfig:{maxOutputTokens:1}})});
         if(testR.status===429) return {ok:false, msg:"⚠ Spending cap detected — go to aistudio.google.com → Settings → Billing and remove the $0.00 spending cap, then test again"};
         if(testR.status===403) return {ok:false, msg:"Key not authorised — enable Gemini API in Google AI Studio"};
@@ -2227,12 +2305,14 @@ const MAKES = [
   "DeBerti",
   "DeLorean",
   "Dodge",
+  "Exomotive",
   "Ferrari",
   "Ford",
   "Formula Drift",
   "Funco",
   "GMC",
   "GR",
+  "Ginetta",
   "Gordon Murray",
   "HSV",
   "Hennessey",
@@ -2284,6 +2364,7 @@ const MAKES = [
   "Subaru",
   "TVR",
   "Toyota",
+  "Vauxhall",
   "Volkswagen",
   "Volvo",
   "Wuling",
@@ -3973,11 +4054,11 @@ const searchResults = carSearch.length > 0
                   <NumIn label={`Front downforce (${units.weight==="lbs"?"lbs":"kg"})`}
                     value={units.weight==="lbs" ? Math.round(aeroF*2.205) : aeroF}
                     onChange={v => setAeroF(units.weight==="lbs" ? Math.round(v/2.205) : v)}
-                    unit={units.weight==="lbs"?"lbs":"kg"} min={units.weight==="lbs"?220:100} max={units.weight==="lbs"?2205:1000} step={units.weight==="lbs"?10:5}/>
+                    unit={units.weight==="lbs"?"lbs":"kg"} min={0} max={units.weight==="lbs"?2205:1000} step={units.weight==="lbs"?10:5}/>
                   <NumIn label={`Rear downforce (${units.weight==="lbs"?"lbs":"kg"})`}
                     value={units.weight==="lbs" ? Math.round(aeroR*2.205) : aeroR}
                     onChange={v => setAeroR(units.weight==="lbs" ? Math.round(v/2.205) : v)}
-                    unit={units.weight==="lbs"?"lbs":"kg"} min={units.weight==="lbs"?220:100} max={units.weight==="lbs"?2205:1000} step={units.weight==="lbs"?10:5}/>
+                    unit={units.weight==="lbs"?"lbs":"kg"} min={0} max={units.weight==="lbs"?2205:1000} step={units.weight==="lbs"?10:5}/>
                 </div>
               )}
             </div>
